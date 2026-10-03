@@ -1,0 +1,19 @@
+# Environment & dependencies
+node_modules/
+.env
+.env.local
+
+# Vercel
+.vercel
+
+# Python
+__pycache__/
+*.pyc
+
+# Local scratch / test files
+scratch_*
+*.log
+*.tmp
+
+# Raw/heavy model archive (not served in production web)
+assets/models_archive/

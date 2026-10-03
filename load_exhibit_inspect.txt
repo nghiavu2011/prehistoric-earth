@@ -1,0 +1,157 @@
+function loadExhibit(exhibit) {
+      currentExhibit = exhibit;
+      updateUIContent();
+
+      document.getElementById('stage-bg-layer').style.backgroundImage = `url('${exhibit.background}')`;
+
+      stageStatus.classList.remove('hidden');
+      progressBar.style.width = '20%';
+
+      while (mainDinoGroup.children.length > 0) {
+        const obj = mainDinoGroup.children[0];
+        mainDinoGroup.remove(obj);
+      }
+      if (mixer) {
+        mixer.stopAllAction();
+        mixer.uncacheRoot(mixer.getRoot());
+      }
+      mixer = null;
+
+      const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+
+      // Nếu đang ở chế độ Skeleton và loài có skeletonFile thì nạp skeletonFile
+      let targetFile = exhibit.modelFile;
+      if (currentPeelMode === "skeleton" && exhibit.skeletonFile) {
+        targetFile = exhibit.skeletonFile;
+      }
+
+      loader.load(
+        targetFile,
+        (gltf) => {
+          const model = gltf.scene;
+
+          model.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              if (child.material) {
+                // Áp dụng bóc tách X-Ray nếu slider > 0
+                if (currentPeelPercent > 0 || currentPeelMode === "xray") {
+                  const factor = currentPeelMode === "xray" ? 0.45 : (1.0 - (currentPeelPercent / 100) * 0.7);
+                  child.material.transparent = true;
+                  child.material.opacity = factor;
+                  child.material.wireframe = currentPeelPercent > 60;
+                } else {
+                  child.material.transparent = false;
+                  child.material.opacity = 1.0;
+                  child.material.wireframe = false;
+                }
+                child.material.depthWrite = true;
+                child.material.depthTest = true;
+                if (child.material.color) child.material.color.setHex(0xffffff);
+                if (child.material.emissive) child.material.emissive.setHex(0x000000);
+                child.material.roughness = Math.min(Math.max(child.material.roughness || 0.65, 0.4), 0.8);
+                child.material.metalness = Math.min(child.material.metalness || 0.05, 0.2);
+                child.material.needsUpdate = true;
+              }
+            }
+          });
+
+          model.position.set(0, 0, 0);
+          model.scale.setScalar(1);
+          model.rotation.set(0, exhibit.rotationOffsetY, 0);
+          model.updateMatrixWorld(true);
+
+          let box = new THREE.Box3().setFromObject(model);
+          let size = new THREE.Vector3();
+          box.getSize(size);
+          const rawLength = Math.max(size.x, size.z);
+          const targetMeters = exhibit.realLengthMeters;
+          const scaleFactor = targetMeters / rawLength;
+          model.scale.setScalar(scaleFactor);
+          model.updateMatrixWorld(true);
+
+          box = new THREE.Box3().setFromObject(model);
+          let center = new THREE.Vector3();
+          box.getCenter(center);
+
+          model.position.x = -center.x;
+          model.position.z = -center.z;
+
+          if (exhibit.isFlying) {
+            model.position.y = 5.5;
+            shadowReceiverPlane.visible = false;
+          } else {
+            model.position.y = -box.min.y;
+            shadowReceiverPlane.visible = true;
+          }
+          model.updateMatrixWorld(true);
+
+          mainDinoGroup.add(model);
+
+          const finalBox = new THREE.Box3().setFromObject(model);
+          const finalSize = new THREE.Vector3();
+          finalBox.getSize(finalSize);
+          const finalCenter = new THREE.Vector3();
+          finalBox.getCenter(finalCenter);
+
+          // Cập nhật quy mô bóng tiếp xúc mềm mại dưới chân
+          if (softContactShadowMesh) {
+            const baseW = Math.max(finalSize.x * 1.35, 2.5);
+            const baseL = Math.max(finalSize.z * 1.35, 3.5);
+            softContactShadowMesh.userData.baseW = baseW;
+            softContactShadowMesh.userData.baseL = baseL;
+            const factor = 1.0 + (currentShadowBlur - 1.0) * 0.04;
+            softContactShadowMesh.scale.set(baseW * factor, 1, baseL * factor);
+            softContactShadowMesh.position.set(0, 0.012, 0);
+            softContactShadowMesh.visible = !exhibit.isFlying;
+          }
+
+          // TỰ ĐỘNG CÂN CHỈNH CAMERA BAO TRỌN FULL BODY (HEAD-TO-TAIL FIT):
+          const maxDim = Math.max(finalSize.x, finalSize.y, finalSize.z);
+          const vFov = camera.fov * (Math.PI / 180);
+          let camDist = (maxDim / 2) / Math.tan(vFov / 2);
+          camDist = Math.max(camDist * 1.45, 6.0); // 45% lề an toàn để view toàn thân cực kỳ thoáng mắt
+
+          const targetY = exhibit.isFlying ? 5.5 : finalCenter.y;
+          CAMERA_PRESETS.FULL.target.set(0, targetY, 0);
+
+          controls.target.copy(CAMERA_PRESETS.FULL.target);
+
+          // Đặt góc nhìn phối cảnh điện ảnh 3/4 kinh điển
+          const viewAngle = 0.52;
+          const camX = Math.sin(viewAngle) * camDist * 0.95;
+          const camY = targetY + finalSize.y * 0.22 + camDist * 0.15;
+          const camZ = Math.cos(viewAngle) * camDist * 0.95;
+
+          CAMERA_PRESETS.FULL.pos.set(camX, camY, camZ);
+          CAMERA_PRESETS.FULL.position = CAMERA_PRESETS.FULL.pos;
+          camera.position.set(camX, camY, camZ);
+          controls.minDistance = 1.5;
+          controls.maxDistance = Math.max(camDist * 3.5, 65.0);
+          controls.update();
+
+          if (gltf.animations && gltf.animations.length > 0) {
+            mixer = new THREE.AnimationMixer(model);
+            const action = mixer.clipAction(gltf.animations[0]);
+            action.play();
+          }
+
+          progressBar.style.width = '100%';
+          setTimeout(() => { stageStatus.classList.add('hidden'); }, 200);
+        },
+        (xhr) => {
+          if (xhr.lengthComputable) {
+            const pct = Math.round((xhr.loaded / xhr.total) * 100);
+            progressBar.style.width = pct + '%';
+          }
+        },
+        (error) => {
+          console.error("Lỗi nạp mô hình:", error);
+          stageStatus.classList.add('hidden');
+        }
+      );
+    }
+
+    

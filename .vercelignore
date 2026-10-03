@@ -1,0 +1,10 @@
+﻿assets/models_archive/
+.git/
+scratch_*
+*.log
+*.tmp
+__pycache__/
+build_prep.py
+generate_v4.py
+generate_v5.py
+prototype_v5_backup.html

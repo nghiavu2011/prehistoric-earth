@@ -1,0 +1,3907 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảo Tàng Tri Thức 3D — Khủng Long Tiền Sử (Interactive 3D Dinosaur Museum)</title>
+  
+  <!-- Phông chữ Google Fonts chuẩn Quốc tế & Tiếng Việt -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- Three.js & Loaders từ CDN Unpkg (ES Module) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-cream: #faf8f5;
+      --bg-cream-dark: #f0ede6;
+      --text-main: #1c1a17;
+      --text-muted: #5e5952;
+      --text-faint: #918b82;
+      --accent-forest: #2b4c3f;
+      --accent-forest-hover: #1e362c;
+      --accent-terracotta: #b85d38;
+      --accent-gold: #c89d47;
+      --accent-cyan: #1a7a82;
+      --border-subtle: rgba(43, 76, 63, 0.14);
+      --border-strong: rgba(43, 76, 63, 0.28);
+      --shadow-sm: 0 2px 8px rgba(28, 26, 23, 0.06);
+      --shadow-md: 0 8px 24px rgba(28, 26, 23, 0.1);
+      --shadow-lg: 0 16px 40px rgba(28, 26, 23, 0.14);
+      --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --sidebar-width: 440px;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 18px;
+      --radius-full: 9999px;
+      --transition-base: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOP HEADER */
+    .app-header {
+      height: 56px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(250, 248, 245, 0.96);
+      backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 40;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: 1.12rem;
+      letter-spacing: 0.08em;
+      font-weight: 700;
+      color: var(--accent-forest);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-title span.badge {
+      font-family: var(--font-body);
+      font-size: 0.65rem;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      background: rgba(43, 76, 63, 0.08);
+      color: var(--accent-forest);
+      border: 1px solid var(--border-subtle);
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .lang-switcher {
+      display: flex;
+      background: var(--bg-cream-dark);
+      padding: 3px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-subtle);
+    }
+    .lang-btn {
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+    }
+    .lang-btn.active {
+      background: #ffffff;
+      color: var(--accent-forest);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    }
+
+    /* APP WORKSPACE */
+    .app-workspace {
+      display: flex;
+      height: calc(100vh - 56px);
+      width: 100vw;
+      position: relative;
+      overflow: hidden;
+      background: #0f0e0c;
+    }
+
+    /* 3D STAGE */
+    .stage-container {
+      flex: 1;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      transition: flex var(--transition-base);
+    }
+
+    /* LỚP ẢNH NỀN HẬU CẢNH */
+    .stage-bg-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center 60%;
+      z-index: 1;
+      transition: filter 0.65s cubic-bezier(0.16, 1, 0.3, 1), background-image 0.6s ease;
+    }
+
+    /* HIỆU ỨNG MÀU NƯỚC MỜ DẦN RA BIÊN */
+    .stage-bg-layer.watercolor-mode {
+      filter: blur(3.5px) saturate(0.85) brightness(0.92);
+      mask-image: radial-gradient(circle at 50% 50%, black 30%, rgba(0,0,0,0.65) 65%, transparent 100%);
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, black 30%, rgba(0,0,0,0.65) 65%, transparent 100%);
+    }
+
+    /* HIỆU ỨNG CHUYỂN MÙA KHÔNG KHÍ */
+    .season-atmosphere-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      mix-blend-mode: soft-light;
+    }
+    .season-atmosphere-overlay.active {
+      opacity: 1;
+    }
+
+    /* TOAST THÔNG BÁO MÙA */
+    .season-toast {
+      position: absolute;
+      top: 64px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: rgba(22, 20, 18, 0.92);
+      color: #f7f5f0;
+      padding: 7px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      z-index: 30;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .season-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* 3D CANVAS VIEWPORT */
+    .canvas-viewport {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      touch-action: none;
+      outline: none;
+    }
+
+    /* TOP CONTROLS BAR */
+    .stage-top-bar {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 15;
+      pointer-events: none;
+      gap: 8px;
+    }
+
+    .cluster-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      pointer-events: auto;
+    }
+
+    .pill-btn {
+      padding: 5px 12px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-full);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .pill-btn:hover { background: #ffffff; transform: translateY(-1px); }
+    .pill-btn.active {
+      background: var(--accent-forest);
+      color: #ffffff;
+      border-color: var(--accent-forest);
+    }
+    .pill-btn.accent-btn {
+      background: rgba(43, 122, 130, 0.92);
+      color: #ffffff;
+      border-color: var(--accent-cyan);
+    }
+    .pill-btn.accent-btn:hover {
+      background: var(--accent-cyan);
+    }
+
+    /* POPOVERS (TÙY CHỈNH NGƯỜI, BÓNG ĐỔ, BÓC TÁCH GIẢI PHẪU) */
+    .app-popover {
+      position: absolute;
+      top: 50px;
+      width: 320px;
+      background: rgba(250, 248, 245, 0.98);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      box-shadow: var(--shadow-lg);
+      z-index: 25;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .app-popover.open { display: flex; }
+    
+    #peeler-popover { left: 14px; }
+    #human-popover { left: 130px; }
+    #shadow-popover { left: 270px; }
+
+    .popover-header {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-forest);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 6px;
+    }
+    .popover-header span.close-btn {
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .tuner-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .tuner-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .tuner-slider {
+      width: 100%;
+      height: 5px;
+      accent-color: var(--accent-forest);
+      cursor: pointer;
+    }
+    .preset-chip-row {
+      display: flex;
+      gap: 5px;
+      margin-top: 4px;
+    }
+    .preset-chip {
+      flex: 1;
+      padding: 5px 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      background: #ffffff;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .preset-chip:hover { background: #f0ede6; }
+    .preset-chip.active {
+      background: var(--accent-forest);
+      color: #ffffff;
+      border-color: var(--accent-forest);
+    }
+
+    /* VÒNG TRÒN LA BÀN HƯỚNG BÓNG ĐỔ */
+    .compass-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      margin-top: 4px;
+    }
+    .compass-dial {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px dashed var(--accent-forest);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-cream-dark);
+      transition: transform 0.1s linear;
+    }
+    .compass-needle {
+      position: absolute;
+      width: 2px;
+      height: 18px;
+      background: var(--accent-terracotta);
+      top: 4px;
+      transform-origin: bottom center;
+      border-radius: 1px;
+    }
+    .compass-needle::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -2px;
+      width: 6px;
+      height: 6px;
+      background: var(--accent-terracotta);
+      border-radius: 50%;
+    }
+
+    /* FLOATING ZOOM */
+    .stage-zoom-controls {
+      position: absolute;
+      bottom: 84px;
+      left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 15;
+    }
+    .zoom-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.15rem;
+      font-weight: 600;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+    }
+    .zoom-btn:hover { background: #ffffff; color: var(--accent-forest); transform: scale(1.06); }
+
+    /* THƯỚC ĐO KHOẢNG CÁCH TRÊN MẶT ĐẤT */
+    .ruler-badge {
+      position: absolute;
+      bottom: 84px;
+      left: 64px;
+      padding: 6px 14px;
+      background: rgba(26, 24, 21, 0.92);
+      color: #f7f5f0;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid var(--accent-gold);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+      z-index: 15;
+      display: none;
+      align-items: center;
+      gap: 7px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* DINOSAUR RAIL */
+    .stage-dino-rail {
+      position: absolute;
+      bottom: 12px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px 2px;
+      z-index: 15;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    }
+    .stage-dino-rail::-webkit-scrollbar { height: 4px; }
+    .stage-dino-rail::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 4px; }
+
+    .dino-tab {
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(26, 24, 21, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: var(--radius-full);
+      color: #ede9e1;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition-base);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dino-tab:hover { background: rgba(43, 76, 63, 0.9); color: #ffffff; }
+    .dino-tab.active {
+      background: #ffffff;
+      color: var(--accent-forest);
+      border-color: #ffffff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      font-weight: 700;
+    }
+
+    /* NÚT THU GỌN / MỞ RỘNG SIDEBAR */
+    .sidebar-toggle-btn {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--border-subtle);
+      border-right: none;
+      border-radius: 6px 0 0 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 35;
+      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+      transition: all var(--transition-base);
+      color: var(--accent-forest);
+    }
+    .sidebar-toggle-btn:hover { background: #ffffff; width: 28px; }
+
+    /* INFO SIDEBAR */
+    .info-sidebar {
+      width: var(--sidebar-width);
+      height: 100%;
+      background: var(--bg-cream);
+      border-left: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 24px 28px 48px;
+      gap: 20px;
+      position: relative;
+      z-index: 30;
+      transition: margin-right var(--transition-base), opacity var(--transition-base);
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .app-workspace.sidebar-collapsed .info-sidebar {
+      margin-right: calc(-1 * var(--sidebar-width));
+      opacity: 0;
+      pointer-events: none;
+    }
+    .app-workspace.sidebar-collapsed .sidebar-toggle-btn {
+      right: 0;
+    }
+    .app-workspace.sidebar-collapsed .sidebar-toggle-btn svg {
+      transform: rotate(180deg);
+    }
+
+    /* TIÊU ĐỀ KHỦNG LONG */
+    .info-title-group h1 {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+      color: var(--accent-forest);
+      margin-bottom: 4px;
+    }
+    .info-title-group p.subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+    .info-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      background: rgba(184, 93, 56, 0.1);
+      color: var(--accent-terracotta);
+      margin-bottom: 8px;
+    }
+
+    .info-intro-p {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    /* KHẢO CỔ HỌC ĐỐI CHỨNG */
+    .observation-box {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-gold);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      color: var(--text-muted);
+    }
+    .observation-box strong { color: var(--text-main); display: block; margin-bottom: 2px; }
+
+    /* BẢNG AUDIO THUYẾT MINH STUDIO */
+    .narration-panel {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .narration-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+    .voice-selection-row {
+      display: flex;
+      gap: 8px;
+    }
+    .voice-btn {
+      flex: 1;
+      padding: 7px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--bg-cream-dark);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all var(--transition-base);
+    }
+    .voice-btn.active {
+      background: var(--accent-forest);
+      color: #ffffff;
+      border-color: var(--accent-forest);
+    }
+    .play-audio-btn {
+      width: 100%;
+      padding: 9px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--accent-forest);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(43, 76, 63, 0.2);
+    }
+    .play-audio-btn:hover { background: var(--accent-forest-hover); }
+
+    /* FACTS GRID */
+    .facts-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .facts-header {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-faint);
+    }
+    .facts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .fact-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .fact-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-faint);
+    }
+    .fact-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .fact-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* PROMPT CARD */
+    .prompt-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .prompt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent-terracotta);
+    }
+    .copy-btn {
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-cream-dark);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #ffffff; }
+    .prompt-text-area {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--text-muted);
+      background: var(--bg-cream);
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-subtle);
+      max-height: 100px;
+      overflow-y: auto;
+      user-select: all;
+    }
+
+    /* LOADING BAR */
+    .stage-status {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(26, 24, 21, 0.94);
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      z-index: 25;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .stage-status.hidden { opacity: 0; pointer-events: none; }
+    .status-progress-track {
+      width: 140px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .status-progress-bar {
+      width: 30%;
+      height: 100%;
+      background: var(--accent-gold);
+      transition: width 0.2s ease;
+    }
+
+    /* UPLOAD INPUT HIDDEN */
+    .upload-input-hidden { display: none; }
+
+    /* ==========================================================================
+       MODAL 1: QUẢ ĐỊA CẦU CỔ SINH & ĐỊA TẦNG HÓA THẠCH (PALEO-GLOBE MODAL)
+       ========================================================================== */
+    .app-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 12, 10, 0.82);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .app-modal-backdrop.open { display: flex; }
+
+    .modal-container {
+      width: 100%;
+      max-width: 960px;
+      max-height: 90vh;
+      background: var(--bg-cream);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-strong);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+    .modal-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      color: var(--accent-forest);
+      letter-spacing: 0.04em;
+    }
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-cream-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--text-muted);
+    }
+    .modal-close-btn:hover { background: #ffffff; color: var(--text-main); }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* TRỤC THỜI GIAN ĐỊA CHẤT */
+    .strat-timeline-row {
+      display: flex;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 6px;
+      gap: 6px;
+    }
+    .strat-period-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+    .strat-period-btn:hover { background: var(--bg-cream-dark); }
+    .strat-period-btn.active {
+      background: var(--accent-forest);
+      color: #ffffff;
+    }
+    .strat-period-btn strong { font-size: 0.85rem; }
+    .strat-period-btn span { font-size: 0.7rem; opacity: 0.85; }
+
+    /* PALEO-GLOBE VIEW CONTAINER */
+    .paleo-view-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+    }
+    .globe-canvas-wrap {
+      width: 100%;
+      height: 340px;
+      background: #090e14;
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .globe-canvas-wrap canvas { width: 100% !important; height: 100% !important; }
+
+    .globe-overlay-tag {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      padding: 4px 10px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: var(--radius-full);
+      font-size: 0.72rem;
+      color: #f7f5f0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      pointer-events: none;
+    }
+
+    .strat-dossier-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .strat-dossier-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent-terracotta);
+    }
+    .dossier-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .dossier-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-faint);
+    }
+    .dossier-val {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* ==========================================================================
+       MODAL 2: BẢN QUYỀN MỞ & NGUỒN GỐC BẢO TÀNG (OPEN ACCESS LICENSES)
+       ========================================================================== */
+    .license-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .license-card {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .license-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(43, 76, 63, 0.1);
+      color: var(--accent-forest);
+      width: fit-content;
+    }
+    .license-card h3 { font-size: 0.92rem; color: var(--text-main); }
+    .license-card p { font-size: 0.78rem; line-height: 1.45; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="brand-title">
+      <span>Bảo Tàng Tri Thức 3D</span>
+      <span class="badge">V0.4 • 18 Tiêu Bản Cổ Sinh</span>
+    </div>
+
+    <div class="header-actions">
+      <!-- Mở Bản Đồ Quả Địa Cầu Cổ Sinh & Mỏ Hóa Thạch -->
+      <button class="pill-btn accent-btn" id="btn-open-paleo-modal" title="Xem quả địa cầu cổ sinh 3D, sự trôi dạt lục địa và mỏ hóa thạch">
+        <span>🌍</span>
+        <span>Địa Cầu & Niên Đại</span>
+      </button>
+
+      <!-- Mở Modal Bản Quyền Bảo Tàng -->
+      <button class="pill-btn" id="btn-open-license-modal" title="Tra cứu nguồn mở và giấy phép bản quyền bảo tàng (CC0 / CC-BY)">
+        <span>🏛️</span>
+        <span>Bản Quyền Nguồn Mở</span>
+      </button>
+
+      <!-- Toàn màn hình -->
+      <button class="pill-btn" id="btn-fullscreen" title="Bật/Tắt Toàn Màn Hình">
+        <span>⛶</span>
+        <span id="ui-btn-fs">Toàn màn hình</span>
+      </button>
+
+      <!-- Ngôn ngữ -->
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="vi">VI</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- WORKSPACE -->
+  <main class="app-workspace" id="app-workspace">
+    
+    <!-- 3D STAGE -->
+    <div class="stage-container" id="stage-container">
+      
+      <!-- HẬU CẢNH THỜI TIỀN SỬ -->
+      <div class="stage-bg-layer watercolor-mode" id="stage-bg-layer"></div>
+
+      <!-- LỚP KHÍ HẬU CHUYỂN MÙA -->
+      <div class="season-atmosphere-overlay" id="season-atmosphere-overlay"></div>
+
+      <!-- TOAST THÔNG BÁO MÙA MƯỢT MÀ -->
+      <div class="season-toast" id="season-toast">
+        <span id="season-toast-text">🌸 Chuyển sang Mùa Xuân Tiền Sử</span>
+      </div>
+
+      <!-- 3D WEBGL VIEWPORT -->
+      <div class="canvas-viewport" id="webgl-canvas-wrap"></div>
+
+      <!-- LOADING INDICATOR -->
+      <div class="stage-status" id="stage-status">
+        <span style="font-size: 0.85rem; font-weight: 600;" id="status-text">Đang tái hiện mô hình 3D...</span>
+        <div class="status-progress-track">
+          <div class="status-progress-bar" id="status-progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- THANH ĐIỀU KHIỂN TRÊN CÙNG -->
+      <div class="stage-top-bar">
+        
+        <!-- Cụm trái: Tách Lớp Giải Phẫu & Tỷ lệ người & Bóng đổ & Màu nước -->
+        <div class="cluster-group">
+          <!-- Bóc tách 3 Lớp Giải phẫu học -->
+          <button class="pill-btn" id="btn-open-peeler-tuner" title="Bóc tách giải phẫu 3 lớp: Da sống ⇄ Khung xương ⇄ Hóa thạch">
+            <span>🧬</span>
+            <span id="ui-btn-peeler">Tách Lớp Giải Phẫu</span>
+          </button>
+
+          <!-- Bật / Tùy chỉnh Người so sánh -->
+          <button class="pill-btn" id="btn-toggle-human" title="Bật / Tắt mô hình Người Joe 1.75m để đối chứng kích thước">
+            <span>🧍</span>
+            <span id="ui-btn-human">So sánh Người (1.75m)</span>
+          </button>
+          
+          <!-- Mở Popover chỉnh khoảng cách & hướng người -->
+          <button class="pill-btn" id="btn-open-human-tuner" title="Tùy chỉnh khoảng cách (2.5m - 12.5m) và vị trí đứng của người">
+            <span>⚙️ Vị trí Người</span>
+          </button>
+
+          <!-- Bật Popover chỉnh Bóng đổ & Mặt trời -->
+          <button class="pill-btn" id="btn-open-shadow-tuner" title="Tùy chỉnh độ rõ nét, góc bóng đứng hoặc trải dài và hướng mặt trời">
+            <span>☀️ Bóng & Ánh Sáng</span>
+          </button>
+
+          <!-- Toggle Màu nước mờ biên -->
+          <button class="pill-btn active" id="btn-toggle-watercolor" title="Bật/Tắt hiệu ứng màu nước mờ dần ra biên để làm nổi bật 3D Model">
+            <span>🎨</span>
+            <span id="ui-btn-watercolor">Nền màu nước</span>
+          </button>
+        </div>
+
+        <!-- Cụm phải: 4 Mùa & Đổi ảnh nền -->
+        <div class="cluster-group">
+          <!-- 4 Mùa Tiền Sử -->
+          <div style="display: flex; gap: 4px; background: rgba(255, 255, 255, 0.94); padding: 3px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle); box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <button class="pill-btn active" data-season="spring" style="padding: 4px 8px; border:none; box-shadow:none; font-size:0.74rem;">🌸 Xuân</button>
+            <button class="pill-btn" data-season="summer" style="padding: 4px 8px; border:none; box-shadow:none; font-size:0.74rem;">☀️ Hạ</button>
+            <button class="pill-btn" data-season="autumn" style="padding: 4px 8px; border:none; box-shadow:none; font-size:0.74rem;">🍂 Thu</button>
+            <button class="pill-btn" data-season="winter" style="padding: 4px 8px; border:none; box-shadow:none; font-size:0.74rem;">❄️ Đông</button>
+          </div>
+
+          <!-- Tải ảnh nền cá nhân -->
+          <label class="pill-btn" for="input-bg-upload" style="cursor: pointer;" title="Tải ảnh nền tùy ý từ máy tính">
+            🖼️ <span id="ui-btn-custom-bg">Đổi ảnh nền</span>
+          </label>
+          <input type="file" id="input-bg-upload" class="upload-input-hidden" accept="image/*">
+        </div>
+      </div>
+
+      <!-- POPOVER 0: BỘ BÓC TÁCH 3 LỚP GIẢI PHẪU HỌC (TRI-LAYER PEELER) -->
+      <div class="app-popover" id="peeler-popover">
+        <div class="popover-header">
+          <span>🧬 Bóc Tách Giải Phẫu Học 3 Lớp</span>
+          <span class="close-btn" id="close-peeler-popover">&times;</span>
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Chế độ hiển thị 3 Lớp</span>
+          </div>
+          <div class="preset-chip-row">
+            <button class="preset-chip active" id="btn-layer-living">🦕 Da Sống</button>
+            <button class="preset-chip" id="btn-layer-skeleton">🦴 Khung Xương</button>
+            <button class="preset-chip" id="btn-layer-xray">🩻 X-Ray</button>
+          </div>
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Độ bóc tách X-Ray (Nhìn xuyên xương)</span>
+            <span id="lbl-peel-val" style="color: var(--accent-cyan);">0% (Đặc khối)</span>
+          </div>
+          <input type="range" class="tuner-slider" id="slider-peel-xray" min="0" max="100" step="5" value="0">
+        </div>
+      </div>
+
+      <!-- POPOVER 1: BỘ ĐỊNH VỊ NGƯỜI SO SÁNH (KHOẢNG CÁCH & VỊ TRÍ) -->
+      <div class="app-popover" id="human-popover">
+        <div class="popover-header">
+          <span>🧍 Định vị Người So Sánh (1.75m)</span>
+          <span class="close-btn" id="close-human-popover">&times;</span>
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Khoảng cách đến chân Khủng long</span>
+            <span id="lbl-human-dist-val" style="color: var(--accent-forest);">10.0 mét</span>
+          </div>
+          <input type="range" class="tuner-slider" id="slider-human-dist" min="2.0" max="15.0" step="0.5" value="10.0">
+          <div class="preset-chip-row">
+            <button class="preset-chip" data-hdist="2.5">2.5m</button>
+            <button class="preset-chip" data-hdist="5.0">5.0m</button>
+            <button class="preset-chip" data-hdist="7.5">7.5m</button>
+            <button class="preset-chip active" data-hdist="10.0">10m</button>
+            <button class="preset-chip" data-hdist="12.5">12.5m</button>
+          </div>
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Vị trí đứng tương quan</span>
+            <span id="lbl-human-pos-val" style="color: var(--accent-terracotta);">Bên phải</span>
+          </div>
+          <div class="preset-chip-row">
+            <button class="preset-chip active" data-hpos="right">👉 Bên phải</button>
+            <button class="preset-chip" data-hpos="left">👈 Bên trái</button>
+            <button class="preset-chip" data-hpos="front">⬆️ Phía trước</button>
+            <button class="preset-chip" data-hpos="behind">⬇️ Đằng sau</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POPOVER 2: BỘ ĐIỀU KHIỂN BÓNG ĐỔ & MẶT TRỜI CHUYÊN SÂU -->
+      <div class="app-popover" id="shadow-popover">
+        <div class="popover-header">
+          <span>☀️ Bộ Điều Khiển Bóng Đổ & Ánh Sáng</span>
+          <span class="close-btn" id="close-shadow-popover">&times;</span>
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Độ rõ nét / Mờ biên (Softness)</span>
+            <span id="lbl-shadow-blur-val">2.5</span>
+          </div>
+          <input type="range" class="tuner-slider" id="slider-shadow-blur" min="1.0" max="25.0" step="0.5" value="8.0">
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Độ đậm bóng đổ (Opacity)</span>
+            <span id="lbl-shadow-op-val">0.52</span>
+          </div>
+          <input type="range" class="tuner-slider" id="slider-shadow-op" min="0.1" max="0.9" step="0.05" value="0.52">
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Độ dài bóng đổ (Góc chiếu đứng/xiên)</span>
+            <span id="lbl-sun-elev-val">50° (Chuẩn)</span>
+          </div>
+          <input type="range" class="tuner-slider" id="slider-sun-elev" min="15" max="85" step="1" value="50">
+          <div class="preset-chip-row">
+            <button class="preset-chip" id="btn-shadow-noon">☀️ Đứng bóng</button>
+            <button class="preset-chip active" id="btn-shadow-natural">🌄 Tự nhiên</button>
+            <button class="preset-chip" id="btn-shadow-sunset">🌅 Trải dài</button>
+          </div>
+        </div>
+
+        <div class="tuner-row">
+          <div class="tuner-label">
+            <span>Hướng chiếu bóng đổ (360° La bàn)</span>
+            <span id="lbl-sun-azimuth-val">Đông Nam (135°)</span>
+          </div>
+          <input type="range" class="tuner-slider" id="slider-sun-azimuth" min="0" max="360" step="5" value="135">
+          <div class="compass-box">
+            <div class="compass-dial" id="compass-dial">
+              <div class="compass-needle" id="compass-needle"></div>
+            </div>
+            <div style="display: flex; gap: 4px;">
+              <button class="preset-chip" data-az="90">Đông</button>
+              <button class="preset-chip" data-az="270">Tây</button>
+              <button class="preset-chip" data-az="180">Nam</button>
+              <button class="preset-chip" data-az="0">Bắc</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Zoom Controls -->
+      <div class="stage-zoom-controls">
+        <button class="zoom-btn" id="btn-zoom-in" aria-label="Phóng to">+</button>
+        <button class="zoom-btn" id="btn-zoom-out" aria-label="Thu nhỏ">−</button>
+      </div>
+
+      <!-- THƯỚC ĐO KHOẢNG CÁCH TRÊN MẶT ĐẤT -->
+      <div class="ruler-badge" id="ruler-badge">
+        <span>📏</span>
+        <span id="ruler-badge-text">Khoảng cách: <strong>10.0 mét</strong> (Bên phải) • Tỉ lệ người 1:1</span>
+      </div>
+
+      <!-- Dinosaur Exhibit Switcher Rail -->
+      <div class="stage-dino-rail" id="dino-rail" role="tablist">
+        <!-- Render từ JS -->
+      </div>
+
+      <!-- Mũi tên Ẩn / Hiện Sidebar -->
+      <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" aria-label="Ẩn / Hiện thông tin chi tiết" title="Ẩn / Hiện khung thông tin (Xem toàn màn hình 3D)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- SIDEBAR THÔNG TIN KHOA HỌC -->
+    <aside class="info-sidebar" id="info-sidebar">
+      
+      <!-- Tiêu đề -->
+      <div class="info-title-group">
+        <div class="info-badge" id="exhibit-tag">Khủng long Ceratopsia</div>
+        <h1 id="exhibit-name">Triceratops</h1>
+        <p class="subtitle" id="exhibit-subtitle">Người khổng lồ ba sừng của cuối Kỷ Phấn Trắng</p>
+      </div>
+
+      <!-- Giới thiệu -->
+      <p class="info-intro-p" id="exhibit-intro">
+        Triceratops sống ở khu vực phía tây Bắc Mỹ khoảng 68–66 triệu năm trước. Hộp sọ khổng lồ dài tới 2.5m, ba chiếc sừng nhọn và phần diềm cổ rộng khiến nó trở thành loài khủng long biểu tượng nhất.
+      </p>
+
+      <!-- Gợi ý quan sát đối chứng -->
+      <div class="observation-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        <div>
+          <strong>Gợi ý nhà cổ sinh vật học</strong>
+          <p id="exhibit-observation">Hãy quan sát tỉ lệ tương quan: Người Joe cao 1.75m đứng cách chân khủng long 10.0m và cùng nhìn về một hướng!</p>
+        </div>
+      </div>
+
+      <!-- BẢN THUYẾT MINH ÂM THANH TIẾNG VIỆT CHUẨN NAM/NỮ MIỀN BẮC -->
+      <div class="narration-panel">
+        <div class="narration-header">
+          <span>Thuyết minh khảo cổ học</span>
+          <span id="audio-status-label" style="color: var(--accent-forest); font-weight: 600;">Sẵn sàng</span>
+        </div>
+
+        <div class="voice-selection-row">
+          <button class="voice-btn active" id="btn-voice-male">
+            <span>🎙️</span>
+            <span>Nam (Thời sự)</span>
+          </button>
+          <button class="voice-btn" id="btn-voice-female">
+            <span>🎙️</span>
+            <span>Nữ (Diễn cảm)</span>
+          </button>
+        </div>
+
+        <button class="btn btn-primary play-audio-btn" id="btn-play-audio">
+          <svg id="audio-icon-play" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <svg id="audio-icon-stop" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display: none;">
+            <rect x="6" y="4" width="4" height="16"/>
+            <rect x="14" y="4" width="4" height="16"/>
+          </svg>
+          <span id="ui-play-btn-text">Nghe thuyết minh (Giọng Nam)</span>
+        </button>
+      </div>
+
+      <!-- Facts Grid -->
+      <div class="facts-section">
+        <h2 class="facts-header">Dữ liệu khảo cổ học đối chứng (Tỉ lệ 1:1)</h2>
+        <div class="facts-grid">
+          
+          <div class="fact-card">
+            <div class="fact-label">Thời kỳ</div>
+            <div class="fact-val" id="fact-val-period">Kỷ Phấn Trắng</div>
+            <div class="fact-sub" id="fact-sub-period">68–66 Ma (Maastrichtian)</div>
+          </div>
+
+          <div class="fact-card">
+            <div class="fact-label">Chế độ ăn</div>
+            <div class="fact-val" id="fact-val-diet">Thực vật</div>
+            <div class="fact-sub" id="fact-sub-diet">Dương xỉ, lá kim, mè gai</div>
+          </div>
+
+          <div class="fact-card">
+            <div class="fact-label">Chiều dài thật</div>
+            <div class="fact-val" id="fact-val-length">8.5 mét</div>
+            <div class="fact-sub" id="fact-sub-length">Cao 3.0m tại hông</div>
+          </div>
+
+          <div class="fact-card">
+            <div class="fact-label">Khối lượng</div>
+            <div class="fact-val" id="fact-val-mass">6–10 tấn</div>
+            <div class="fact-sub" id="fact-sub-mass">Gấp đôi voi châu Phi</div>
+          </div>
+
+          <div class="fact-card" style="grid-column: span 2;">
+            <div class="fact-label">Hệ tầng địa chất</div>
+            <div class="fact-val" id="fact-val-loc">Hệ tầng Hell Creek</div>
+            <div class="fact-sub" id="fact-sub-loc">Bắc Mỹ (Montana, Wyoming, Alberta)</div>
+          </div>
+
+        </div>
+      </div>
+
+
+
+    </aside>
+  </main>
+
+  <!-- ==========================================================================
+       MODAL 1: QUẢ ĐỊA CẦU CỔ SINH & ĐỊA TẦNG HÓA THẠCH (PALEO-GLOBE MODAL)
+       ========================================================================== -->
+  <div class="app-modal-backdrop" id="paleo-modal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h2 style="margin: 0;">🌍 Quả Địa Cầu Cổ Sinh & Mỏ Hóa Thạch Khảo Cổ</h2>
+          <button id="btn-globe-fullscreen" style="background: var(--bg-cream-dark); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 4px 10px; font-size: 0.74rem; font-weight: 600; cursor: pointer;">⛶ Phóng to Địa cầu</button>
+        </div>
+        <button class="modal-close-btn" id="close-paleo-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- TRỤC THỜI GIAN ĐỊA CHẤT -->
+        <div class="strat-timeline-row">
+          <button class="strat-period-btn" data-period="triassic">
+            <strong>Kỷ Tam Điệp (Triassic)</strong>
+            <span>252–201 Ma • Siêu lục địa Pangaea</span>
+          </button>
+          <button class="strat-period-btn" data-period="jurassic">
+            <strong>Kỷ Jura (Jurassic)</strong>
+            <span>201–145 Ma • Laurasia & Gondwana</span>
+          </button>
+          <button class="strat-period-btn active" data-period="cretaceous">
+            <strong>Kỷ Phấn Trắng (Cretaceous)</strong>
+            <span>145–66 Ma • Lục địa phân tán & T-Rex</span>
+          </button>
+        </div>
+
+        <!-- GRID QUẢ ĐỊA CẦU & THẺ HỆ TẦNG -->
+        <div class="paleo-view-grid">
+          <div class="globe-canvas-wrap" id="globe-canvas-wrap">
+            <div class="globe-overlay-tag" id="globe-overlay-tag">Kỷ Phấn Trắng • Kéo chuột để xoay địa cầu 3D</div>
+          </div>
+
+          <div class="strat-dossier-card">
+            <div class="strat-dossier-title">Hồ sơ khảo sát địa tầng hiện trường</div>
+            
+            <div class="dossier-item">
+              <div class="dossier-label">Hệ tầng khai quật (Formation)</div>
+              <div class="dossier-val" id="dossier-formation">Hệ tầng Hell Creek (Bắc Mỹ)</div>
+            </div>
+
+            <div class="dossier-item">
+              <div class="dossier-label">Tọa độ địa lý cổ (Paleo-Coordinates)</div>
+              <div class="dossier-val" id="dossier-coords">52.4° Bắc • 68.2° Tây (Biển nội địa Western Interior)</div>
+            </div>
+
+            <div class="dossier-item">
+              <div class="dossier-label">Tầng đá trầm tích (Rock Matrix)</div>
+              <div class="dossier-val" id="dossier-matrix">Sa thạch xám mịn, sét than bùn ven đầm lầy</div>
+            </div>
+
+            <div class="dossier-item">
+              <div class="dossier-label">Độ sâu địa tầng & Phương pháp định tuổi</div>
+              <div class="dossier-val" id="dossier-dating">Tầng đỉnh Maastrichtian • 66.8 Ma (Đồng vị Argon-Argon)</div>
+            </div>
+
+            <div class="dossier-item">
+              <div class="dossier-label">Phát hiện đầu tiên & Taphonomy</div>
+              <div class="dossier-val" id="dossier-discoverer">1889 • Othniel Charles Marsh (Hóa thạch đầu tiên nguyên vẹn sọ)</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: BẢN QUYỀN MỞ & NGUỒN GỐC BẢO TÀNG (OPEN ACCESS LICENSES)
+       ========================================================================== -->
+  <div class="app-modal-backdrop" id="license-modal">
+    <div class="modal-container" style="max-width: 800px;">
+      <div class="modal-header">
+        <h2>🏛️ Thẩm Định Bản Quyền Mở & Ghi Công Bảo Tàng (Open Science)</h2>
+        <button class="modal-close-btn" id="close-license-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-muted);">
+          Toàn bộ các tiêu bản 3D sử dụng trong Bảo Tàng Tri Thức 3D được tuyển chọn nghiêm ngặt từ các viện bảo tàng và chương trình số hóa di sản văn hóa mở hàng đầu thế giới với giấy phép kiểm chứng minh bạch:
+        </p>
+
+        <div class="license-grid">
+          <div class="license-card">
+            <span class="license-badge">CC0 1.0 Universal</span>
+            <h3>Smithsonian Institution 3D</h3>
+            <p>Bản quét 3D giải phẫu tiêu bản Triceratops và các mẫu vật cổ sinh vật học thuộc phạm vi công cộng (Public Domain), toàn quyền sử dụng phi thương mại và nghiên cứu khoa học.</p>
+          </div>
+
+          <div class="license-card">
+            <span class="license-badge">CC-BY 4.0 International</span>
+            <h3>Naturhistorisches Museum Wien</h3>
+            <p>Bảo tàng Lịch sử Tự nhiên Viên (Áo). Cung cấp các bản photogrammetry hộp sọ Protoceratops và tiêu bản hóa thạch kỷ Phấn Trắng sa mạc Gobi.</p>
+          </div>
+
+          <div class="license-card">
+            <span class="license-badge">Open Access Education</span>
+            <h3>Natural History Museum London</h3>
+            <p>Bảo tàng Lịch sử Tự nhiên Luân Đôn. Cung cấp bản quét 3D tổ trứng hóa thạch Maiasaura khai quật năm 2020 phục vụ giáo dục cộng đồng.</p>
+          </div>
+
+          <div class="license-card">
+            <span class="license-badge">CC-BY 4.0 Creative Commons</span>
+            <h3>Sketchfab Cultural Heritage</h3>
+            <p>Các nghệ sĩ và viện khảo cổ học quốc tế chia sẻ mẫu 3D rigged & textured mô phỏng động học sinh học với quyền ghi công tác giả mở.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+    /* ==========================================================================
+       HƯỚNG NHÌN CHUẨN CỦA KHỦNG LONG VÀ NGƯỜI
+       - Toàn bộ khủng long và người đều nhìn cùng một hướng duy nhất (Profile quay phải 3/4)
+       ========================================================================== */
+    const TARGET_FACING_ANGLE = -0.25;
+
+    /* ==========================================================================
+       1. CƠ SỞ DỮ LIỆU CỔ SINH VẬT HỌC — 18 TIÊU BẢN ĐẠI TRUNG SINH
+       ========================================================================== */
+    const EXHIBITS = [
+      {
+        id: "triceratops",
+        nameVi: "Triceratops",
+        nameEn: "Triceratops",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "68–66 Ma (Maastrichtian)",
+        timeScaleEn: "68–66 Ma (Maastrichtian)",
+        modelFile: "./assets/models/triceratops.glb",
+        skeletonFile: "./assets/models/triceratops_skeleton.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 8.5,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Hell Creek (Montana, Bắc Mỹ)",
+        paleoCoords: "52.4° Bắc • 68.2° Tây",
+        rockMatrix: "Sa thạch xám mịn, sét bùn ven sông",
+        datingMethod: "66.8 Ma • Đồng vị Argon-Argon",
+        discoverer: "1889 • Othniel Charles Marsh",
+        prompt: "Vast cinematic prehistoric landscape of the Late Cretaceous Hell Creek Formation, sprawling lush wetlands, ancient flowering magnolias, giant bald cypresses, low Cretaceous ferns and cycads, golden afternoon sun rays casting long shadows across meandering riverbank, 16:9 widescreen eye-level framing, hyper-realistic natural museum diorama backdrop, tranquil and wild, high detail, no dinosaurs in the scene.",
+        vi: {
+          tag: "Khủng long Ceratopsia",
+          subtitle: "Người khổng lồ ba sừng của cuối Kỷ Phấn Trắng",
+          intro: "Triceratops sở hữu hộp sọ khổng lồ dài tới 2.5m, ba chiếc sừng nhọn và phần diềm cổ rộng khiến nó trở thành biểu tượng phòng thủ dũng mãnh nhất chống lại kẻ săn mồi T-Rex.",
+          obs: "Người Joe cao 1.75m đứng cạnh đối chứng tỷ lệ. Riêng phần hộp sọ đã dài hơn cả chiều cao người trưởng thành!",
+          diet: "Thực vật",
+          dietSub: "Dương xỉ, lá kim, mè gai",
+          length: "8.5 mét",
+          lengthSub: "Cao 3.0m tại hông",
+          mass: "6–10 tấn",
+          massSub: "Gấp đôi voi châu Phi",
+          loc: "Hệ tầng Hell Creek",
+          locSub: "Bắc Mỹ (Montana, Wyoming)"
+        },
+        en: {
+          tag: "Ceratopsian dinosaur",
+          subtitle: "The three-horned giant of the Late Cretaceous",
+          intro: "Triceratops sported a massive 2.5m skull, three formidable horns, and a solid bony neck frill, representing the pinnacle of herbivore defense.",
+          obs: "Compare proportions with human Joe (1.75m). The skull alone exceeds human height!",
+          diet: "Herbivore",
+          dietSub: "Ferns, cycads, conifers",
+          length: "8.5 metres",
+          lengthSub: "Hip height ~3.0m",
+          mass: "6–10 tonnes",
+          massSub: "Twice an African elephant",
+          loc: "Hell Creek Formation",
+          locSub: "North America"
+        }
+      },
+      {
+        id: "triceratops_skeleton",
+        nameVi: "Triceratops (Khung xương)",
+        nameEn: "Triceratops (Skeleton)",
+        periodVi: "Bảo tàng Hoàng gia",
+        periodEn: "Museum Exhibition",
+        timeScaleVi: "Bản quét 3D Giải phẫu",
+        timeScaleEn: "3D Anatomical Scan",
+        modelFile: "./assets/models/triceratops_skeleton.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 8.5,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Phòng Trưng Bày Quốc Tế (Bảo tàng Cổ sinh)",
+        paleoCoords: "Bản quét Smithsonian Open Access",
+        rockMatrix: "Mẫu vật lắp dựng tiêu chuẩn Articulated Mount",
+        datingMethod: "Bản quét 3D laser giải phẫu",
+        discoverer: "Bộ sưu tập Cổ sinh vật học Hoàng gia",
+        prompt: "Grand prestigious natural history museum exhibition hall, polished dark marble platform floor with subtle reflection, warm museum architectural spotlights illuminating the center stage, neoclassical architectural columns and arched windows in soft background bokeh, calm editorial atmosphere, museum diorama background, no other exhibits.",
+        vi: {
+          tag: "Khảo cổ học Hóa thạch",
+          subtitle: "Khung xương giải phẫu hoàn chỉnh trong bảo tàng",
+          intro: "Bản quét 3D bộ xương hóa thạch Triceratops prorsus tái hiện chi tiết từng đốt sống, xương sườn và cấu trúc hộp sọ rỗng đồ sộ theo tiêu chuẩn bảo tàng quốc tế.",
+          obs: "Người Joe đứng cạnh nhìn thấy toàn bộ cấu trúc xương sọ diềm cổ 2.5m và bộ khung nâng đỡ thể trọng 10 tấn.",
+          diet: "Tiêu bản hóa thạch",
+          dietSub: "Bảo tàng Lịch sử Tự nhiên",
+          length: "8.5 mét",
+          lengthSub: "Khung xương giải phẫu 1:1",
+          mass: "Hóa thạch đá",
+          massSub: "Bộ xương hoàn chỉnh",
+          loc: "Phòng Trưng bày Quốc tế",
+          locSub: "Bảo tàng Cổ sinh vật học"
+        },
+
+      {
+        id: "t_rex",
+        nameVi: "Tyrannosaurus Rex",
+        nameEn: "Tyrannosaurus Rex",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "68–66 Ma (Maastrichtian)",
+        timeScaleEn: "68–66 Ma (Maastrichtian)",
+        modelFile: "./assets/models/t_rex.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 12.3,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        groundOffsetY: -4.55,
+        isFlying: false,
+        formation: "Hệ tầng Lance & Hell Creek (Bắc Mỹ)",
+        paleoCoords: "51.8° Bắc • 67.5° Tây",
+        rockMatrix: "Trầm tích phù sa châu thổ cổ đại",
+        datingMethod: "67.0 Ma • Đồng vị Argon-Argon",
+        discoverer: "1902 • Barnum Brown (AMNH)",
+        prompt: "Late Cretaceous subtropical floodplain at dusk, ancient sequoia and ginkgo groves with sprawling fern undergrowth, mist rising from murky primordial bayous, dramatic twilight sky with deep amber and dusky indigo clouds, 16:9 panoramic eye-level view, atmospheric lighting, quiet primeval stillness, 8k resolution, no dinosaurs in the image.",
+        vi: {
+          tag: "Khủng long Theropoda",
+          subtitle: "Vua săn mồi đỉnh cao của Kỷ Phấn Trắng",
+          intro: "Tyrannosaurus rex dài hơn 12 mét, cao gần 4 mét tại hông với lực cắn khủng khiếp lên tới 35.000 Newton, đủ sức nghiền nát xương của mọi con mồi.",
+          obs: "Người Joe đứng cạnh chỉ cao ngang đầu gối của T-Rex! Chiếc đầu bạo chúa khổng lồ có thể nuốt trọn một người lớn.",
+          diet: "Ăn thịt",
+          dietSub: "Triceratops, Edmontosaurus",
+          length: "12.3 mét",
+          lengthSub: "Cao gần 4.0m tại hông",
+          mass: "8–9 tấn",
+          massSub: "Vua bạo chúa tiền sử",
+          loc: "Hệ tầng Hell Creek & Lance",
+          locSub: "Bắc Mỹ"
+        },
+        en: {
+          tag: "Theropod dinosaur",
+          subtitle: "Apex predator of the Late Cretaceous",
+          intro: "Tyrannosaurus rex was over 12 meters long with bone-crushing jaws capable of exerting immense bite force.",
+          obs: "The human reaches only knee-level to the giant predator.",
+          diet: "Carnivore",
+          dietSub: "Ceratopsids, hadrosaurs",
+          length: "12.3 metres",
+          lengthSub: "Hip height ~4.0m",
+          mass: "8–9 tonnes",
+          massSub: "Heavier than an elephant",
+          loc: "Hell Creek & Lance Formations",
+          locSub: "North America"
+        }
+      },
+      {
+        id: "maiasaura_nest",
+        nameVi: "Tổ Trứng Maiasaura",
+        nameEn: "Maiasaura Fossil Nest",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "76.7 Ma (Campanian)",
+        timeScaleEn: "76.7 Ma (Campanian)",
+        modelFile: "./assets/models/maiasaura_nest.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 2.5,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Two Medicine (Montana, Mỹ)",
+        paleoCoords: "48.2° Bắc • 75.1° Tây",
+        rockMatrix: "Bùn kết xám và tro núi lửa mịn bảo tồn phôi",
+        datingMethod: "76.7 Ma • Bảo tàng NHM London",
+        discoverer: "1978 • Jack Horner & Bob Makela",
+        prompt: "Close-up eye-level view of prehistoric communal dinosaur nesting grounds in late Cretaceous semi-arid plains, dry mud nest craters with straw-like plant bedding, distant volcanic smoke plumes, warm harsh sunlight, photorealistic 8k museum background, no creatures.",
+        vi: {
+          tag: "Bằng Chứng Hóa Thạch (NHM London)",
+          subtitle: "Tổ khủng long ấp trứng hóa thạch nguyên bản",
+          intro: "Bản quét 3D từ Bảo tàng Lịch sử Tự nhiên Luân Đôn tái hiện tổ ấp hình miệng núi lửa bằng bùn của Maiasaura ('Người mẹ thằn lằn tốt lành'), chứa các quả trứng hóa thạch xếp vòng tròn.",
+          obs: "Đây là bằng chứng hóa thạch chấn động thế giới chứng minh khủng long biết xây tổ, ủ ấm trứng và chăm sóc con non chu đáo như loài chim ngày nay!",
+          diet: "Tiêu bản tổ trứng",
+          dietSub: "Bảo tàng NHM London",
+          length: "Đường kính 2.5m",
+          lengthSub: "Chứa 15–20 quả trứng",
+          mass: "Hóa thạch nguyên khối",
+          massSub: "Bảo tồn phôi non",
+          loc: "Hệ tầng Two Medicine",
+          locSub: "Montana (Bắc Mỹ)"
+        },
+        en: {
+          tag: "Fossil Evidence (NHM London)",
+          subtitle: "Original fossilized dinosaur nesting site",
+          intro: "3D photogrammetry scan from the Natural History Museum London showing a Maiasaura mud nest crater with concentric clutches of fossil eggs.",
+          obs: "Groundbreaking paleontological proof of parental care and nesting behavior in dinosaurs, identical to modern birds.",
+          diet: "Fossil Nest Specimen",
+          dietSub: "NHM London Collection",
+          length: "Diameter 2.5m",
+          lengthSub: "Holds 15–20 eggs",
+          mass: "Sedimentary matrix",
+          massSub: "Preserved embryonic bones",
+          loc: "Two Medicine Formation",
+          locSub: "Montana, USA"
+        }
+      },
+      {
+        id: "protoceratops_fossil",
+        nameVi: "Hóa Thạch Protoceratops",
+        nameEn: "Protoceratops Skull Fossil",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "75–71 Ma (Campanian)",
+        timeScaleEn: "75–71 Ma (Campanian)",
+        modelFile: "./assets/models/protoceratops_fossil.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 1.8,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Djadochta (Sa mạc Gobi)",
+        paleoCoords: "42.8° Bắc • 103.5° Đông",
+        rockMatrix: "Sa thạch cồn cát đỏ sa mạc hạt mịn",
+        datingMethod: "73.5 Ma • Bảo tàng NHMW Vienna",
+        discoverer: "1922 • Roy Chapman Andrews",
+        prompt: "Arid red sandstone canyon in prehistoric Gobi Desert, weathered sandstone cliff face with exposed fossil bone layers, dry desert wind blowing fine red sand, stark midday sunlight with sharp shadows, photorealistic museum diorama backdrop, empty desert, no dinosaurs.",
+        vi: {
+          tag: "Hóa Thạch Viện Bảo Tàng (NHMW Vienna)",
+          subtitle: "Tiêu bản sọ hóa thạch sa mạc Gobi tại Áo",
+          intro: "Bản quét 3D độ phân giải cao từ Bảo tàng Lịch sử Tự nhiên Viên (Áo) ghi nhận hộp sọ Protoceratops andrewsi nguyên bản được chôn vùi trong lớp cát đỏ sa mạc Gobi.",
+          obs: "Quan sát phần diềm cổ xương và mỏ vẹt sắc bén: Đây chính là loài khủng long tiền thân tiến hóa thành Triceratops khổng lồ!",
+          diet: "Hóa thạch hộp sọ",
+          dietSub: "Bảo tàng NHMW Áo",
+          length: "Dài 1.8 mét",
+          lengthSub: "Kích thước bằng con cừu",
+          mass: "Hóa thạch sa mạc",
+          massSub: "Diềm xương nguyên vẹn",
+          loc: "Hệ tầng Djadochta",
+          locSub: "Sa mạc Gobi (Mông Cổ)"
+        },
+        en: {
+          tag: "Fossil Skull (NHMW Vienna)",
+          subtitle: "Authentic Gobi Desert fossil skull at Vienna Museum",
+          intro: "High-resolution 3D scan from the Natural History Museum Vienna showing the complete skull and neck frill of Protoceratops andrewsi.",
+          obs: "Notice the parrot-like beak and broad frill, ancestral features that later evolved into giant horned dinosaurs.",
+          diet: "Fossil Skull Specimen",
+          dietSub: "NHMW Vienna Collection",
+          length: "Length 1.8m",
+          lengthSub: "Sheep-sized ancestor",
+          mass: "Fossilized in red sandstone",
+          massSub: "Pristine skull frill",
+          loc: "Djadochta Formation",
+          locSub: "Gobi Desert, Mongolia"
+        }
+      },
+      {
+        id: "giganotosaurus",
+        nameVi: "Giganotosaurus",
+        nameEn: "Giganotosaurus",
+        periodVi: "Kỷ Phấn Trắng Giữa",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "99–97 Ma (Cenomanian)",
+        timeScaleEn: "99–97 Ma (Cenomanian)",
+        modelFile: "./assets/models/giganotosaurus.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 13.2,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Candeleros (Patagonia, Argentina)",
+        paleoCoords: "39.2° Nam • 69.1° Tây",
+        rockMatrix: "Trầm tích châu thổ sông sa thạch đỏ",
+        datingMethod: "98.0 Ma • Định tuổi Cổ từ",
+        discoverer: "1993 • Rubén D. Carolini",
+        prompt: "Wide semi-arid prehistoric plains of Cretaceous Patagonia, massive braided gravel rivers, scattered araucaria conifers and dry scrub, distant snowless Andes ranges under scorching sun, 16:9 eye-level panoramic framing, realistic museum background, no dinosaurs.",
+        vi: {
+          tag: "Khủng long Carcharodontosauridae",
+          subtitle: "Bạo chúa khổng lồ Nam Mỹ vượt trội T-Rex",
+          intro: "Giganotosaurus carolinii là một trong những loài khủng long ăn thịt trên cạn lớn nhất từng tồn tại, dài hơn 13 mét, nặng tới 9 tấn và sở hữu hàm răng hình lưỡi dao chuyên xẻ thịt các loài thằn lằn hộ pháp khổng lồ.",
+          obs: "Chiều dài hơn 13m của Giganotosaurus thậm chí vượt qua cả T-Rex! Hãy điều chỉnh người sang bên phải hoặc phía trước để cảm nhận độ choáng ngợp.",
+          diet: "Ăn thịt",
+          dietSub: "Argentinosaurus non, sauropod",
+          length: "13.2 mét",
+          lengthSub: "Dài hơn T-Rex Bắc Mỹ",
+          mass: "8.5–9.5 tấn",
+          massSub: "Khổng lồ Nam Bán Cầu",
+          loc: "Hệ tầng Candeleros",
+          locSub: "Patagonia (Argentina)"
+        },
+        en: {
+          tag: "Carcharodontosaurid",
+          subtitle: "Giant Southern Tyrant of Patagonia",
+          intro: "Giganotosaurus was one of the largest terrestrial carnivores ever known, exceeding T-Rex in body length and hunting giant sauropods in packs.",
+          obs: "Measuring 13.2m in length, notice its immense serrated blade-like dentition.",
+          diet: "Carnivore",
+          dietSub: "Titanosaurs",
+          length: "13.2 metres",
+          lengthSub: "Longer than T-Rex",
+          mass: "8.5–9.5 tonnes",
+          massSub: "Apex predator of South America",
+          loc: "Candeleros Formation",
+          locSub: "Argentina"
+        }
+      },
+      {
+        id: "mamenchisaurus",
+        nameVi: "Mamenchisaurus",
+        nameEn: "Mamenchisaurus",
+        periodVi: "Kỷ Jura Muộn",
+        periodEn: "Late Jurassic",
+        timeScaleVi: "160–145 Ma (Oxfordian)",
+        timeScaleEn: "160–145 Ma (Oxfordian)",
+        modelFile: "./assets/models/mamenchisaurus.glb",
+        background: "./assets/backgrounds/jurassic.jpg",
+        realLengthMeters: 26.0,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Shishugou (Tân Cương, Trung Quốc)",
+        paleoCoords: "45.1° Bắc • 89.2° Đông",
+        rockMatrix: "Trầm tích hồ ngập phù sa ẩm ướt",
+        datingMethod: "155.0 Ma • Đồng vị U-Pb",
+        discoverer: "1952 • C. C. Young",
+        prompt: "Lush ancient Jurassic subtropical forest of prehistoric East Asia, sweeping fern plains dotted with ancient ginkgoes and seed ferns, majestic towering conifers, wide river valley under humid atmospheric morning haze, horizontal eye-level perspective, photorealistic museum backdrop, no animals.",
+        vi: {
+          tag: "Khủng long Sauropoda",
+          subtitle: "Người khổng lồ sở hữu chiếc cổ dài nhất thế giới",
+          intro: "Mamenchisaurus sinocanadorum sở hữu chiếc cổ kỳ quan dài tới 14 mét (chiếm hơn nửa chiều dài cơ thể 26m) gồm 19 đốt sống rỗng được gia cố bằng các gân xương chịu lực siêu nhẹ.",
+          obs: "Với chiều dài 26m, Mamenchisaurus gấp 15 lần chiều cao người! Chiếc cổ vươn cao như một cần cẩu xây dựng đồ sộ.",
+          diet: "Thực vật",
+          dietSub: "Tán cây lá kim cao tầng, dương xỉ",
+          length: "26.0 mét",
+          lengthSub: "Riêng cổ dài 14 mét",
+          mass: "25–35 tấn",
+          massSub: "Bằng 6 con voi cộng lại",
+          loc: "Hệ tầng Shishugou",
+          locSub: "Đông Á (Tân Cương, Trung Quốc)"
+        },
+        en: {
+          tag: "Sauropod dinosaur",
+          subtitle: "The longest-necked creature in Earth's history",
+          intro: "Mamenchisaurus possessed an astonishing 14-meter-long neck consisting of 19 hollow vertebrae, allowing it to graze high canopies.",
+          obs: "At 26 meters total length, it dwarfs the human observer by a factor of fifteen!",
+          diet: "Herbivore",
+          dietSub: "High conifer canopies",
+          length: "26.0 metres",
+          lengthSub: "Neck spans 14 metres",
+          mass: "25–35 tonnes",
+          massSub: "Equivalent to 6 elephants",
+          loc: "Shishugou Formation",
+          locSub: "East Asia"
+        }
+      },
+      {
+        id: "baryonyx",
+        nameVi: "Baryonyx",
+        nameEn: "Baryonyx",
+        periodVi: "Kỷ Phấn Trắng Sớm",
+        periodEn: "Early Cretaceous",
+        timeScaleVi: "130–125 Ma (Barremian)",
+        timeScaleEn: "130–125 Ma (Barremian)",
+        modelFile: "./assets/models/baryonyx.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 8.5,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Weald Clay (Surrey, Anh Quốc)",
+        paleoCoords: "38.5° Bắc • 5.2° Đông",
+        rockMatrix: "Bùn sét châu thổ nước ngọt",
+        datingMethod: "128.0 Ma • Sinh địa tầng",
+        discoverer: "1983 • William J. Walker",
+        prompt: "Cretaceous freshwater delta wetland in Western Europe, shallow muddy banks lined with primitive reeds and horsetails, slow meandering river with exposed sandbars, soft overcast temperate sunlight, 16:9 panoramic eye-level view, realistic diorama background, no creatures.",
+        vi: {
+          tag: "Khủng long Spinosauridae",
+          subtitle: "Thợ săn vuốt liềm có hộp sọ cá sấu",
+          intro: "Baryonyx walkeri sở hữu hàm răng hẹp dài hình nón tương tự cá sấu nước ngọt và chiếc móng vuốt ngón cái cong sắc lẹm dài tới 31cm dùng để quặp giữ những con cá vảy dày khổng lồ.",
+          obs: "Người Joe đứng cạnh đối chứng: Chiếc móng vuốt ngón tay của Baryonyx dài gần bằng cả cẳng tay người lớn!",
+          diet: "Cá & Động vật nhỏ",
+          dietSub: "Cá vảy Lepidotes, Iguanodon non",
+          length: "8.5 mét",
+          lengthSub: "Móng vuốt cong 31cm",
+          mass: "1.7–2.0 tấn",
+          massSub: "Thích nghi săn cá ven sông",
+          loc: "Hệ tầng Weald Clay",
+          locSub: "Châu Âu (Anh Quốc & Tây Ban Nha)"
+        },
+        en: {
+          tag: "Spinosaurid dinosaur",
+          subtitle: "Heavy-clawed crocodilian fisher",
+          intro: "Baryonyx featured a long crocodile-like snout filled with serrated conical teeth and a massive 31cm sickle-like thumb claw.",
+          obs: "Its lethal thumb claw alone is nearly as long as a human forearm.",
+          diet: "Piscivore / Carnivore",
+          dietSub: "Giant Lepidotes fish",
+          length: "8.5 metres",
+          lengthSub: "Thumb claw 31cm",
+          mass: "1.7–2.0 tonnes",
+          massSub: "Semi-aquatic predator",
+          loc: "Weald Clay Formation",
+          locSub: "Europe"
+        }
+      },
+      {
+        id: "liopleurodon",
+        nameVi: "Liopleurodon",
+        nameEn: "Liopleurodon",
+        periodVi: "Kỷ Jura Muộn",
+        periodEn: "Late Jurassic",
+        timeScaleVi: "166–155 Ma (Callovian)",
+        timeScaleEn: "166–155 Ma (Callovian)",
+        modelFile: "./assets/models/liopleurodon.glb",
+        background: "./assets/backgrounds/jurassic.jpg",
+        realLengthMeters: 10.0,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Oxford Clay (Peterborough, Anh)",
+        paleoCoords: "35.2° Bắc • 8.1° Đông",
+        rockMatrix: "Sét bùn biển sâu chứa cúc đá Ammonite",
+        datingMethod: "160.0 Ma • Sinh địa tầng Cúc đá",
+        discoverer: "1873 • Henri Émile Sauvage",
+        prompt: "Deep clear underwater view of a warm Jurassic epicontinental ocean, sunlight beams penetrating turquoise waters, ancient seafloor with ammonite shells and crinoids, peaceful realistic marine environment, wide 16:9 aspect ratio, no marine monsters in view.",
+        vi: {
+          tag: "Bò sát biển Pliosauroidea",
+          subtitle: "Thần săn mồi đại dương cổ đại Kỷ Jura",
+          intro: "Liopleurodon ferox sở hữu bốn vây bơi thủy động học có khả năng tăng tốc chớp nhoáng, chiếc đầu dài tới 2m với hàm răng cắm chéo sắc nhọn tạo ra lực cắn có thể bẻ gãy mọi bộ xương.",
+          obs: "Thân hình 10m của Liopleurodon dưới nước đồ sộ gấp gần sáu lần chiều cao người đứng trên cạn!",
+          diet: "Thịt biển",
+          dietSub: "Cá măng, thằn lằn cổ dài Plesiosaur",
+          length: "10.0 mét",
+          lengthSub: "Đầu dài 2.0 mét",
+          mass: "5–8 tấn",
+          massSub: "Tăng tốc chớp nhoáng 4 vây",
+          loc: "Biển nông Oxford Clay",
+          locSub: "Châu Âu (Anh & Pháp)"
+        },
+        en: {
+          tag: "Pliosaur reptile",
+          subtitle: "Apex marine ambush hunter of the Jurassic",
+          intro: "Liopleurodon was a short-necked pliosaur capable of explosive underwater acceleration propelled by four massive flippers.",
+          obs: "Its 2-meter skull is larger than the entire height of an adult human.",
+          diet: "Carnivore",
+          dietSub: "Ichthyosaurs, plesiosaurs",
+          length: "10.0 metres",
+          lengthSub: "Skull length 2.0m",
+          mass: "5–8 tonnes",
+          massSub: "Four-flipper propulsion",
+          loc: "Oxford Clay",
+          locSub: "Europe"
+        }
+      },
+      {
+        id: "allosaurus",
+        nameVi: "Allosaurus",
+        nameEn: "Allosaurus",
+        periodVi: "Kỷ Jura Muộn",
+        periodEn: "Late Jurassic",
+        timeScaleVi: "155–145 Ma (Kimmeridgian)",
+        timeScaleEn: "155–145 Ma (Kimmeridgian)",
+        modelFile: "./assets/models/allosaurus.glb",
+        background: "./assets/backgrounds/jurassic.jpg",
+        realLengthMeters: 9.5,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Morrison (Utah / Colorado / Wyoming)",
+        paleoCoords: "36.5° Bắc • 65.4° Tây",
+        rockMatrix: "Phù sa sa thạch lòng sông cổ đại",
+        datingMethod: "150.0 Ma • Đồng vị U-Pb",
+        discoverer: "1877 • Othniel Charles Marsh",
+        prompt: "Sweeping semi-arid Jurassic alluvial plain, scattered prehistoric conifer groves (Araucaria and Monkey Puzzle trees), sprawling cycad meadows, distant rugged red sandstone mesas under a bright clear sky, low horizontal eye-level framing, warm natural daylight, museum quality diorama backdrop, highly detailed, no dinosaurs.",
+        vi: {
+          tag: "Khủng long Allosauroidea",
+          subtitle: "Sư tử săn mồi bầy đàn Kỷ Jura",
+          intro: "Allosaurus là kẻ săn mồi thống trị kỷ Jura với chiều dài 9.5 mét, sở hữu hộp sọ linh hoạt với khớp hàm mở rộng như một chiếc rìu chiến bổ xuống.",
+          obs: "Người cao 1.75m chỉ đứng ngang tầm đùi của Allosaurus! Khi đứng thẳng, đầu Allosaurus cao hơn 3.2 mét.",
+          diet: "Ăn thịt",
+          dietSub: "Stegosaurus, sauropod non",
+          length: "9.5 mét",
+          lengthSub: "Cao 3.2m, sải bước cực dài",
+          mass: "2.5–3 tấn",
+          massSub: "Cơ động và nhanh nhẹn",
+          loc: "Hệ tầng Morrison",
+          locSub: "Bắc Mỹ & Châu Âu"
+        },
+        en: {
+          tag: "Allosauroid dinosaur",
+          subtitle: "The apex predator of the Jurassic",
+          intro: "Allosaurus was the dominant terrestrial carnivore of the Jurassic period, reaching nearly 10 meters in length.",
+          obs: "Observed alongside human Joe: note its muscular build adapted for cooperative hunting.",
+          diet: "Carnivore",
+          dietSub: "Sauropods, stegosaurs",
+          length: "9.5 metres",
+          lengthSub: "Height ~3.2m",
+          mass: "2.5–3 tonnes",
+          massSub: "Lean and agile",
+          loc: "Morrison Formation",
+          locSub: "North America & Europe"
+        }
+      },
+      {
+        id: "stegosaurus",
+        nameVi: "Stegosaurus",
+        nameEn: "Stegosaurus",
+        periodVi: "Kỷ Jura Muộn",
+        periodEn: "Late Jurassic",
+        timeScaleVi: "155–150 Ma (Tithonian)",
+        timeScaleEn: "155–150 Ma (Tithonian)",
+        modelFile: "./assets/models/stegosaurus.glb",
+        background: "./assets/backgrounds/jurassic.jpg",
+        realLengthMeters: 9.0,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Morrison (Wyoming / Colorado)",
+        paleoCoords: "36.2° Bắc • 64.9° Tây",
+        rockMatrix: "Bùn kết xám ven hồ ngập lụt",
+        datingMethod: "152.0 Ma • Đồng vị phóng xạ",
+        discoverer: "1877 • Othniel Charles Marsh",
+        prompt: "Tranquil Jurassic prehistoric woodland clearing, expansive grassy glade with primitive horsetails and clubmosses, distant misty redwoods, mossy ground with low prehistoric ferns, horizontal eye-level framing, warm gentle daylight, museum quality diorama backdrop, pristine natural atmosphere, no dinosaurs.",
+        vi: {
+          tag: "Khủng long Thyreophora",
+          subtitle: "Hiệp sĩ phiến sừng của Kỷ Jura",
+          intro: "Stegosaurus sở hữu hai hàng phiến sừng xương hình thoi dựng đứng dọc sống lưng vươn cao tới 3.8m và bốn gai nhọn chết người (thagomizer) ở chóp đuôi.",
+          obs: "Đỉnh phiến sừng cao hơn 3.8m, gấp hơn hai lần chiều cao người Joe.",
+          diet: "Thực vật",
+          dietSub: "Dương xỉ tầng thấp, rêu",
+          length: "9.0 mét",
+          lengthSub: "Đỉnh phiến sừng cao 3.8m",
+          mass: "4.5–5 tấn",
+          massSub: "Vũ khí đuôi thagomizer",
+          loc: "Hệ tầng Morrison",
+          locSub: "Bắc Mỹ"
+        },
+        en: {
+          tag: "Thyreophoran dinosaur",
+          subtitle: "Plated giant of the Late Jurassic",
+          intro: "Stegosaurus reached 9 meters in length, armed with prominent dorsal plates and a deadly four-spiked tail club.",
+          obs: "The tallest back plates stood nearly 4 meters high, more than double human height.",
+          diet: "Herbivore",
+          dietSub: "Low ferns, mosses",
+          length: "9.0 metres",
+          lengthSub: "Plate crest height ~3.8m",
+          mass: "4.5–5 tonnes",
+          massSub: "Armored herbivore",
+          loc: "Morrison Formation",
+          locSub: "North America"
+        }
+      },
+      {
+        id: "spinosaurus",
+        nameVi: "Spinosaurus",
+        nameEn: "Spinosaurus",
+        periodVi: "Kỷ Phấn Trắng Giữa",
+        periodEn: "Mid Cretaceous",
+        timeScaleVi: "99–93 Ma (Cenomanian)",
+        timeScaleEn: "99–93 Ma (Cenomanian)",
+        modelFile: "./assets/models/spinosaurus.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 14.5,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Kem Kem (Morocco & Ai Cập)",
+        paleoCoords: "12.8° Bắc • 4.1° Đông",
+        rockMatrix: "Trầm tích cửa sông ngập mặn biển Tethys",
+        datingMethod: "95.0 Ma • Đồng vị Argon",
+        discoverer: "1912 • Ernst Stromer",
+        prompt: "Expansive mid-Cretaceous tropical delta river basin in North Africa, wide tranquil freshwater lagoons lined with ancient mangrove roots and giant seed ferns, low shoreline horizon, golden haze sunbeams glistening on calm tidal waters, realistic eye-level museum backdrop, empty foreground shore, 8k resolution, no animals in the image.",
+        vi: {
+          tag: "Khủng long Bán thủy sinh",
+          subtitle: "Thủy quái khổng lồ dài nhất thời tiền sử",
+          intro: "Spinosaurus aegyptianus là loài khủng long ăn thịt dài nhất từng tồn tại (14.5m), sở hữu cánh buồm xương cao gần 2m trên lưng và cấu tạo đuôi bơi dẹp chuyên săn cá lớn.",
+          obs: "Chiều dài 14.5m của Spinosaurus gấp hơn 8 lần chiều cao người đứng cạnh!",
+          diet: "Cá & Thủy sinh",
+          dietSub: "Cá đao Mawsonia, cá phổi",
+          length: "14.5 mét",
+          lengthSub: "Khủng long ăn thịt dài nhất",
+          mass: "7.5–9 tấn",
+          massSub: "Thích nghi sông nước",
+          loc: "Hệ tầng Kem Kem",
+          locSub: "Bắc Phi (Morocco & Ai Cập)"
+        },
+        en: {
+          tag: "Spinosaurid dinosaur",
+          subtitle: "The semiaquatic river monster",
+          intro: "Measuring over 14 meters in length, Spinosaurus is the longest known carnivorous dinosaur, sporting a 1.8m dorsal sail.",
+          obs: "Its 14.5-meter body length is over 8 times the height of the human observer.",
+          diet: "Piscivore",
+          dietSub: "Giant coelacanths, sawfish",
+          length: "14.5 metres",
+          lengthSub: "Longest predatory dinosaur",
+          mass: "7.5–9 tonnes",
+          massSub: "Semi-aquatic giant",
+          loc: "Kem Kem Beds",
+          locSub: "North Africa"
+        }
+      },
+      {
+        id: "pterosaur",
+        nameVi: "Pterosaur (Dực long bay)",
+        nameEn: "Pterosaur",
+        periodVi: "Kỷ Phấn Trắng",
+        periodEn: "Cretaceous",
+        timeScaleVi: "120–66 Ma",
+        timeScaleEn: "120–66 Ma",
+        modelFile: "./assets/models/pterosaur.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 6.5,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: true,
+        formation: "Hệ tầng Santana (Brazil, Nam Mỹ)",
+        paleoCoords: "15.4° Nam • 22.8° Tây",
+        rockMatrix: "Đá vôi kết hạch bảo tồn màng cánh",
+        datingMethod: "115.0 Ma • Đồng vị Carbon",
+        discoverer: "1784 • Cosimo Alessandro Collini",
+        prompt: "Majestic high-altitude panoramic view over a prehistoric Cretaceous ocean coastline, dramatic limestone sea cliffs, sweeping turquoise sea with gentle foaming waves below, sunlit cumulus clouds in an expansive blue sky, eye-level aerial horizon, serene primeval atmosphere, highly realistic, no flying reptiles in the sky.",
+        vi: {
+          tag: "Bò sát bay Tiền sử",
+          subtitle: "Chúa tể bầu trời thời khủng long",
+          intro: "Pterosaur là loài động vật có xương sống đầu tiên phát triển khả năng bay lượn thực thụ nhờ màng cánh da nối ngón tay thứ tư kéo dài và bộ xương rỗng siêu nhẹ.",
+          obs: "Quan sát ở cao độ ngang tầm mắt trên trời: Sải cánh 6.5m của dực long rộng gấp gần bốn lần chiều cao người!",
+          diet: "Cá & Động vật nhỏ",
+          dietSub: "Săn mồi ven biển",
+          length: "Sải cánh 6.5m",
+          lengthSub: "Xương khí nén siêu nhẹ",
+          mass: "30–50 kg",
+          massSub: "Khí động học tuyệt hảo",
+          loc: "Toàn cầu",
+          locSub: "Vách đá ven biển tiền sử"
+        },
+        en: {
+          tag: "Pterosaur",
+          subtitle: "Lord of the Prehistoric Skies",
+          intro: "Pterosaurs were the first vertebrates to conquer the skies, soaring on membranous wings supported by an elongated fourth finger.",
+          obs: "Its 6.5-meter wingspan is nearly four times human height!",
+          diet: "Piscivore",
+          dietSub: "Coastal fish, crustaceans",
+          length: "Wingspan 6.5m",
+          lengthSub: "Pneumatic hollow bones",
+          mass: "30–50 kg",
+          massSub: "Aerodynamic mastery",
+          loc: "Worldwide",
+          locSub: "Ancient coastal cliffs"
+        }
+      },
+      {
+        id: "ankylosaurus",
+        nameVi: "Ankylosaurus",
+        nameEn: "Ankylosaurus",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "68–66 Ma (Maastrichtian)",
+        timeScaleEn: "68–66 Ma (Maastrichtian)",
+        modelFile: "./assets/models/ankylosaurus.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 8.0,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Scollard & Hell Creek (Alberta, Canada)",
+        paleoCoords: "55.1° Bắc • 69.4° Tây",
+        rockMatrix: "Trầm tích phù sa đồng bằng ven biển",
+        datingMethod: "66.5 Ma • Đồng vị Argon",
+        discoverer: "1906 • Barnum Brown",
+        prompt: "Dense temperate late Cretaceous fern prairie and open woodland, scattered fallen petrified logs, sandstone boulders covered in prehistoric lichen and moss, low scrubby cycads, diffuse overcast morning light filtering through humid canopy, 16:9 eye-level perspective, photorealistic nature backdrop, empty scene without dinosaurs.",
+        vi: {
+          tag: "Khủng long Giáp Long",
+          subtitle: "Cỗ xe tăng bọc thép Kỷ Phấn Trắng",
+          intro: "Ankylosaurus magniventris là loài khủng long bọc giáp lớn nhất với những tấm xương gai dày đặc phủ kín lưng và chiếc chùy xương nặng nề có thể đập vỡ xương kẻ thù.",
+          obs: "Người Joe đứng cạnh nhìn thấy rõ thân hình bè rộng đồ sộ (rộng tới 2.5m) của cỗ xe tăng sống tiền sử.",
+          diet: "Thực vật",
+          dietSub: "Cây bụi tầng thấp, quả rụng",
+          length: "8.0 mét",
+          lengthSub: "Thân rộng 2.5 mét",
+          mass: "5–8 tấn",
+          massSub: "Chùy đuôi nặng 50kg",
+          loc: "Hệ tầng Scollard & Hell Creek",
+          locSub: "Bắc Mỹ"
+        },
+        en: {
+          tag: "Ankylosaurid dinosaur",
+          subtitle: "Living tank of the Cretaceous",
+          intro: "Ankylosaurus was heavily armored with thick osteoderms and possessed a heavy bone club at the tip of its tail.",
+          obs: "Observe its extraordinary wide-barrel body width of 2.5 meters.",
+          diet: "Herbivore",
+          dietSub: "Low shrubs, fallen fruits",
+          length: "8.0 metres",
+          lengthSub: "Width ~2.5 metres",
+          mass: "5–8 tonnes",
+          massSub: "Heavy tail club",
+          loc: "Hell Creek Formation",
+          locSub: "North America"
+        }
+      },
+      {
+        id: "cryolophosaurus",
+        nameVi: "Cryolophosaurus",
+        nameEn: "Cryolophosaurus",
+        periodVi: "Kỷ Jura Sớm",
+        periodEn: "Early Jurassic",
+        timeScaleVi: "194–188 Ma (Pliensbachian)",
+        timeScaleEn: "194–188 Ma (Pliensbachian)",
+        modelFile: "./assets/models/cryolophosaurus.glb",
+        background: "./assets/backgrounds/jurassic.jpg",
+        realLengthMeters: 6.5,
+        rotationOffsetY: -Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Hanson (Transantarctic, Nam Cực)",
+        paleoCoords: "64.2° Nam • 120.5° Đông",
+        rockMatrix: "Trầm tích tro núi lửa và sa thạch ôn đới",
+        datingMethod: "190.0 Ma • Đồng vị Argon",
+        discoverer: "1991 • William R. Hammer",
+        prompt: "Early Jurassic temperate polar rainforest of prehistoric Antarctica, lush moss-covered Podocarp and Ginkgo groves, mountain slopes shrouded in cool glacial mist, crystal-clear cold mountain stream with damp gravel banks, soft pale diffused sunlight, 16:9 horizontal eye-level framing, serene primeval diorama, no creatures.",
+        vi: {
+          tag: "Khủng long Ăn thịt Nam Cực",
+          subtitle: "Dị long mào băng của Kỷ Jura Sớm",
+          intro: "Cryolophosaurus ellioti là loài khủng long ăn thịt đầu tiên được khai quật tại châu Nam Cực, sở hữu chiếc mào xương hình quạt độc đáo vắt ngang trán.",
+          obs: "Chiếc mào hình lược độc nhất vô nhị dùng để phô diễn thị giác thu hút bạn tình.",
+          diet: "Ăn thịt",
+          dietSub: "Khủng long chân thằn lằn nguyên thủy",
+          length: "6.5 mét",
+          lengthSub: "Cao 2.2m tại hông",
+          mass: "500–600 kg",
+          massSub: "Mào xương Elvis Presley",
+          loc: "Hệ tầng Hanson",
+          locSub: "Châu Nam Cực (Transantarctic)"
+        },
+        en: {
+          tag: "Antarctic Theropod",
+          subtitle: "The frozen crested lizard",
+          intro: "Cryolophosaurus was the first carnivorous dinosaur discovered in Antarctica, sporting a distinctive Spanish comb-like cranial crest.",
+          obs: "Examine the unique forward-facing crest used for visual display.",
+          diet: "Carnivore",
+          dietSub: "Prosauropods",
+          length: "6.5 metres",
+          lengthSub: "Hip height ~2.2m",
+          mass: "500–600 kg",
+          massSub: "Elvis crest dinosaur",
+          loc: "Hanson Formation",
+          locSub: "Antarctica"
+        }
+      },
+      {
+        id: "velociraptor",
+        nameVi: "Velociraptor",
+        nameEn: "Velociraptor",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "75–71 Ma (Campanian)",
+        timeScaleEn: "75–71 Ma (Campanian)",
+        modelFile: "./assets/models/velociraptor.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 2.0,
+        rotationOffsetY: Math.PI / 2 + TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Hệ tầng Djadochta (Sa mạc Gobi, Mông Cổ)",
+        paleoCoords: "43.1° Bắc • 104.2° Đông",
+        rockMatrix: "Cát sa mạc hóa đá đỏ hạt mịn",
+        datingMethod: "72.0 Ma • Địa từ học",
+        discoverer: "1923 • Peter Kaisen (AMNH)",
+        prompt: "Vast arid Late Cretaceous red sandstone dunes and dry desert oasis, ancient stunted desert shrubs and dry scrubland, weathered badlands formations beneath a blazing arid sky, heat haze on the red sandy horizon, eye-level framing, cinematic photorealistic diorama backdrop, empty desert with no dinosaurs.",
+        vi: {
+          tag: "Khủng long Dromaeosauridae",
+          subtitle: "Thợ săn lông vũ tốc độ cao Sa mạc Gobi",
+          intro: "Velociraptor ngoài đời thực chỉ cao khoảng 0.5m, phủ đầy lông vũ và sở hữu móng vuốt hình liềm sắc bén dài 6.5cm ở ngón chân thứ hai để ghì chặt con mồi.",
+          obs: "Người Joe (1.75m) cao hơn gấp ba lần Velociraptor! Chiều cao thực tế của loài này chỉ ngang bắp chân người lớn.",
+          diet: "Ăn thịt",
+          dietSub: "Protoceratops non, thằn lằn",
+          length: "2.0 mét",
+          lengthSub: "Cao 0.5m tại hông",
+          mass: "15–18 kg",
+          massSub: "Nhỏ bé nhưng cực kỳ nhanh nhẹn",
+          loc: "Hệ tầng Djadochta",
+          locSub: "Sa mạc Gobi (Mông Cổ)"
+        },
+        en: {
+          tag: "Dromaeosaurid dinosaur",
+          subtitle: "Feathered swift hunter of the Gobi",
+          intro: "Unlike cinematic depictions, the real Velociraptor was turkey-sized, feathered, with a specialized killing sickle claw.",
+          obs: "The 1.75m human is over three times taller than a real Velociraptor!",
+          diet: "Carnivore",
+          dietSub: "Protoceratops, lizards",
+          length: "2.0 metres",
+          lengthSub: "Hip height ~0.5m",
+          mass: "15–18 kg",
+          massSub: "Fast and agile hunter",
+          loc: "Djadochta Formation",
+          locSub: "Gobi Desert (Mongolia)"
+        }
+      },
+      {
+        id: "gorgosaurus",
+        nameVi: "Gorgosaurus",
+        nameEn: "Gorgosaurus",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "76–75 Ma (Campanian)",
+        timeScaleEn: "76–75 Ma (Campanian)",
+        modelFile: "./assets/models/gorgosaurus.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 8.5,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Công viên Khủng long Alberta (Canada)",
+        paleoCoords: "54.8° Bắc • 70.2° Tây",
+        rockMatrix: "Trầm tích sa thạch đồng bằng duyên hải",
+        datingMethod: "75.5 Ma • Đồng vị Argon",
+        discoverer: "1913 • Lawrence Lambe",
+        prompt: "Late Cretaceous river delta swamp and coastal forest, meandering muddy tributaries, towering Metasequoia and fern glades, dramatic overcast storm clouds parting to reveal golden sunlight, wide open foreground shore, 16:9 museum backdrop framing, hyper-realistic, no dinosaurs in view.",
+        vi: {
+          tag: "Khủng long Tyrannosauridae",
+          subtitle: "Bạo chúa phương Bắc sải bước tốc độ",
+          intro: "Gorgosaurus là họ hàng tiền thân thon thả và nhanh nhẹn của T-Rex, chuyên săn đuổi các loài khủng long mỏ vịt và khủng long có sừng ven các đồng bằng duyên hải Bắc Mỹ.",
+          obs: "Người Joe đứng đối chứng nhìn thấy rõ cấu trúc chi sau thanh thoát, tối ưu hóa cho những cú bứt tốc săn mồi kinh hoàng.",
+          diet: "Ăn thịt",
+          dietSub: "Hadrosauridae, Centrosaurus",
+          length: "8.5 mét",
+          lengthSub: "Cao 2.8m tại hông",
+          mass: "2.5–3 tấn",
+          massSub: "Tốc độ chạy vượt trội T-Rex",
+          loc: "Công viên Khủng long Alberta",
+          locSub: "Canada & Hoa Kỳ"
+        },
+        en: {
+          tag: "Tyrannosaurid dinosaur",
+          subtitle: "The fleet-footed northern tyrant",
+          intro: "Gorgosaurus was a sleeker, faster tyrannosaurid that dominated western Canada prior to the emergence of T-Rex.",
+          obs: "Notice its elongated limb proportions built for rapid pursuit.",
+          diet: "Carnivore",
+          dietSub: "Duck-billed dinosaurs",
+          length: "8.5 metres",
+          lengthSub: "Hip height ~2.8m",
+          mass: "2.5–3 tonnes",
+          massSub: "High sprint velocity",
+          loc: "Dinosaur Park Formation",
+          locSub: "Canada & USA"
+        }
+      },
+      {
+        id: "mosasaurus",
+        nameVi: "Mosasaurus",
+        nameEn: "Mosasaurus",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        periodEn: "Late Cretaceous",
+        timeScaleVi: "82–66 Ma (Maastrichtian)",
+        timeScaleEn: "82–66 Ma (Maastrichtian)",
+        modelFile: "./assets/models/mosasaurus.glb",
+        background: "./assets/backgrounds/cretaceous.jpg",
+        realLengthMeters: 14.0,
+        rotationOffsetY: TARGET_FACING_ANGLE,
+        isFlying: false,
+        formation: "Western Interior Seaway (Bắc Mỹ / Hà Lan)",
+        paleoCoords: "45.0° Bắc • 30.0° Tây",
+        rockMatrix: "Đá phấn biển nông Maastricht",
+        datingMethod: "66.0 Ma • Sinh địa tầng Vi cổ sinh",
+        discoverer: "1764 • Johann Leonard Hoffmann",
+        prompt: "Underwater panoramic view of a shallow warm Cretaceous inland sea, golden sun caustic patterns dancing across white seabed sands, ancient coral pinnacles and towering kelp-like prehistoric seaweeds, clear turquoise-azure waters with sunbeams descending from surface, 16:9 horizontal perspective, peaceful marine backdrop, no sea monsters.",
+        vi: {
+          tag: "Bò sát biển Mosasauroidea",
+          subtitle: "Thương long chúa tể đại dương Kỷ Phấn Trắng",
+          intro: "Mosasaurus là loài thằn lằn biển khổng lồ thống trị các đại dương kỷ Phấn Trắng với chiều dài 14m, bốn vây chèo mạnh mẽ và chiếc đuôi vây hình cá mập xé nước.",
+          obs: "Thân hình 14m của Mosasaurus đồ sộ vượt bậc so với người Joe 1.75m đứng cạnh!",
+          diet: "Thịt biển",
+          dietSub: "Cá mập, rùa biển, thằn lằn đầu rắn",
+          length: "14.0 mét",
+          lengthSub: "Thủy quái biển đỉnh cao",
+          mass: "10–14 tấn",
+          massSub: "Hàm phụ nuốt chửng con mồi",
+          loc: "Western Interior Seaway",
+          locSub: "Đại dương toàn cầu"
+        },
+        en: {
+          tag: "Marine Squamate",
+          subtitle: "The apex predator of the Cretaceous oceans",
+          intro: "Mosasaurus was a massive apex marine lizard reaching up to 14 meters, wielding a powerful shark-like tail fluke.",
+          obs: "Compare the 14-meter marine leviathan to the human observer.",
+          diet: "Piscivore / Carnivore",
+          dietSub: "Ammonites, sharks, plesiosaurs",
+          length: "14.0 metres",
+          lengthSub: "Apex oceanic carnivore",
+          mass: "10–14 tonnes",
+          massSub: "Pterygoid secondary jaws",
+          loc: "Global Mesozoic Seas",
+          locSub: "Worldwide"
+        }
+      },
+      
+        en: {
+          tag: "Fossil Anatomy",
+          subtitle: "Complete museum-mounted fossil skeleton",
+          intro: "High-resolution anatomical 3D scan of an articulated Triceratops prorsus fossil mount in international museum posture.",
+          obs: "Examine the 1:1 bone architecture alongside human Joe.",
+          diet: "Fossil Specimen",
+          dietSub: "Natural History Museum",
+          length: "8.5 metres",
+          lengthSub: "1:1 Anatomical frame",
+          mass: "Petrified fossil",
+          massSub: "Articulated skeleton",
+          loc: "Museum Exhibition Hall",
+          locSub: "Paleontological Collection"
+        }
+      }
+    ];
+
+    let currentExhibitIndex = 0;
+    let currentExhibit = EXHIBITS[currentExhibitIndex];
+    let currentLang = localStorage.getItem('museum_lang') || 'vi';
+
+    /* ==========================================================================
+       2. THREE.JS VIEWER ENGINE: ĐẶC KHỐI, BÓNG ĐỔ, TỶ LỆ 1:1, CỐT 0.00
+       ========================================================================== */
+        const container = document.getElementById('webgl-canvas-wrap');
+    const stageStatus = document.getElementById('stage-status');
+    const progressBar = document.getElementById('status-progress-bar');
+    const dinoRail = document.getElementById('dino-rail');
+    const stageBgLayer = document.getElementById('stage-bg-layer');
+    let scene, camera, renderer, controls;
+    let mainDinoGroup = new THREE.Group();
+    let humanGroup = new THREE.Group();
+    let groundRulerLine = null;
+    let rawHumanScene = null;
+    let shadowReceiverPlane = null;
+    let softContactShadowMesh = null;
+    let keyLight, hemiLight, rimLight;
+    let mixer = null;
+    const clock = new THREE.Clock();
+    let isHumanVisible = false;
+
+    // THÔNG SỐ VỊ TRÍ & KHOẢNG CÁCH NGƯỜI JOE
+    let currentHumanDist = 10.0;
+    let currentHumanPosDir = "right";
+
+    // THÔNG SỐ BÓNG ĐỔ & MẶT TRỜI
+    let currentSunAzimuth = 135;
+    let currentSunElevation = 50;
+    let currentShadowBlur = 8.0;
+    let currentShadowOpacity = 0.52;
+
+    // THÔNG SỐ BÓC TÁCH GIẢI PHẪU X-RAY (0% - 100%)
+    let currentPeelPercent = 0;
+    let currentPeelMode = "living"; // "living", "skeleton", "xray"
+
+    // Camera presets đặt theo tầm mắt quan sát
+    const CAMERA_PRESETS = {
+      FULL: { pos: new THREE.Vector3(7.5, 2.2, 8.5), target: new THREE.Vector3(0, 1.8, 0) },
+      HUMAN_SCALE: { pos: new THREE.Vector3(12.0, 3.2, 14.5), target: new THREE.Vector3(3.5, 1.8, 0.8) }
+    };
+    let targetCamPos = CAMERA_PRESETS.FULL.pos.clone();
+    let targetCamLookAt = CAMERA_PRESETS.FULL.target.clone();
+    let isTransitioningCam = false;
+
+    function init3D() {
+      scene = new THREE.Scene();
+      scene.add(mainDinoGroup);
+      scene.add(humanGroup);
+
+      const aspect = container.clientWidth / container.clientHeight;
+      camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 150);
+      camera.position.copy(CAMERA_PRESETS.FULL.pos);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2 + 0.02;
+      controls.minDistance = 1.5;
+      controls.maxDistance = 50.0;
+      controls.target.copy(CAMERA_PRESETS.FULL.target);
+      controls.update();
+
+      container.addEventListener('wheel', (e) => { e.preventDefault(); }, { passive: false });
+
+      // Ánh sáng môi trường
+      hemiLight = new THREE.HemisphereLight(0xffffff, 0xb8b09d, 1.15);
+      hemiLight.position.set(0, 30, 0);
+      scene.add(hemiLight);
+
+      keyLight = new THREE.DirectionalLight(0xfff5dd, 2.0);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 1024;
+      keyLight.shadow.mapSize.height = 1024;
+      keyLight.shadow.camera.near = 0.5;
+      keyLight.shadow.camera.far = 50;
+      keyLight.shadow.bias = -0.0006;
+      keyLight.shadow.radius = currentShadowBlur;
+      const d = 18;
+      keyLight.shadow.camera.left = -d;
+      keyLight.shadow.camera.right = d;
+      keyLight.shadow.camera.top = d;
+      keyLight.shadow.camera.bottom = -d;
+      scene.add(keyLight);
+      scene.add(keyLight.target);
+
+      rimLight = new THREE.DirectionalLight(0xbad2c8, 0.85);
+      rimLight.position.set(-10, 10, -10);
+      scene.add(rimLight);
+
+      updateSunDirection();
+
+      
+    function createSoftContactShadowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+      gradient.addColorStop(0, 'rgba(15, 12, 10, 0.72)');
+      gradient.addColorStop(0.25, 'rgba(15, 12, 10, 0.50)');
+      gradient.addColorStop(0.55, 'rgba(15, 12, 10, 0.22)');
+      gradient.addColorStop(0.80, 'rgba(15, 12, 10, 0.06)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+      const texture = new THREE.CanvasTexture(canvas);
+      return texture;
+    }
+
+      // Mặt phẳng bóng đổ mặt đất cốt Y = 0.000
+      const groundGeo = new THREE.PlaneGeometry(80, 80);
+      const shadowMat = new THREE.ShadowMaterial({ opacity: currentShadowOpacity });
+      shadowReceiverPlane = new THREE.Mesh(groundGeo, shadowMat);
+      shadowReceiverPlane.rotation.x = -Math.PI / 2;
+      shadowReceiverPlane.position.y = 0.000;
+      shadowReceiverPlane.receiveShadow = true;
+      scene.add(shadowReceiverPlane);
+      const softContactGeo = new THREE.PlaneGeometry(1, 1);
+      softContactGeo.rotateX(-Math.PI / 2);
+      const softContactMat = new THREE.MeshBasicMaterial({
+        map: createSoftContactShadowTexture(),
+        transparent: true,
+        opacity: currentShadowOpacity * 0.85,
+        depthWrite: false
+      });
+      softContactShadowMesh = new THREE.Mesh(softContactGeo, softContactMat);
+      softContactShadowMesh.position.y = 0.012;
+      scene.add(softContactShadowMesh);
+
+
+      initGroundRuler();
+      loadHumanJoeModel();
+      window.addEventListener('resize', onWindowResize);
+      requestAnimationFrame(renderLoop);
+      renderDinoRail();
+      loadExhibit(currentExhibit);
+    }
+
+    function initGroundRuler() {
+      const rulerMat = new THREE.LineDashedMaterial({
+        color: 0xc89d47,
+        dashSize: 0.4,
+        gapSize: 0.25,
+        linewidth: 2
+      });
+      const points = [
+        new THREE.Vector3(0, 0.015, 0),
+        new THREE.Vector3(10.0, 0.015, 0)
+      ];
+      const geom = new THREE.BufferGeometry().setFromPoints(points);
+      groundRulerLine = new THREE.Line(geom, rulerMat);
+      groundRulerLine.computeLineDistances();
+      groundRulerLine.visible = false;
+      scene.add(groundRulerLine);
+    }
+
+    /* ==========================================================================
+       3. CẬP NHẬT TỌA ĐỘ MẶT TRỜI & BÓNG ĐỔ (BÓNG ĐỨNG HOẶC TRẢI DÀI, 360 ĐỘ)
+       ========================================================================== */
+    function updateSunDirection() {
+      if (!keyLight) return;
+      const radAzimuth = THREE.MathUtils.degToRad(currentSunAzimuth);
+      const radElevation = THREE.MathUtils.degToRad(currentSunElevation);
+      const radius = 25.0;
+
+      const y = radius * Math.sin(radElevation);
+      const groundDist = radius * Math.cos(radElevation);
+      const x = groundDist * Math.sin(radAzimuth);
+      const z = groundDist * Math.cos(radAzimuth);
+
+      keyLight.position.set(x, y, z);
+      keyLight.target.position.set(0, 1.2, 0);
+      keyLight.updateMatrixWorld();
+
+      const needle = document.getElementById('compass-needle');
+      if (needle) {
+        needle.style.transform = `rotate(${currentSunAzimuth}deg)`;
+      }
+    }
+
+    /* ==========================================================================
+       4. TẢI MÔ HÌNH NGƯỜI JOE & ĐỊNH VỊ ĐỘNG (KHOẢNG CÁCH + 4 VỊ TRÍ)
+       ========================================================================== */
+    function loadHumanJoeModel() {
+      const loader = new GLTFLoader();
+      loader.load('./assets/models/joe_human.glb', (gltf) => {
+        rawHumanScene = gltf.scene;
+
+        rawHumanScene.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            if (child.material) {
+              child.material.transparent = false;
+              child.material.opacity = 1.0;
+              child.material.depthWrite = true;
+              child.material.depthTest = true;
+            }
+          }
+        });
+
+        rawHumanScene.position.set(0, 0, 0);
+        rawHumanScene.scale.setScalar(1);
+        rawHumanScene.updateMatrixWorld(true);
+
+        const box = new THREE.Box3().setFromObject(rawHumanScene);
+        const originalHeight = box.max.y - box.min.y;
+        const targetHeightMeters = 1.75;
+        const humanScale = targetHeightMeters / originalHeight;
+        rawHumanScene.scale.setScalar(humanScale);
+        rawHumanScene.updateMatrixWorld(true);
+
+        const updatedBox = new THREE.Box3().setFromObject(rawHumanScene);
+        rawHumanScene.position.y = -updatedBox.min.y;
+
+        rawHumanScene.rotation.y = -Math.PI / 2 + TARGET_FACING_ANGLE;
+
+        humanGroup.add(rawHumanScene);
+        humanGroup.visible = isHumanVisible;
+
+        updateHumanRelativePlacement();
+      });
+    }
+
+    function updateHumanRelativePlacement() {
+      if (!humanGroup) return;
+
+      const theta = TARGET_FACING_ANGLE;
+      const D = currentHumanDist;
+
+      const uFront = new THREE.Vector2(Math.cos(theta), -Math.sin(theta));
+      const uRight = new THREE.Vector2(-Math.sin(theta), -Math.cos(theta));
+      const uLeft = new THREE.Vector2(Math.sin(theta), Math.cos(theta));
+      const uBehind = new THREE.Vector2(-Math.cos(theta), Math.sin(theta));
+
+      let targetPos2D = new THREE.Vector2();
+      let posNameVi = "Bên phải";
+      let posNameEn = "Right side";
+
+      if (currentHumanPosDir === "right") {
+        targetPos2D.copy(uRight).multiplyScalar(D);
+        posNameVi = "Bên phải"; posNameEn = "Right side";
+      } else if (currentHumanPosDir === "left") {
+        targetPos2D.copy(uLeft).multiplyScalar(D);
+        posNameVi = "Bên trái"; posNameEn = "Left side";
+      } else if (currentHumanPosDir === "front") {
+        targetPos2D.copy(uFront).multiplyScalar(D);
+        posNameVi = "Phía trước"; posNameEn = "Front";
+      } else if (currentHumanPosDir === "behind") {
+        targetPos2D.copy(uBehind).multiplyScalar(D);
+        posNameVi = "Đằng sau"; posNameEn = "Behind";
+      }
+
+      const hX = targetPos2D.x;
+      const hZ = targetPos2D.y;
+
+      humanGroup.position.set(hX, 0, hZ);
+
+      if (groundRulerLine) {
+        const positions = groundRulerLine.geometry.attributes.position.array;
+        positions[0] = 0; positions[1] = 0.015; positions[2] = 0;
+        positions[3] = hX; positions[4] = 0.015; positions[5] = hZ;
+        groundRulerLine.geometry.attributes.position.needsUpdate = true;
+        groundRulerLine.computeLineDistances();
+        groundRulerLine.visible = isHumanVisible;
+      }
+
+      const badge = document.getElementById('ruler-badge');
+      const badgeText = document.getElementById('ruler-badge-text');
+      if (badge && badgeText) {
+        badge.style.display = isHumanVisible ? 'flex' : 'none';
+        const pName = currentLang === 'vi' ? posNameVi : posNameEn;
+        badgeText.innerHTML = `Khoảng cách: <strong>${D.toFixed(1)} mét</strong> (${pName}) • Tỉ lệ người 1:1`;
+      }
+    }
+
+    function onWindowResize() {
+      if (!camera || !renderer || !container) return;
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+
+    /* ==========================================================================
+       5. TẢI MÔ HÌNH KHỦNG LONG: ĐẶC KHỐI, SCALE 1:1, CỐT 0.00, CÙNG 1 HƯỚNG NHÌN
+       ========================================================================== */
+    // stageStatus & progressBar hoisted to top
+
+    function loadExhibit(exhibit) {
+      currentExhibit = exhibit;
+      updateUIContent();
+
+      document.getElementById('stage-bg-layer').style.backgroundImage = `url('${exhibit.background}')`;
+
+      stageStatus.classList.remove('hidden');
+      progressBar.style.width = '20%';
+
+      while (mainDinoGroup.children.length > 0) {
+        const obj = mainDinoGroup.children[0];
+        mainDinoGroup.remove(obj);
+      }
+      if (mixer) {
+        mixer.stopAllAction();
+        mixer.uncacheRoot(mixer.getRoot());
+      }
+      mixer = null;
+
+      const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+
+      // Nếu đang ở chế độ Skeleton và loài có skeletonFile thì nạp skeletonFile
+      let targetFile = exhibit.modelFile;
+      if (currentPeelMode === "skeleton" && exhibit.skeletonFile) {
+        targetFile = exhibit.skeletonFile;
+      }
+
+      loader.load(
+        targetFile,
+        (gltf) => {
+          const model = gltf.scene;
+
+          model.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+              if (child.material) {
+                // Áp dụng bóc tách X-Ray nếu slider > 0
+                if (currentPeelPercent > 0 || currentPeelMode === "xray") {
+                  const factor = currentPeelMode === "xray" ? 0.45 : (1.0 - (currentPeelPercent / 100) * 0.7);
+                  child.material.transparent = true;
+                  child.material.opacity = factor;
+                  child.material.wireframe = currentPeelPercent > 60;
+                } else {
+                  child.material.transparent = false;
+                  child.material.opacity = 1.0;
+                  child.material.wireframe = false;
+                }
+                child.material.depthWrite = true;
+                child.material.depthTest = true;
+                if (child.material.color) child.material.color.setHex(0xffffff);
+                if (child.material.emissive) child.material.emissive.setHex(0x000000);
+                child.material.roughness = Math.min(Math.max(child.material.roughness || 0.65, 0.4), 0.8);
+                child.material.metalness = Math.min(child.material.metalness || 0.05, 0.2);
+                child.material.needsUpdate = true;
+              }
+            }
+          });
+
+          model.position.set(0, 0, 0);
+          model.scale.setScalar(1);
+          model.rotation.set(0, exhibit.rotationOffsetY, 0);
+          model.updateMatrixWorld(true);
+
+          let box = new THREE.Box3().setFromObject(model);
+          let size = new THREE.Vector3();
+          box.getSize(size);
+          const rawLength = Math.max(size.x, size.z);
+          const targetMeters = exhibit.realLengthMeters;
+          const scaleFactor = targetMeters / rawLength;
+          model.scale.setScalar(scaleFactor);
+          model.updateMatrixWorld(true);
+
+          box = new THREE.Box3().setFromObject(model);
+          let center = new THREE.Vector3();
+          box.getCenter(center);
+
+          model.position.x = -center.x;
+          model.position.z = -center.z;
+
+          if (exhibit.isFlying) {
+            model.position.y = exhibit.flyHeight !== undefined ? exhibit.flyHeight : 1.85;
+            shadowReceiverPlane.visible = false;
+          } else {
+            model.position.y = -box.min.y + (exhibit.groundOffsetY || 0.0);
+            shadowReceiverPlane.visible = true;
+          }
+          model.updateMatrixWorld(true);
+
+          mainDinoGroup.add(model);
+
+          const finalBox = new THREE.Box3().setFromObject(model);
+          const finalSize = new THREE.Vector3();
+          finalBox.getSize(finalSize);
+          const finalCenter = new THREE.Vector3();
+          finalBox.getCenter(finalCenter);
+
+          // Cập nhật quy mô bóng tiếp xúc mềm mại dưới chân
+          if (softContactShadowMesh) {
+            const baseW = Math.max(finalSize.x * 1.35, 2.5);
+            const baseL = Math.max(finalSize.z * 1.35, 3.5);
+            softContactShadowMesh.userData = softContactShadowMesh.userData || {};
+            softContactShadowMesh.userData.baseW = baseW;
+            softContactShadowMesh.userData.baseL = baseL;
+            const factor = 1.0 + (currentShadowBlur - 1.0) * 0.04;
+            softContactShadowMesh.scale.set(baseW * factor, 1, baseL * factor);
+            softContactShadowMesh.position.set(0, 0.012, 0);
+            softContactShadowMesh.visible = !exhibit.isFlying;
+          }
+
+          // TỰ ĐỘNG CÂN CHỈNH CAMERA BAO TRỌN FULL BODY (HEAD-TO-TAIL FIT):
+          const maxDim = Math.max(finalSize.x, finalSize.y, finalSize.z);
+          const vFov = camera.fov * (Math.PI / 180);
+          let camDist = (maxDim / 2) / Math.tan(vFov / 2);
+          camDist = Math.max(camDist * 1.45, 6.0); // 45% lề an toàn để view toàn thân cực kỳ thoáng mắt
+
+          const targetY = exhibit.isFlying ? (exhibit.flyHeight !== undefined ? exhibit.flyHeight : 1.85) : finalCenter.y;
+          CAMERA_PRESETS.FULL.target.set(0, targetY, 0);
+
+          controls.target.copy(CAMERA_PRESETS.FULL.target);
+
+          // Đặt góc nhìn phối cảnh điện ảnh 3/4 kinh điển
+          const viewAngle = 0.52;
+          const camX = Math.sin(viewAngle) * camDist * 0.95;
+          const camY = targetY + finalSize.y * 0.22 + camDist * 0.15;
+          const camZ = Math.cos(viewAngle) * camDist * 0.95;
+
+          CAMERA_PRESETS.FULL.pos.set(camX, camY, camZ);
+          camera.position.set(camX, camY, camZ);
+          controls.minDistance = 1.5;
+          controls.maxDistance = Math.max(camDist * 3.5, 65.0);
+          controls.update();
+
+          if (gltf.animations && gltf.animations.length > 0) {
+            mixer = new THREE.AnimationMixer(model);
+            const action = mixer.clipAction(gltf.animations[0]);
+            action.play();
+          }
+
+          progressBar.style.width = '100%';
+          setTimeout(() => { stageStatus.classList.add('hidden'); }, 200);
+        },
+        (xhr) => {
+          if (xhr.lengthComputable) {
+            const pct = Math.round((xhr.loaded / xhr.total) * 100);
+            progressBar.style.width = pct + '%';
+          }
+        },
+        (error) => {
+          console.error("Lỗi nạp mô hình:", error);
+          stageStatus.classList.add('hidden');
+        }
+      );
+    }
+
+    /* ==========================================================================
+       6. SỰ KIỆN POPOVER BÓC TÁCH GIẢI PHẪU & NGƯỜI & BÓNG ĐỔ
+       ========================================================================== */
+    const peelerPopover = document.getElementById('peeler-popover');
+    const humanPopover = document.getElementById('human-popover');
+    const shadowPopover = document.getElementById('shadow-popover');
+
+    document.getElementById('btn-open-peeler-tuner').addEventListener('click', () => {
+      peelerPopover.classList.toggle('open');
+      humanPopover.classList.remove('open');
+      shadowPopover.classList.remove('open');
+    });
+    document.getElementById('close-peeler-popover').addEventListener('click', () => {
+      peelerPopover.classList.remove('open');
+    });
+
+    document.getElementById('btn-open-human-tuner').addEventListener('click', () => {
+      humanPopover.classList.toggle('open');
+      peelerPopover.classList.remove('open');
+      shadowPopover.classList.remove('open');
+    });
+    document.getElementById('close-human-popover').addEventListener('click', () => {
+      humanPopover.classList.remove('open');
+    });
+
+    document.getElementById('btn-open-shadow-tuner').addEventListener('click', () => {
+      shadowPopover.classList.toggle('open');
+      peelerPopover.classList.remove('open');
+      humanPopover.classList.remove('open');
+    });
+    document.getElementById('close-shadow-popover').addEventListener('click', () => {
+      shadowPopover.classList.remove('open');
+    });
+
+    // Slider bóc tách X-Ray
+    const sliderPeelXray = document.getElementById('slider-peel-xray');
+    const lblPeelVal = document.getElementById('lbl-peel-val');
+    sliderPeelXray.addEventListener('input', (e) => {
+      currentPeelPercent = parseInt(e.target.value);
+      if (currentPeelPercent === 0) {
+        lblPeelVal.textContent = "0% (Đặc khối)";
+      } else if (currentPeelPercent >= 80) {
+        lblPeelVal.textContent = `${currentPeelPercent}% (Lộ khung xương)`;
+      } else {
+        lblPeelVal.textContent = `${currentPeelPercent}% (Bán trong suốt)`;
+      }
+      applyPeelingToScene();
+    });
+
+    document.getElementById('btn-layer-living').addEventListener('click', () => {
+      currentPeelMode = "living";
+      currentPeelPercent = 0;
+      sliderPeelXray.value = 0;
+      lblPeelVal.textContent = "0% (Đặc khối)";
+      setActivePeelBtn('btn-layer-living');
+      loadExhibit(currentExhibit);
+    });
+    document.getElementById('btn-layer-skeleton').addEventListener('click', () => {
+      currentPeelMode = "skeleton";
+      currentPeelPercent = 100;
+      sliderPeelXray.value = 100;
+      lblPeelVal.textContent = "100% (Khung xương)";
+      setActivePeelBtn('btn-layer-skeleton');
+      loadExhibit(currentExhibit);
+    });
+    document.getElementById('btn-layer-xray').addEventListener('click', () => {
+      currentPeelMode = "xray";
+      currentPeelPercent = 50;
+      sliderPeelXray.value = 50;
+      lblPeelVal.textContent = "50% (Hologram X-Ray)";
+      setActivePeelBtn('btn-layer-xray');
+      applyPeelingToScene();
+    });
+
+    function setActivePeelBtn(id) {
+      document.querySelectorAll('#btn-layer-living, #btn-layer-skeleton, #btn-layer-xray').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function applyPeelingToScene() {
+      mainDinoGroup.traverse((child) => {
+        if (child.isMesh && child.material) {
+          if (currentPeelPercent === 0) {
+            child.material.transparent = false;
+            child.material.opacity = 1.0;
+            child.material.wireframe = false;
+          } else {
+            child.material.transparent = true;
+            child.material.opacity = Math.max(0.18, 1.0 - (currentPeelPercent / 100) * 0.8);
+            child.material.wireframe = currentPeelPercent > 65;
+          }
+          child.material.needsUpdate = true;
+        }
+      });
+    }
+
+    // Slider khoảng cách người
+    const sliderHumanDist = document.getElementById('slider-human-dist');
+    const lblHumanDistVal = document.getElementById('lbl-human-dist-val');
+    sliderHumanDist.addEventListener('input', (e) => {
+      currentHumanDist = parseFloat(e.target.value);
+      lblHumanDistVal.textContent = `${currentHumanDist.toFixed(1)} mét`;
+      document.querySelectorAll('[data-hdist]').forEach(b => {
+        b.classList.toggle('active', parseFloat(b.dataset.hdist) === currentHumanDist);
+      });
+      updateHumanRelativePlacement();
+    });
+
+    document.querySelectorAll('[data-hdist]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-hdist]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentHumanDist = parseFloat(btn.dataset.hdist);
+        sliderHumanDist.value = currentHumanDist;
+        lblHumanDistVal.textContent = `${currentHumanDist.toFixed(1)} mét`;
+        updateHumanRelativePlacement();
+      });
+    });
+
+    const lblHumanPosVal = document.getElementById('lbl-human-pos-val');
+    document.querySelectorAll('[data-hpos]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-hpos]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentHumanPosDir = btn.dataset.hpos;
+        lblHumanPosVal.textContent = btn.textContent.replace(/[👉👈⬆️⬇️]/g, '').trim();
+        updateHumanRelativePlacement();
+      });
+    });
+
+    // Slider độ mờ biên bóng đổ
+    const sliderShadowBlur = document.getElementById('slider-shadow-blur');
+    const lblShadowBlurVal = document.getElementById('lbl-shadow-blur-val');
+    sliderShadowBlur.addEventListener('input', (e) => {
+      currentShadowBlur = parseFloat(e.target.value);
+      lblShadowBlurVal.textContent = currentShadowBlur.toFixed(1);
+      if (keyLight) keyLight.shadow.radius = currentShadowBlur;
+      if (softContactShadowMesh) {
+        const factor = 1.0 + (currentShadowBlur - 1.0) * 0.04;
+        softContactShadowMesh.scale.x = (softContactShadowMesh.userData.baseW || 6.0) * factor;
+        softContactShadowMesh.scale.z = (softContactShadowMesh.userData.baseL || 8.0) * factor;
+      }
+    });
+
+    const sliderShadowOp = document.getElementById('slider-shadow-op');
+    const lblShadowOpVal = document.getElementById('lbl-shadow-op-val');
+    sliderShadowOp.addEventListener('input', (e) => {
+      currentShadowOpacity = parseFloat(e.target.value);
+      lblShadowOpVal.textContent = currentShadowOpacity.toFixed(2);
+      if (shadowReceiverPlane) shadowReceiverPlane.material.opacity = currentShadowOpacity;
+      if (softContactShadowMesh) softContactShadowMesh.material.opacity = currentShadowOpacity * 0.85;
+    });
+
+    const sliderSunElev = document.getElementById('slider-sun-elev');
+    const lblSunElevVal = document.getElementById('lbl-sun-elev-val');
+    sliderSunElev.addEventListener('input', (e) => {
+      currentSunElevation = parseInt(e.target.value);
+      updateSunElevLabel();
+      updateSunDirection();
+    });
+
+    function updateSunElevLabel() {
+      if (currentSunElevation >= 75) {
+        lblSunElevVal.textContent = `${currentSunElevation}° (Đứng bóng)`;
+      } else if (currentSunElevation <= 25) {
+        lblSunElevVal.textContent = `${currentSunElevation}° (Trải dài)`;
+      } else {
+        lblSunElevVal.textContent = `${currentSunElevation}° (Xiên chuẩn)`;
+      }
+    }
+
+    document.getElementById('btn-shadow-noon').addEventListener('click', () => {
+      currentSunElevation = 80;
+      sliderSunElev.value = 80;
+      updateSunElevLabel();
+      updateSunDirection();
+    });
+    document.getElementById('btn-shadow-natural').addEventListener('click', () => {
+      currentSunElevation = 50;
+      sliderSunElev.value = 50;
+      updateSunElevLabel();
+      updateSunDirection();
+    });
+    document.getElementById('btn-shadow-sunset').addEventListener('click', () => {
+      currentSunElevation = 20;
+      sliderSunElev.value = 20;
+      updateSunElevLabel();
+      updateSunDirection();
+    });
+
+    const sliderSunAzimuth = document.getElementById('slider-sun-azimuth');
+    const lblSunAzimuthVal = document.getElementById('lbl-sun-azimuth-val');
+    sliderSunAzimuth.addEventListener('input', (e) => {
+      currentSunAzimuth = parseInt(e.target.value);
+      updateAzimuthLabel();
+      updateSunDirection();
+    });
+
+    function updateAzimuthLabel() {
+      let dirName = "Đông Nam";
+      if (currentSunAzimuth >= 337.5 || currentSunAzimuth < 22.5) dirName = "Bắc";
+      else if (currentSunAzimuth < 67.5) dirName = "Đông Bắc";
+      else if (currentSunAzimuth < 112.5) dirName = "Đông";
+      else if (currentSunAzimuth < 157.5) dirName = "Đông Nam";
+      else if (currentSunAzimuth < 202.5) dirName = "Nam";
+      else if (currentSunAzimuth < 247.5) dirName = "Tây Nam";
+      else if (currentSunAzimuth < 292.5) dirName = "Tây";
+      else dirName = "Tây Bắc";
+
+      lblSunAzimuthVal.textContent = `${dirName} (${currentSunAzimuth}°)`;
+    }
+
+    document.querySelectorAll('[data-az]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentSunAzimuth = parseInt(btn.dataset.az);
+        sliderSunAzimuth.value = currentSunAzimuth;
+        updateAzimuthLabel();
+        updateSunDirection();
+      });
+    });
+
+    // Toggle Màu nước mờ biên
+    // stageBgLayer already declared at top
+
+    const btnToggleWatercolor = document.getElementById('btn-toggle-watercolor');
+    let isWatercolor = true;
+
+    btnToggleWatercolor.addEventListener('click', () => {
+      isWatercolor = !isWatercolor;
+      stageBgLayer.classList.toggle('watercolor-mode', isWatercolor);
+      btnToggleWatercolor.classList.toggle('active', isWatercolor);
+    });
+
+    /* ==========================================================================
+       7. CHUYỂN 4 MÙA TIỀN SỬ MƯỢT MÀ TINH TẾ (GIỮ NGUYÊN KHUNG CẢNH REF)
+       ========================================================================== */
+    const seasonOverlay = document.getElementById('season-atmosphere-overlay');
+    const seasonToast = document.getElementById('season-toast');
+    const seasonToastText = document.getElementById('season-toast-text');
+    let seasonToastTimeout = null;
+    let seasonAnimId = null;
+
+    function showSeasonToast(text) {
+      if (seasonToastTimeout) clearTimeout(seasonToastTimeout);
+      seasonToastText.textContent = text;
+      seasonToast.classList.add('show');
+      seasonToastTimeout = setTimeout(() => {
+        seasonToast.classList.remove('show');
+      }, 3000);
+    }
+
+    const SEASON_PRESETS = {
+      spring: {
+        exposure: 1.32,
+        keyColor: new THREE.Color(0xfbfbe8),
+        hemiSky: new THREE.Color(0xffffff),
+        hemiGround: new THREE.Color(0xafba9d),
+        bgFilter: isWatercolor ? 'blur(3.5px) saturate(1.1) brightness(1.04) hue-rotate(-4deg)' : 'saturate(1.1) brightness(1.02)',
+        overlayGrad: 'radial-gradient(circle, rgba(160, 220, 140, 0.22) 0%, transparent 75%)',
+        toastVi: "🌸 Mùa Xuân: Khí hậu ôn hòa, dương xỉ đâm chồi, ánh sáng tươi non",
+        toastEn: "🌸 Spring: Mild climate, sprouting flora, gentle crisp daylight"
+      },
+      summer: {
+        exposure: 1.25,
+        keyColor: new THREE.Color(0xfff5dd),
+        hemiSky: new THREE.Color(0xffffff),
+        hemiGround: new THREE.Color(0xb8b09d),
+        bgFilter: isWatercolor ? 'blur(3.5px) saturate(0.85) brightness(0.92)' : 'none',
+        overlayGrad: 'radial-gradient(circle, rgba(255, 220, 120, 0.22) 0%, transparent 75%)',
+        toastVi: "☀️ Mùa Hạ: Nắng gắt nhiệt đới ẩm, độ tương phản cao, đổ bóng rực rỡ",
+        toastEn: "☀️ Summer: Tropical greenhouse heat, high contrast, vivid shadows"
+      },
+      autumn: {
+        exposure: 1.15,
+        keyColor: new THREE.Color(0xffc57a),
+        hemiSky: new THREE.Color(0xffeedd),
+        hemiGround: new THREE.Color(0xa88d68),
+        bgFilter: isWatercolor ? 'blur(3.5px) sepia(0.25) saturate(1.2) hue-rotate(8deg)' : 'sepia(0.28) saturate(1.15)',
+        overlayGrad: 'radial-gradient(circle, rgba(230, 140, 60, 0.24) 0%, transparent 75%)',
+        toastVi: "🍂 Mùa Thu: Gió hanh khô, lá hạt trần ngả vàng, nắng chiều hổ phách",
+        toastEn: "🍂 Autumn: Dry winds, golden amber conifers, warm raking sunset"
+      },
+      winter: {
+        exposure: 0.98,
+        keyColor: new THREE.Color(0xd2e8ff),
+        hemiSky: new THREE.Color(0xecf4ff),
+        hemiGround: new THREE.Color(0x8a9ba8),
+        bgFilter: isWatercolor ? 'blur(3.5px) grayscale(0.35) brightness(0.88) hue-rotate(190deg)' : 'grayscale(0.3) brightness(0.92)',
+        overlayGrad: 'radial-gradient(circle, rgba(140, 190, 255, 0.25) 0%, transparent 75%)',
+        toastVi: "❄️ Mùa Đông: Sương giá cận cực, bầu trời trong trẻo se lạnh",
+        toastEn: "❄️ Winter: Subpolar frost, crisp pale skies, cool silver luminance"
+      }
+    };
+
+    function applySeasonWithSmoothTransition(seasonKey) {
+      const cfg = SEASON_PRESETS[seasonKey];
+      if (!cfg) return;
+
+      showSeasonToast(currentLang === 'vi' ? cfg.toastVi : cfg.toastEn);
+
+      seasonOverlay.style.background = cfg.overlayGrad;
+      seasonOverlay.classList.add('active');
+      setTimeout(() => seasonOverlay.classList.remove('active'), 900);
+
+      stageBgLayer.style.filter = cfg.bgFilter;
+
+      if (seasonAnimId) cancelAnimationFrame(seasonAnimId);
+      const startExp = renderer.toneMappingExposure;
+      const startKey = keyLight.color.clone();
+      const startHemiSky = hemiLight.color.clone();
+      const startHemiGnd = hemiLight.groundColor.clone();
+      const startTime = performance.now();
+      const duration = 650;
+
+      function animateLights(now) {
+        const elapsed = now - startTime;
+        const t = Math.min(elapsed / duration, 1.0);
+        const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+        renderer.toneMappingExposure = startExp + (cfg.exposure - startExp) * ease;
+        keyLight.color.copy(startKey).lerp(cfg.keyColor, ease);
+        hemiLight.color.copy(startHemiSky).lerp(cfg.hemiSky, ease);
+        hemiLight.groundColor.copy(startHemiGnd).lerp(cfg.hemiGround, ease);
+
+        if (t < 1.0) {
+          seasonAnimId = requestAnimationFrame(animateLights);
+        }
+      }
+      seasonAnimId = requestAnimationFrame(animateLights);
+    }
+
+    document.querySelectorAll('[data-season]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-season]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applySeasonWithSmoothTransition(btn.dataset.season);
+      });
+    });
+
+    /* ==========================================================================
+       8. THUYẾT MINH ÂM THANH TIẾNG VIỆT CHUẨN NAM/NỮ MIỀN BẮC
+       ========================================================================== */
+    let selectedVoice = "male";
+    let isPlayingAudio = false;
+    let audioPlayer = new Audio();
+
+    const btnVoiceMale = document.getElementById('btn-voice-male');
+    const btnVoiceFemale = document.getElementById('btn-voice-female');
+    const btnPlayAudio = document.getElementById('btn-play-audio');
+    const iconPlay = document.getElementById('audio-icon-play');
+    const iconStop = document.getElementById('audio-icon-stop');
+    const audioStatusLabel = document.getElementById('audio-status-label');
+    const uiPlayBtnText = document.getElementById('ui-play-btn-text');
+
+    btnVoiceMale.addEventListener('click', () => {
+      selectedVoice = "male";
+      btnVoiceMale.classList.add('active');
+      btnVoiceFemale.classList.remove('active');
+      uiPlayBtnText.textContent = "Nghe thuyết minh (Giọng Nam)";
+      if (isPlayingAudio) playExhibitAudio();
+    });
+
+    btnVoiceFemale.addEventListener('click', () => {
+      selectedVoice = "female";
+      btnVoiceFemale.classList.add('active');
+      btnVoiceMale.classList.remove('active');
+      uiPlayBtnText.textContent = "Nghe thuyết minh (Giọng Nữ)";
+      if (isPlayingAudio) playExhibitAudio();
+    });
+
+    function playExhibitAudio() {
+      stopExhibitAudio();
+      isPlayingAudio = true;
+      iconPlay.style.display = 'none';
+      iconStop.style.display = 'block';
+      audioStatusLabel.textContent = "Đang phát…";
+
+      const mp3Url = `./assets/audio/${currentExhibit.id}_vi_${selectedVoice}.mp3`;
+      audioPlayer.src = mp3Url;
+      audioPlayer.play().catch(err => {
+        console.warn("Lỗi phát audio:", err);
+      });
+
+      audioPlayer.onended = () => {
+        stopExhibitAudio();
+      };
+    }
+
+    function stopExhibitAudio() {
+      audioPlayer.pause();
+      audioPlayer.currentTime = 0;
+      isPlayingAudio = false;
+      iconPlay.style.display = 'block';
+      iconStop.style.display = 'none';
+      audioStatusLabel.textContent = "Sẵn sàng";
+    }
+
+    btnPlayAudio.addEventListener('click', () => {
+      if (isPlayingAudio) stopExhibitAudio();
+      else playExhibitAudio();
+    });
+
+    /* ==========================================================================
+       9. GIAO DIỆN & RENDER RAIL 18 TIÊU BẢN KHỦNG LONG
+       ========================================================================== */
+    // dinoRail hoisted to top
+    const DINO_ICONS = {
+      triceratops: '🦏',
+      t_rex: '🦖',
+      maiasaura_nest: '🪺',
+      protoceratops_fossil: '🪨',
+      giganotosaurus: '🐲',
+      mamenchisaurus: '🦒',
+      baryonyx: '🐊',
+      liopleurodon: '🐋',
+      allosaurus: '🦖',
+      stegosaurus: '🛡️',
+      spinosaurus: '🐊',
+      pterosaur: '🦅',
+      ankylosaurus: '🐢',
+      cryolophosaurus: '❄️',
+      velociraptor: '🪶',
+      gorgosaurus: '🐺',
+      mosasaurus: '🌊',
+      triceratops_skeleton: '🦴'
+    };
+
+    function renderDinoRail() {
+      dinoRail.innerHTML = EXHIBITS.map((ex, idx) => `
+        <button class="dino-tab ${idx === currentExhibitIndex ? 'active' : ''}" data-index="${idx}">
+          <span>${DINO_ICONS[ex.id] || '🦕'}</span>
+          <span>${currentLang === 'vi' ? ex.nameVi : ex.nameEn}</span>
+        </button>
+      `).join('');
+
+      dinoRail.querySelectorAll('.dino-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const idx = parseInt(tab.dataset.index);
+          currentExhibitIndex = idx;
+          dinoRail.querySelectorAll('.dino-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          if (isPlayingAudio) stopExhibitAudio();
+          loadExhibit(EXHIBITS[idx]);
+        });
+      });
+    }
+
+    function updateUIContent() {
+      const isVi = currentLang === 'vi';
+      const ex = currentExhibit;
+      const data = ex[currentLang];
+
+      document.getElementById('exhibit-tag').textContent = data.tag;
+      document.getElementById('exhibit-name').textContent = isVi ? ex.nameVi : ex.nameEn;
+      document.getElementById('exhibit-subtitle').textContent = data.subtitle;
+      document.getElementById('exhibit-intro').textContent = data.intro;
+      document.getElementById('exhibit-observation').textContent = data.obs;
+
+      document.getElementById('fact-val-period').textContent = isVi ? ex.periodVi : ex.periodEn;
+      document.getElementById('fact-sub-period').textContent = isVi ? ex.timeScaleVi : ex.timeScaleEn;
+      document.getElementById('fact-val-diet').textContent = data.diet;
+      document.getElementById('fact-sub-diet').textContent = data.dietSub;
+      document.getElementById('fact-val-length').textContent = data.length;
+      document.getElementById('fact-sub-length').textContent = data.lengthSub;
+      document.getElementById('fact-val-mass').textContent = data.mass;
+      document.getElementById('fact-sub-mass').textContent = data.massSub;
+      document.getElementById('fact-val-loc').textContent = data.loc;
+      document.getElementById('fact-sub-loc').textContent = data.locSub;
+
+      
+
+      // Cập nhật dossier địa tầng trong Paleo Modal
+      document.getElementById('dossier-formation').textContent = ex.formation || "Chưa cập nhật";
+      document.getElementById('dossier-coords').textContent = ex.paleoCoords || "Tọa độ viễn thám cổ";
+      document.getElementById('dossier-matrix').textContent = ex.rockMatrix || "Sa thạch & bùn kết cổ sinh";
+      document.getElementById('dossier-dating').textContent = ex.datingMethod || "Đồng vị phóng xạ";
+      document.getElementById('dossier-discoverer').textContent = ex.discoverer || "Hồ sơ bảo tàng";
+    }
+
+
+
+    // Tải ảnh nền tùy ý từ máy tính
+    document.getElementById('input-bg-upload').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          stageBgLayer.style.backgroundImage = `url('${event.target.result}')`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Nút Sidebar Toggle
+    const appWorkspace = document.getElementById('app-workspace');
+    document.getElementById('btn-toggle-sidebar').addEventListener('click', () => {
+      appWorkspace.classList.toggle('sidebar-collapsed');
+      setTimeout(onWindowResize, 320);
+    });
+
+    // Toàn màn hình
+    document.getElementById('btn-fullscreen').addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.warn(err));
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    // Bật/Tắt Tỉ lệ người thật 1.75m
+    const btnToggleHuman = document.getElementById('btn-toggle-human');
+    btnToggleHuman.addEventListener('click', () => {
+      isHumanVisible = !isHumanVisible;
+      humanGroup.visible = isHumanVisible;
+      if (groundRulerLine) groundRulerLine.visible = isHumanVisible;
+      document.getElementById('ruler-badge').style.display = isHumanVisible ? 'flex' : 'none';
+      btnToggleHuman.classList.toggle('active', isHumanVisible);
+
+      if (isHumanVisible) {
+        smoothMoveCamera(CAMERA_PRESETS.HUMAN_SCALE.pos, CAMERA_PRESETS.HUMAN_SCALE.target);
+      } else {
+        smoothMoveCamera(CAMERA_PRESETS.FULL.pos, CAMERA_PRESETS.FULL.target);
+      }
+    });
+
+    function smoothMoveCamera(newPos, newLookAt) {
+      targetCamPos.copy(newPos);
+      targetCamLookAt.copy(newLookAt);
+      isTransitioningCam = true;
+    }
+
+    // Zoom Buttons
+    document.getElementById('btn-zoom-in').addEventListener('click', () => {
+      camera.position.addScaledVector(camera.getWorldDirection(new THREE.Vector3()), 1.4);
+      controls.update();
+    });
+    document.getElementById('btn-zoom-out').addEventListener('click', () => {
+      camera.position.addScaledVector(camera.getWorldDirection(new THREE.Vector3()), -1.4);
+      controls.update();
+    });
+
+    // Chuyển đổi ngôn ngữ VI / EN
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentLang = btn.dataset.lang;
+        localStorage.setItem('museum_lang', currentLang);
+        renderDinoRail();
+        updateUIContent();
+      });
+    });
+
+    /* ==========================================================================
+       10. QUẢ ĐỊA CẦU CỔ SINH 3D (INTERACTIVE 3D PALEO-GLOBE)
+       ========================================================================== */
+    const paleoModal = document.getElementById('paleo-modal');
+    const licenseModal = document.getElementById('license-modal');
+
+    document.getElementById('btn-open-paleo-modal').addEventListener('click', () => {
+      paleoModal.classList.add('open');
+      initPaleoGlobe();
+    });
+    document.getElementById('close-paleo-modal').addEventListener('click', () => {
+      paleoModal.classList.remove('open');
+    });
+
+    document.getElementById('btn-open-license-modal').addEventListener('click', () => {
+      licenseModal.classList.add('open');
+    });
+    document.getElementById('close-license-modal').addEventListener('click', () => {
+      licenseModal.classList.remove('open');
+    });
+
+    let globeScene, globeCamera, globeRenderer, globeMesh, pinMesh;
+    let isGlobeInit = false;
+
+    
+    /* ==========================================================================
+       BẢN ĐỒ ĐỊA CẦU CỔ SINH (PALEOMAP TEXTURE GENERATOR - 3 NIÊN ĐẠI TRUNG SINH)
+       Chuẩn hình chiếu Equirectangular 2:1 (UV Spherical Projection)
+       ========================================================================== */
+    function createPaleoMapCanvasTexture(period) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Đại dương nguyên thủy (Panthalassa / Tethys / Atlantic)
+      const oceanGrad = ctx.createLinearGradient(0, 0, 0, 512);
+      if (period === 'triassic') {
+        oceanGrad.addColorStop(0, '#0c2230');
+        oceanGrad.addColorStop(0.5, '#12394f');
+        oceanGrad.addColorStop(1, '#0c2230');
+      } else if (period === 'jurassic') {
+        oceanGrad.addColorStop(0, '#0b2638');
+        oceanGrad.addColorStop(0.3, '#10435b');
+        oceanGrad.addColorStop(0.5, '#165773');
+        oceanGrad.addColorStop(0.7, '#10435b');
+        oceanGrad.addColorStop(1, '#0b2638');
+      } else {
+        oceanGrad.addColorStop(0, '#09253b');
+        oceanGrad.addColorStop(0.2, '#114a6e');
+        oceanGrad.addColorStop(0.5, '#18648e');
+        oceanGrad.addColorStop(0.8, '#114a6e');
+        oceanGrad.addColorStop(1, '#09253b');
+      }
+      ctx.fillStyle = oceanGrad;
+      ctx.fillRect(0, 0, 1024, 512);
+
+      // Thềm lục địa nước nông (Cyan coastal shelves)
+      ctx.fillStyle = period === 'cretaceous' ? 'rgba(32, 178, 170, 0.45)' : 'rgba(26, 122, 130, 0.35)';
+
+      if (period === 'triassic') {
+        // --- KỶ TAM ĐIỆP: SIÊU LỤC ĐỊA PANGAEA (Hình chữ C khổng lồ) ---
+        // Vùng thềm nông bao quanh Pangaea
+        ctx.beginPath();
+        ctx.ellipse(512, 256, 260, 210, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pangaea Landmass chính
+        ctx.fillStyle = '#b56338'; // Sa mạc đỏ nội lục
+        ctx.beginPath();
+        ctx.moveTo(512, 60);
+        ctx.bezierCurveTo(680, 70, 720, 200, 680, 320);
+        ctx.bezierCurveTo(640, 420, 420, 460, 360, 420);
+        ctx.bezierCurveTo(310, 360, 340, 240, 400, 180);
+        ctx.bezierCurveTo(460, 120, 450, 70, 512, 60);
+        ctx.fill();
+
+        // Biển Tethys khoét sâu vào sườn phía đông tạo hình chữ C
+        ctx.fillStyle = oceanGrad;
+        ctx.beginPath();
+        ctx.moveTo(700, 256);
+        ctx.bezierCurveTo(600, 220, 520, 240, 480, 256);
+        ctx.bezierCurveTo(520, 270, 600, 290, 700, 256);
+        ctx.fill();
+
+        // Vành đai ven biển xanh (Lush coastal margin)
+        ctx.fillStyle = '#426b42';
+        ctx.beginPath();
+        ctx.arc(380, 380, 45, 0, Math.PI * 2);
+        ctx.arc(620, 120, 40, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (period === 'jurassic') {
+        // --- KỶ JURA: LAURASIA (Bắc) VÀ GONDWANA (Nam) TÁCH ĐÔI ---
+        // 1. Laurasia (Bắc Mỹ, Âu-Á sơ khai)
+        ctx.fillStyle = '#2d6a4f';
+        ctx.beginPath();
+        ctx.ellipse(480, 140, 220, 75, -0.08, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Đới núi tùng bách Laurasia
+        ctx.fillStyle = '#1b4332';
+        ctx.beginPath();
+        ctx.ellipse(460, 130, 160, 40, -0.05, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Gondwana (Nam Mỹ, Châu Phi, Nam Cực, Úc, Ấn Độ)
+        ctx.fillStyle = '#8c502a';
+        ctx.beginPath();
+        ctx.ellipse(540, 350, 230, 95, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Vùng rừng rậm xích đạo ven biển
+        ctx.fillStyle = '#40916c';
+        ctx.beginPath();
+        ctx.arc(380, 310, 60, 0, Math.PI * 2); // Nam Mỹ cổ
+        ctx.arc(580, 320, 75, 0, Math.PI * 2); // Châu Phi cổ
+        ctx.fill();
+
+        // Eo biển Đại Tây Dương sơ khai rạn nứt chia đôi 2 mảng
+        ctx.fillStyle = oceanGrad;
+        ctx.beginPath();
+        ctx.moveTo(240, 220);
+        ctx.bezierCurveTo(450, 200, 580, 240, 800, 210);
+        ctx.lineWidth = 28;
+        ctx.strokeStyle = '#10435b';
+        ctx.stroke();
+
+      } else {
+        // --- KỶ PHẤN TRẮNG: LỤC ĐỊA TRÔI DẠT & BIỂN NỘI ĐỊA SEAWAY ---
+        // 1. Bắc Mỹ bị xẻ đôi thành Laramidia (Tây) & Appalachia (Đông)
+        ctx.fillStyle = '#40916c';
+        // Laramidia
+        ctx.beginPath();
+        ctx.ellipse(320, 150, 55, 80, -0.15, 0, Math.PI * 2);
+        ctx.fill();
+        // Appalachia
+        ctx.beginPath();
+        ctx.ellipse(430, 140, 45, 75, 0.1, 0, Math.PI * 2);
+        ctx.fill();
+        // Western Interior Seaway (Biển nông màu ngọc lam giữa 2 đảo lục địa)
+        ctx.fillStyle = '#2ec4b6';
+        ctx.fillRect(365, 80, 32, 145);
+
+        // 2. Nam Mỹ (Tách xa khỏi châu Phi)
+        ctx.fillStyle = '#52b788';
+        ctx.beginPath();
+        ctx.moveTo(350, 260);
+        ctx.lineTo(410, 290);
+        ctx.lineTo(390, 420);
+        ctx.lineTo(340, 370);
+        ctx.closePath();
+        ctx.fill();
+
+        // 3. Châu Phi
+        ctx.fillStyle = '#a37042';
+        ctx.beginPath();
+        ctx.ellipse(540, 290, 80, 95, 0.08, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Lục địa Á - Âu & Quần đảo Châu Âu cổ
+        ctx.fillStyle = '#2d6a4f';
+        ctx.beginPath();
+        ctx.ellipse(680, 140, 180, 65, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 5. Nam Cực & Châu Úc dính liền ở cực Nam
+        ctx.fillStyle = '#74c69d'; // Xanh tươi, không có băng tuyết (Greenhouse world)
+        ctx.beginPath();
+        ctx.ellipse(650, 440, 160, 45, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 6. Tiểu lục địa Ấn Độ (Hòn đảo trôi dạt trên Ấn Độ Dương)
+        ctx.fillStyle = '#40916c';
+        ctx.beginPath();
+        ctx.ellipse(710, 320, 32, 45, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Lưới kinh vĩ tuyến cổ điển mờ nhẹ (Equirectangular Lat/Lon grid)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= 1024; x += 128) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 512);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= 512; y += 64) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(1024, y);
+        ctx.stroke();
+      }
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+      return texture;
+    }
+
+    let paleoTextures = {};
+    function initPaleoGlobe() {
+      const gWrap = document.getElementById('globe-canvas-wrap');
+      if (isGlobeInit) {
+        onGlobeResize();
+        return;
+      }
+      isGlobeInit = true;
+
+      globeScene = new THREE.Scene();
+      const w = gWrap.clientWidth || 450;
+      const h = gWrap.clientHeight || 340;
+
+      globeCamera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
+      globeCamera.position.set(0, 0, 4.2);
+
+      globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      globeRenderer.setSize(w, h);
+      globeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      gWrap.appendChild(globeRenderer.domElement);
+
+      // Quả cầu Trái Đất Cổ sinh
+      const sphereGeo = new THREE.SphereGeometry(1.4, 48, 48);
+      const texLoader = new THREE.TextureLoader();
+      const canvasTriassic = createPaleoMapCanvasTexture('triassic');
+      const canvasJurassic = createPaleoMapCanvasTexture('jurassic');
+      const canvasCretaceous = createPaleoMapCanvasTexture('cretaceous');
+
+      paleoTextures = {
+        triassic: canvasTriassic,
+        jurassic: canvasJurassic,
+        cretaceous: canvasCretaceous
+      };
+
+      // Tự động nạp 3 file PNG map thật người dùng vừa thêm trong assets/texture/
+      texLoader.load('./assets/texture/paleo_triassic.png', (tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        paleoTextures.triassic = tex;
+        console.log('✓ Đã nạp thành công map Kỷ Tam Điệp: paleo_triassic.png');
+      });
+
+      texLoader.load('./assets/texture/paleo_jurassic.png', (tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        paleoTextures.jurassic = tex;
+        console.log('✓ Đã nạp thành công map Kỷ Jura: paleo_jurassic.png');
+      });
+
+      texLoader.load('./assets/texture/paleo_cretaceous.png', (tex) => {
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        paleoTextures.cretaceous = tex;
+        if (globeMesh) {
+          globeMesh.material.map = tex;
+          globeMesh.material.needsUpdate = true;
+        }
+        console.log('✓ Đã nạp thành công map Kỷ Phấn Trắng: paleo_cretaceous.png');
+      });
+
+      const sphereMat = new THREE.MeshStandardMaterial({
+        map: paleoTextures.cretaceous,
+        roughness: 0.65,
+        metalness: 0.08,
+        wireframe: false
+      });
+      globeMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      globeScene.add(globeMesh);
+
+      // Lớp mây quyển khí cầu
+      const atmosGeo = new THREE.SphereGeometry(1.44, 32, 32);
+      const atmosMat = new THREE.MeshBasicMaterial({
+        color: 0x4aa398,
+        transparent: true,
+        opacity: 0.15,
+        wireframe: true
+      });
+      const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+      // atmosMesh removed
+
+      // Ghim định vị màu đỏ 3D 📍 (Red Location Pin)
+      pinMesh = new THREE.Group();
+      
+      const pinHeadGeo = new THREE.SphereGeometry(0.065, 16, 16);
+      const pinHeadMat = new THREE.MeshStandardMaterial({ color: 0xff2a2a, roughness: 0.2, metalness: 0.1 });
+      const pinHead = new THREE.Mesh(pinHeadGeo, pinHeadMat);
+      pinHead.position.y = 0.11;
+      pinMesh.add(pinHead);
+
+      const pinConeGeo = new THREE.ConeGeometry(0.045, 0.12, 16);
+      const pinConeMat = new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.3 });
+      const pinCone = new THREE.Mesh(pinConeGeo, pinConeMat);
+      pinCone.position.y = 0.05;
+      pinMesh.add(pinCone);
+
+      const pulseGeo = new THREE.RingGeometry(0.04, 0.09, 24);
+      const pulseMat = new THREE.MeshBasicMaterial({ color: 0xff3333, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+      const pulseRing = new THREE.Mesh(pulseGeo, pulseMat);
+      pulseRing.rotation.x = Math.PI / 2;
+      pulseRing.position.y = 0.005;
+      pinMesh.add(pulseRing);
+      pinMesh.userData.pulseRing = pulseRing;
+
+      pinMesh.position.set(0.6, 0.8, 1.0).normalize().multiplyScalar(1.40);
+      globeScene.add(pinMesh);
+
+      const gLight = new THREE.DirectionalLight(0xfff5dd, 2.0);
+      gLight.position.set(5, 4, 4);
+      globeScene.add(gLight);
+
+      const gAmb = new THREE.AmbientLight(0xffffff, 2.6);
+      globeScene.add(gAmb);
+      const gLight2 = new THREE.DirectionalLight(0xffffff, 1.2);
+      gLight2.position.set(-5, -3, -5);
+      globeScene.add(gLight2);
+
+      // Orbit cho Địa Cầu
+      const gControls = new OrbitControls(globeCamera, globeRenderer.domElement);
+      gControls.enableDamping = true;
+      gControls.dampingFactor = 0.05;
+      gControls.autoRotate = true;
+      gControls.autoRotateSpeed = 0.8;
+
+      function renderGlobe() {
+        if (!paleoModal.classList.contains('open')) return;
+        requestAnimationFrame(renderGlobe);
+        gControls.update();
+        globeRenderer.render(globeScene, globeCamera);
+      }
+      renderGlobe();
+    }
+
+    function onGlobeResize() {
+      const gWrap = document.getElementById('globe-canvas-wrap');
+      if (!globeCamera || !globeRenderer || !gWrap) return;
+      const w = gWrap.clientWidth || 450;
+      const h = gWrap.clientHeight || 340;
+      globeCamera.aspect = w / h;
+      globeCamera.updateProjectionMatrix();
+      globeRenderer.setSize(w, h);
+    }
+
+    // Nút chọn 3 kỷ trong Paleo-Globe Modal
+    document.querySelectorAll('[data-period]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const p = btn.dataset.period;
+        const tag = document.getElementById('globe-overlay-tag');
+
+        if (globeMesh && paleoTextures[p]) {
+          globeMesh.material.map = paleoTextures[p];
+          globeMesh.material.needsUpdate = true;
+        }
+
+        if (p === 'triassic') {
+          tag.textContent = "Kỷ Tam Điệp (Triassic: 252–201 Ma) • Siêu lục địa Pangaea liền khối & Đại dương Panthalassa";
+          if (pinMesh) pinMesh.position.set(0.65, 0.35, 1.2).normalize().multiplyScalar(1.44);
+        } else if (p === 'jurassic') {
+          tag.textContent = "Kỷ Jura (Jurassic: 201–145 Ma) • Rạn nứt tách đôi Laurasia & Gondwana";
+          if (pinMesh) pinMesh.position.set(-0.2, 0.7, 1.2).normalize().multiplyScalar(1.44);
+        } else {
+          tag.textContent = "Kỷ Phấn Trắng (Cretaceous: 145–66 Ma) • Lục địa trôi dạt & Biển nội địa Western Interior";
+          if (pinMesh) pinMesh.position.set(0.6, 0.8, 1.0).normalize().multiplyScalar(1.44);
+        }
+      });
+    });
+
+    
+    /* ==========================================================================
+       XỬ LÝ BUY ME A COFFEE & CÂN BẰNG SÁNG & XOAY MÔ HÌNH & PALEO FULLSCREEN
+       ========================================================================== */
+    // 1. Buy Me a Coffee Modal
+    const coffeeModal = document.getElementById('coffee-modal');
+    if (coffeeModal) {
+      document.getElementById('btn-open-coffee')?.addEventListener('click', () => {
+        coffeeModal.style.display = 'flex';
+      });
+      document.getElementById('close-coffee-modal')?.addEventListener('click', () => {
+        coffeeModal.style.display = 'none';
+      });
+      coffeeModal.addEventListener('click', (e) => {
+        if (e.target === coffeeModal) coffeeModal.style.display = 'none';
+      });
+    }
+
+    // 2. Popover Cân Bằng Ánh Sáng & Màu Sắc
+    const colorPopover = document.getElementById('color-popover');
+    document.getElementById('btn-open-color-tuner')?.addEventListener('click', () => {
+      colorPopover?.classList.toggle('active');
+      peelerPopover?.classList.remove('active');
+      humanPopover?.classList.remove('active');
+      shadowPopover?.classList.remove('active');
+      rotPopover?.classList.remove('active');
+    });
+    document.getElementById('close-color-popover')?.addEventListener('click', () => {
+      colorPopover?.classList.remove('active');
+    });
+
+    const sliderExposure = document.getElementById('slider-exposure');
+    const lblExposureVal = document.getElementById('lbl-exposure-val');
+    sliderExposure?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      if (lblExposureVal) lblExposureVal.textContent = val.toFixed(2);
+      if (renderer) renderer.toneMappingExposure = val;
+    });
+
+    const sliderKeylight = document.getElementById('slider-keylight');
+    const lblKeylightVal = document.getElementById('lbl-keylight-val');
+    sliderKeylight?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      if (lblKeylightVal) lblKeylightVal.textContent = val.toFixed(1);
+      if (keyLight) keyLight.intensity = val;
+    });
+
+    const sliderAmbient = document.getElementById('slider-ambient');
+    const lblAmbientVal = document.getElementById('lbl-ambient-val');
+    sliderAmbient?.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      if (lblAmbientVal) lblAmbientVal.textContent = val.toFixed(2);
+      if (hemiLight) hemiLight.intensity = val;
+    });
+
+    const sliderSaturate = document.getElementById('slider-saturate');
+    const lblSaturateVal = document.getElementById('lbl-saturate-val');
+    sliderSaturate?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      if (lblSaturateVal) lblSaturateVal.textContent = val + '%';
+      if (renderer && renderer.domElement) {
+        renderer.domElement.style.filter = `saturate(${val}%) contrast(102%)`;
+      }
+    });
+
+    document.getElementById('btn-color-natural')?.addEventListener('click', () => {
+      if (sliderExposure) { sliderExposure.value = 1.20; sliderExposure.dispatchEvent(new Event('input')); }
+      if (sliderKeylight) { sliderKeylight.value = 2.0; sliderKeylight.dispatchEvent(new Event('input')); }
+      if (sliderAmbient) { sliderAmbient.value = 1.15; sliderAmbient.dispatchEvent(new Event('input')); }
+      if (sliderSaturate) { sliderSaturate.value = 100; sliderSaturate.dispatchEvent(new Event('input')); }
+    });
+    document.getElementById('btn-color-bright')?.addEventListener('click', () => {
+      if (sliderExposure) { sliderExposure.value = 1.55; sliderExposure.dispatchEvent(new Event('input')); }
+      if (sliderKeylight) { sliderKeylight.value = 2.6; sliderKeylight.dispatchEvent(new Event('input')); }
+      if (sliderAmbient) { sliderAmbient.value = 1.45; sliderAmbient.dispatchEvent(new Event('input')); }
+      if (sliderSaturate) { sliderSaturate.value = 110; sliderSaturate.dispatchEvent(new Event('input')); }
+    });
+    document.getElementById('btn-color-warm')?.addEventListener('click', () => {
+      if (sliderExposure) { sliderExposure.value = 1.25; sliderExposure.dispatchEvent(new Event('input')); }
+      if (sliderKeylight) { sliderKeylight.value = 2.2; sliderKeylight.dispatchEvent(new Event('input')); }
+      if (sliderAmbient) { sliderAmbient.value = 1.20; sliderAmbient.dispatchEvent(new Event('input')); }
+      if (sliderSaturate) { sliderSaturate.value = 120; sliderSaturate.dispatchEvent(new Event('input')); }
+    });
+    document.getElementById('btn-color-reset')?.addEventListener('click', () => {
+      document.getElementById('btn-color-natural')?.click();
+    });
+
+    // 3. Popover Xoay Ngang Mô Hình Chủ Động
+    const rotPopover = document.getElementById('rot-popover');
+    document.getElementById('btn-open-rot-tuner')?.addEventListener('click', () => {
+      rotPopover?.classList.toggle('active');
+      peelerPopover?.classList.remove('active');
+      humanPopover?.classList.remove('active');
+      shadowPopover?.classList.remove('active');
+      colorPopover?.classList.remove('active');
+    });
+    document.getElementById('close-rot-popover')?.addEventListener('click', () => {
+      rotPopover?.classList.remove('active');
+    });
+
+    let userModelRotationDeg = 0;
+    const sliderModelRot = document.getElementById('slider-model-rot');
+    const lblModelRotVal = document.getElementById('lbl-model-rot-val');
+
+    function applyUserRotation() {
+      if (lblModelRotVal) lblModelRotVal.textContent = `${userModelRotationDeg}°`;
+      if (sliderModelRot) sliderModelRot.value = userModelRotationDeg;
+      if (mainDinoGroup && currentExhibit) {
+        const baseRot = currentExhibit.rotationOffsetY || 0;
+        mainDinoGroup.rotation.y = baseRot + THREE.MathUtils.degToRad(userModelRotationDeg);
+      }
+    }
+
+    sliderModelRot?.addEventListener('input', (e) => {
+      userModelRotationDeg = parseInt(e.target.value);
+      applyUserRotation();
+    });
+
+    document.querySelectorAll('[data-rot]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        userModelRotationDeg = parseInt(btn.dataset.rot);
+        applyUserRotation();
+      });
+    });
+
+    // 4. Paleo-Globe Toàn Màn Hình & Slide-Out Drawer
+    const btnGlobeFullscreen = document.getElementById('btn-globe-fullscreen');
+    const paleoModalContainer = document.querySelector('#paleo-modal .modal-container');
+    const paleoDrawer = document.getElementById('paleo-dossier-drawer');
+    const btnTogglePaleoDrawer = document.getElementById('btn-toggle-paleo-drawer');
+    const paleoDrawerArrow = document.getElementById('paleo-drawer-arrow');
+    let isPaleoDrawerOpen = true;
+    let isGlobeModalExpanded = false;
+
+    btnGlobeFullscreen?.addEventListener('click', () => {
+      isGlobeModalExpanded = !isGlobeModalExpanded;
+      if (isGlobeModalExpanded) {
+        if (paleoModalContainer) {
+          paleoModalContainer.style.maxWidth = '98vw';
+          paleoModalContainer.style.height = '94vh';
+        }
+        btnGlobeFullscreen.textContent = "🗗 Thu nhỏ";
+      } else {
+        if (paleoModalContainer) {
+          paleoModalContainer.style.maxWidth = '960px';
+          paleoModalContainer.style.height = 'auto';
+        }
+        btnGlobeFullscreen.textContent = "⛶ Phóng to Địa cầu";
+      }
+      setTimeout(onGlobeResize, 250);
+    });
+
+    btnTogglePaleoDrawer?.addEventListener('click', () => {
+      isPaleoDrawerOpen = !isPaleoDrawerOpen;
+      if (isPaleoDrawerOpen) {
+        if (paleoDrawer) paleoDrawer.style.transform = 'translateX(0)';
+        if (btnTogglePaleoDrawer) btnTogglePaleoDrawer.style.right = '385px';
+        if (paleoDrawerArrow) paleoDrawerArrow.textContent = '▶';
+      } else {
+        if (paleoDrawer) paleoDrawer.style.transform = 'translateX(105%)';
+        if (btnTogglePaleoDrawer) btnTogglePaleoDrawer.style.right = '0px';
+        if (paleoDrawerArrow) paleoDrawerArrow.textContent = '◀';
+      }
+      setTimeout(onGlobeResize, 350);
+    });
+
+    /* ==========================================================================
+       11. RENDER LOOP
+       ========================================================================== */
+    function renderLoop() {
+      requestAnimationFrame(renderLoop);
+      const delta = clock.getDelta();
+
+      if (mixer) {
+        mixer.update(delta);
+      }
+
+      if (isTransitioningCam) {
+        camera.position.lerp(targetCamPos, 0.08);
+        controls.target.lerp(targetCamLookAt, 0.08);
+        controls.update();
+
+        if (camera.position.distanceTo(targetCamPos) < 0.05 && controls.target.distanceTo(targetCamLookAt) < 0.05) {
+          isTransitioningCam = false;
+        }
+      } else {
+        controls.update();
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => { init3D(); });
+    } else {
+      init3D();
+    }
+  </script>
+</body>
+</html>

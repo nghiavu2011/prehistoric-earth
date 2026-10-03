@@ -1,0 +1,64 @@
+function initPaleoGlobe() {
+      const gWrap = document.getElementById('globe-canvas-wrap');
+      if (isGlobeInit) {
+        onGlobeResize();
+        return;
+      }
+      isGlobeInit = true;
+
+      globeScene = new THREE.Scene();
+      const w = gWrap.clientWidth || 450;
+      const h = gWrap.clientHeight || 340;
+
+      globeCamera = new THREE.PerspectiveCamera(40, w / h, 0.1, 100);
+      globeCamera.position.set(0, 0, 4.2);
+
+      globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      globeRenderer.setSize(w, h);
+      globeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      gWrap.appendChild(globeRenderer.domElement);
+
+      // Quả cầu Trái Đất Cổ sinh
+      const sphereGeo = new THREE.SphereGeometry(1.4, 48, 48);
+      const sphereMat = new THREE.MeshStandardMaterial({
+        color: 0x1b3b32,
+        roughness: 0.7,
+        metalness: 0.1,
+        wireframe: false
+      });
+      globeMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      globeScene.add(globeMesh);
+
+      // Lớp mây quyển khí cầu
+      const atmosGeo = new THREE.SphereGeometry(1.44, 32, 32);
+      const atmosMat = new THREE.MeshBasicMaterial({
+        color: 0x4aa398,
+        transparent: true,
+        opacity: 0.15,
+        wireframe: true
+      });
+      const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+      globeScene.add(atmosMesh);
+
+      // Điểm ghim phát sáng (Pulsing Pinpoint)
+      const pinGeo = new THREE.SphereGeometry(0.06, 16, 16);
+      const pinMat = new THREE.MeshBasicMaterial({ color: 0xffaa33 });
+      pinMesh = new THREE.Mesh(pinGeo, pinMat);
+      pinMesh.position.set(0.6, 0.8, 1.0).normalize().multiplyScalar(1.44);
+      globeScene.add(pinMesh);
+
+      const gLight = new THREE.DirectionalLight(0xfff5dd, 2.0);
+      gLight.position.set(5, 4, 4);
+      globeScene.add(gLight);
+
+      const gAmb = new THREE.AmbientLight(0x223344, 1.2);
+      globeScene.add(gAmb);
+
+      // Orbit cho Địa Cầu
+      const gControls = new OrbitControls(globeCamera, globeRenderer.domElement);
+      gControls.enableDamping = true;
+      gControls.dampingFactor = 0.05;
+      gControls.autoRotate = true;
+      gControls.autoRotateSpeed = 0.8;
+
+      

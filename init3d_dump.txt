@@ -1,0 +1,242 @@
+function init3D() {
+      scene = new THREE.Scene();
+      scene.add(mainDinoGroup);
+      scene.add(humanGroup);
+
+      const aspect = container.clientWidth / container.clientHeight;
+      camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 150);
+      camera.position.copy(CAMERA_PRESETS.FULL.pos);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxPolarAngle = Math.PI / 2 + 0.02;
+      controls.minDistance = 1.5;
+      controls.maxDistance = 50.0;
+      controls.target.copy(CAMERA_PRESETS.FULL.target);
+      controls.update();
+
+      container.addEventListener('wheel', (e) => { e.preventDefault(); }, { passive: false });
+
+      // Ánh sáng môi trường
+      hemiLight = new THREE.HemisphereLight(0xffffff, 0xb8b09d, 1.15);
+      hemiLight.position.set(0, 30, 0);
+      scene.add(hemiLight);
+
+      keyLight = new THREE.DirectionalLight(0xfff5dd, 2.0);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 1024;
+      keyLight.shadow.mapSize.height = 1024;
+      keyLight.shadow.camera.near = 0.5;
+      keyLight.shadow.camera.far = 50;
+      keyLight.shadow.bias = -0.0006;
+      keyLight.shadow.radius = currentShadowBlur;
+      const d = 18;
+      keyLight.shadow.camera.left = -d;
+      keyLight.shadow.camera.right = d;
+      keyLight.shadow.camera.top = d;
+      keyLight.shadow.camera.bottom = -d;
+      scene.add(keyLight);
+      scene.add(keyLight.target);
+
+      rimLight = new THREE.DirectionalLight(0xbad2c8, 0.85);
+      rimLight.position.set(-10, 10, -10);
+      scene.add(rimLight);
+
+      updateSunDirection();
+
+      
+    function createSoftContactShadowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 512;
+      const ctx = canvas.getContext('2d');
+      const gradient = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+      gradient.addColorStop(0, 'rgba(15, 12, 10, 0.72)');
+      gradient.addColorStop(0.25, 'rgba(15, 12, 10, 0.50)');
+      gradient.addColorStop(0.55, 'rgba(15, 12, 10, 0.22)');
+      gradient.addColorStop(0.80, 'rgba(15, 12, 10, 0.06)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, 512, 512);
+      const texture = new THREE.CanvasTexture(canvas);
+      return texture;
+    }
+
+      // Mặt phẳng bóng đổ mặt đất cốt Y = 0.000
+      const groundGeo = new THREE.PlaneGeometry(80, 80);
+      const shadowMat = new THREE.ShadowMaterial({ opacity: currentShadowOpacity });
+      shadowReceiverPlane = new THREE.Mesh(groundGeo, shadowMat);
+      shadowReceiverPlane.rotation.x = -Math.PI / 2;
+      shadowReceiverPlane.position.y = 0.000;
+      shadowReceiverPlane.receiveShadow = true;
+      scene.add(shadowReceiverPlane);
+      const softContactGeo = new THREE.PlaneGeometry(1, 1);
+      softContactGeo.rotateX(-Math.PI / 2);
+      const softContactMat = new THREE.MeshBasicMaterial({
+        map: createSoftContactShadowTexture(),
+        transparent: true,
+        opacity: currentShadowOpacity * 0.85,
+        depthWrite: false
+      });
+      softContactShadowMesh = new THREE.Mesh(softContactGeo, softContactMat);
+      softContactShadowMesh.position.y = 0.012;
+      scene.add(softContactShadowMesh);
+
+
+      initGroundRuler();
+      loadHumanJoeModel();
+      window.addEventListener('resize', onWindowResize);
+      requestAnimationFrame(renderLoop);
+      renderDinoRail();
+      loadExhibit(currentExhibit);
+    }
+
+    function initGroundRuler() {
+      const rulerMat = new THREE.LineDashedMaterial({
+        color: 0xc89d47,
+        dashSize: 0.4,
+        gapSize: 0.25,
+        linewidth: 2
+      });
+      const points = [
+        new THREE.Vector3(0, 0.015, 0),
+        new THREE.Vector3(10.0, 0.015, 0)
+      ];
+      const geom = new THREE.BufferGeometry().setFromPoints(points);
+      groundRulerLine = new THREE.Line(geom, rulerMat);
+      groundRulerLine.computeLineDistances();
+      groundRulerLine.visible = false;
+      scene.add(groundRulerLine);
+    }
+
+    /* ==========================================================================
+       3. CẬP NHẬT TỌA ĐỘ MẶT TRỜI & BÓNG ĐỔ (BÓNG ĐỨNG HOẶC TRẢI DÀI, 360 ĐỘ)
+       ========================================================================== */
+    function updateSunDirection() {
+      if (!keyLight) return;
+      const radAzimuth = THREE.MathUtils.degToRad(currentSunAzimuth);
+      const radElevation = THREE.MathUtils.degToRad(currentSunElevation);
+      const radius = 25.0;
+
+      const y = radius * Math.sin(radElevation);
+      const groundDist = radius * Math.cos(radElevation);
+      const x = groundDist * Math.sin(radAzimuth);
+      const z = groundDist * Math.cos(radAzimuth);
+
+      keyLight.position.set(x, y, z);
+      keyLight.target.position.set(0, 1.2, 0);
+      keyLight.updateMatrixWorld();
+
+      const needle = document.getElementById('compass-needle');
+      if (needle) {
+        needle.style.transform = `rotate(${currentSunAzimuth}deg)`;
+      }
+    }
+
+    /* ==========================================================================
+       4. TẢI MÔ HÌNH NGƯỜI JOE & ĐỊNH VỊ ĐỘNG (KHOẢNG CÁCH + 4 VỊ TRÍ)
+       ========================================================================== */
+    function loadHumanJoeModel() {
+      const loader = new GLTFLoader();
+      loader.load('./assets/models/joe_human.glb', (gltf) => {
+        rawHumanScene = gltf.scene;
+
+        rawHumanScene.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            if (child.material) {
+              child.material.transparent = false;
+              child.material.opacity = 1.0;
+              child.material.depthWrite = true;
+              child.material.depthTest = true;
+            }
+          }
+        });
+
+        rawHumanScene.position.set(0, 0, 0);
+        rawHumanScene.scale.setScalar(1);
+        rawHumanScene.updateMatrixWorld(true);
+
+        const box = new THREE.Box3().setFromObject(rawHumanScene);
+        const originalHeight = box.max.y - box.min.y;
+        const targetHeightMeters = 1.75;
+        const humanScale = targetHeightMeters / originalHeight;
+        rawHumanScene.scale.setScalar(humanScale);
+        rawHumanScene.updateMatrixWorld(true);
+
+        const updatedBox = new THREE.Box3().setFromObject(rawHumanScene);
+        rawHumanScene.position.y = -updatedBox.min.y;
+
+        rawHumanScene.rotation.y = -Math.PI / 2 + TARGET_FACING_ANGLE;
+
+        humanGroup.add(rawHumanScene);
+        humanGroup.visible = isHumanVisible;
+
+        updateHumanRelativePlacement();
+      });
+    }
+
+    function updateHumanRelativePlacement() {
+      if (!humanGroup) return;
+
+      const theta = TARGET_FACING_ANGLE;
+      const D = currentHumanDist;
+
+      const uFront = new THREE.Vector2(Math.cos(theta), -Math.sin(theta));
+      const uRight = new THREE.Vector2(-Math.sin(theta), -Math.cos(theta));
+      const uLeft = new THREE.Vector2(Math.sin(theta), Math.cos(theta));
+      const uBehind = new THREE.Vector2(-Math.cos(theta), Math.sin(theta));
+
+      let targetPos2D = new THREE.Vector2();
+      let posNameVi = "Bên phải";
+      let posNameEn = "Right side";
+
+      if (currentHumanPosDir === "right") {
+        targetPos2D.copy(uRight).multiplyScalar(D);
+        posNameVi = "Bên phải"; posNameEn = "Right side";
+      } else if (currentHumanPosDir === "left") {
+        targetPos2D.copy(uLeft).multiplyScalar(D);
+        posNameVi = "Bên trái"; posNameEn = "Left side";
+      } else if (currentHumanPosDir === "front") {
+        targetPos2D.copy(uFront).multiplyScalar(D);
+        posNameVi = "Phía trước"; posNameEn = "Front";
+      } else if (currentHumanPosDir === "behind") {
+        targetPos2D.copy(uBehind).multiplyScalar(D);
+        posNameVi = "Đằng sau"; posNameEn = "Behind";
+      }
+
+      const hX = targetPos2D.x;
+      const hZ = targetPos2D.y;
+
+      humanGroup.position.set(hX, 0, hZ);
+
+      if (groundRulerLine) {
+        const positions = groundRulerLine.geometry.attributes.position.array;
+        positions[0] = 0; positions[1] = 0.015; positions[2] = 0;
+        positions[3] = hX; positions[4] = 0.015; positions[5] = hZ;
+        groundRulerLine.geometry.attributes.position.needsUpdate = true;
+        groundRulerLine.computeLineDistances();
+        groundRulerLine.visible = isHumanVisible;
+      }
+
+      const badge = document.getElementById('ruler-badge');
+      const badgeText = document.getElementById('ruler-badge-text');
+      if (badge && badgeText) {
+        badge.style.display = isHumanVisible ? 'flex' : 'none';
+        const pName = currentLang === 'vi' ? posNameVi : posNameEn;
+        badgeText.innerHTML = `Khoảng cách: <strong>${D.toFixed(1)} mét</strong> (${pName}) • Tỉ lệ người 1:1`;
+      }
+    }
+
+    
