@@ -1,9 +1,11 @@
-﻿assets/models_archive/
+assets/models_archive/
+assets/models_archive/**
 .git/
 scratch_*
 *.log
 *.tmp
 __pycache__/
+*.ps1
 build_prep.py
 generate_v4.py
 generate_v5.py
