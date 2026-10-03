@@ -4381,6 +4381,7 @@
     let currentExhibitIndex = 0;
     let currentExhibit = EXHIBITS[currentExhibitIndex];
     let currentLang = localStorage.getItem('museum_lang') || 'vi';
+    window.currentLang = currentLang;
 
     /* ==========================================================================
        2. THREE.JS VIEWER ENGINE: ĐẶC KHỐI, BÓNG ĐỔ, TỶ LỆ 1:1, CỐT 0.00
@@ -4528,7 +4529,8 @@
       window.camera = camera;
       window.controls = controls;
       window.THREE = THREE;
-      renderDinoRail();
+      setLanguage(currentLang);
+    renderDinoRail();
       loadExhibit(currentExhibit);
     }
 
@@ -4853,6 +4855,489 @@
         }
       );
     }
+    
+    /* ==========================================================================
+       HỆ THỐNG ĐA NGÔN NGỮ TOÀN DIỆN (VI / EN) & NARRATION TTS
+       ========================================================================== */
+    const UI_TRANSLATIONS = {
+      vi: {
+        brandTitleSub: "BẢO TÀNG KHỦNG LONG 3D • 17 TIÊU BẢN",
+        brandPhone: "📞 Zalo / Hợp tác: <strong>0985.578.385</strong>",
+        btnPaleoText: "Địa Cầu & Niên Đại",
+        btnPaleoTitle: "Xem quả địa cầu cổ sinh 3D, sự trôi dạt lục địa và mỏ hóa thạch",
+        btnCoffeeText: "Ủng Hộ Tác Giả",
+        btnCoffeeTitle: "Ủng hộ tác giả một ly cà phê",
+        btnLicenseText: "Bản Quyền",
+        btnLicenseTitle: "Tra cứu nguồn mở và giấy phép bản quyền bảo tàng (CC0 / CC-BY)",
+        btnFs: "Toàn màn hình",
+        btnFsTitle: "Bật/Tắt Toàn Màn Hình",
+        seasonSpring: "🌸 Xuân",
+        seasonSummer: "☀️ Hạ",
+        seasonAutumn: "🍂 Thu",
+        seasonWinter: "❄️ Đông",
+        btnCustomBg: "Đổi ảnh nền",
+        btnCustomBgTitle: "Thư viện 23 bối cảnh tiền sử 2K hoặc tải ảnh từ máy tính/điện thoại",
+
+        btnTogglePeeler: "Tách Lớp Giải Phẫu",
+        btnToggleHuman: "So sánh Người (1.75m)",
+        btnTogglePos: "Vị trí Người",
+        btnToggleColor: "Cân Bằng Sáng & Màu",
+        btnToggleShadow: "Bóng & Ánh Sáng",
+
+        tabOverview: "Tổng quan",
+        tabFacts: "Chỉ số",
+        tabMedia: "Video & Ảnh",
+        obsTitle: "Gợi ý nhà cổ sinh vật học",
+        playVoiceMale: "Nghe thuyết minh (Giọng Nam)",
+        playVoiceFemale: "Nghe thuyết minh (Giọng Nữ)",
+        voiceMale: "Nam",
+        voiceFemale: "Nữ",
+        audioReady: "Sẵn sàng",
+        audioPlaying: "Đang phát…",
+
+        hudMatrixActive: "PALEO-TELEMETRY // HUD MATRIX ACTIVE",
+        hudLengthLabel: "CHIỀU DÀI THỰC TẾ",
+        hudLengthUnit: "MÉT",
+        hudMassLabel: "KHỐI LƯỢNG ƯỚC TÍNH",
+        hudMassUnit: "TẤN",
+        hudDietLabel: "KHẨU PHẦN & BẬC DINH DƯỠNG",
+        hudChronoLabel: "NIÊN ĐẠI ĐỊA CHẤT (GEO-CHRONO)",
+        hudChronoUnit: "TRIỆU NĂM (Ma)",
+        hudFormationLabel: "HỆ TẦNG ĐỊA CHẤT & MỎ HÓA THẠCH",
+        hudCoordsKey: "TỌA ĐỘ CỔ",
+        hudMatrixKey: "TẦNG ĐÁ CHỨA",
+
+        videoDocTitle: "🎥 Video Phục Dựng 1080p",
+        videoPlaceholderText: "Video tư liệu chuẩn 1080p đang được phục dựng cho loài này.",
+        artTitle: "🖼️ Tranh Khảo Cổ & Môi Trường",
+        zoomHint: "🔍 Phóng to 2K",
+
+        bgModalTitle: "Thư Viện Bối Cảnh Tiền Sử & Đổi Ảnh Nền",
+        bgModalSub: "23 bối cảnh cổ sinh 2K có sẵn hoặc tùy biến từ thiết bị người dùng",
+        bgUploadTitle: "Tải ảnh từ máy tính hoặc điện thoại",
+        bgUploadSub: "Hỗ trợ ảnh cá nhân (JPG, PNG, WebP) làm bối cảnh 3D trực quan",
+        btnChooseDevice: "📂 Chọn ảnh từ thiết bị",
+        btnResetDefaultBg: "🔄 Khôi phục bối cảnh gốc của loài này",
+        bgGalleryHeading: "🌿 Thư Viện 23 Bối Cảnh Cổ Sinh 2K Chuẩn",
+        bgGalleryBadge: "23 Bối Cảnh",
+        bgGalleryHint: "Bấm vào bất kỳ bối cảnh nào để áp dụng tức thì",
+
+        paleoModalTitle: "🌍 Quả Địa Cầu Cổ Sinh & Mỏ Hóa Thạch Khảo Cổ",
+        paleoBtnFs: "⛶ Phóng to Địa cầu",
+        paleoTriasBtn: "<strong>Kỷ Tam Điệp (Triassic)</strong><span>252–201 Ma • Siêu lục địa Pangaea</span>",
+        paleoJuraBtn: "<strong>Kỷ Jura (Jurassic)</strong><span>201–145 Ma • Laurasia & Gondwana</span>",
+        paleoCretaBtn: "<strong>Kỷ Phấn Trắng (Cretaceous)</strong><span>145–66 Ma • Biển nội địa chia cắt</span>",
+        paleoPresentBtn: "<strong>Hiện Đại (Present Day)</strong><span>0 Ma • Phân bố mỏ hóa thạch toàn cầu</span>",
+        paleoDossierTitle: "HỒ SƠ ĐỊA TẦNG & MỎ HÓA THẠCH",
+
+        supportTitle: "Ủng Hộ Dự Án",
+        supportDesc: "Quét mã trực tiếp để tiếp tục duy trì máy chủ & phát triển mô hình 3D:",
+        btnToggleWatercolor: "Nền màu nước",
+        copyBtn: "Chép",
+        bankHintTcb: "Mọi App Ngân Hàng quét được",
+        bankHintMomo: "Quét nhanh qua App MoMo",
+        btnCoffeeDetail: "Mời tách cà phê chi tiết",
+        peelerModalHeader: "🧬 Bóc Tách Giải Phẫu Học 3 Lớp",
+        peelerModeLabel: "Chế độ hiển thị 3 Lớp",
+        peelerLiving: "🦕 Da Sống",
+        peelerSkeleton: "🦴 Khung Xương",
+        peelerXray: "🩻 X-Ray",
+        peelerSliderLabel: "Độ bóc tách X-Ray (Nhìn xuyên xương)",
+        humanHeader: "🧍 Định vị Người So Sánh (1.75m)",
+        humanDistLabel: "Khoảng cách đến chân Khủng long",
+        humanPosLabel: "Vị trí đứng tương quan",
+        posRight: "👉 Bên phải",
+        posLeft: "👈 Bên trái",
+        posFront: "⬆️ Phía trước",
+        posBehind: "⬇️ Đằng sau",
+        shadowHeader: "☀️ Bộ Điều Khiển Bóng Đổ & Ánh Sáng",
+        shadowSoftness: "Độ rõ nét / Mờ biên (Softness)",
+        shadowOpacity: "Độ đậm bóng đổ (Opacity)",
+        shadowLength: "Độ dài bóng đổ (Góc chiếu đứng/xiên)",
+        shadowNoon: "☀️ Đứng bóng",
+        shadowNatural: "🌄 Tự nhiên",
+        shadowSunset: "🌅 Trải dài",
+        shadowAzimuth: "Hướng chiếu bóng đổ (360° La bàn)",
+        azEast: "Đông",
+        azWest: "Tây",
+        azSouth: "Nam",
+        azNorth: "Bắc",
+        colorHeader: "🎨 Cân Bằng Ánh Sáng & Màu Sắc Model 3D",
+        colorExposure: "Độ phơi sáng (Exposure)",
+        colorKeylight: "Đèn chiếu chính (Key Light)",
+        colorAmbient: "Ánh sáng môi trường (Ambient)"
+      },
+      en: {
+        brandTitleSub: "3D DINOSAUR MUSEUM • 17 SPECIMENS",
+        brandPhone: "📞 Partnership / Zalo: <strong>+84 985.578.385</strong>",
+        btnPaleoText: "Paleo Globe & Eras",
+        btnPaleoTitle: "Interactive 3D Paleo Globe, Continental Drift & Fossil Formations",
+        btnCoffeeText: "Support Creator",
+        btnCoffeeTitle: "Buy the creator a coffee",
+        btnLicenseText: "Licenses",
+        btnLicenseTitle: "Open source and museum licensing records (CC0 / CC-BY)",
+        btnFs: "Fullscreen",
+        btnFsTitle: "Toggle Fullscreen Mode",
+        seasonSpring: "🌸 Spring",
+        seasonSummer: "☀️ Summer",
+        seasonAutumn: "🍂 Autumn",
+        seasonWinter: "❄️ Winter",
+        btnCustomBg: "Change Background",
+        btnCustomBgTitle: "23 curated 2K natural habitats or upload from your device",
+
+        btnTogglePeeler: "Anatomical Layers",
+        btnToggleHuman: "Human Scale (1.75m)",
+        btnTogglePos: "Human Position",
+        btnToggleColor: "Color & Lighting",
+        btnToggleShadow: "Sun & Shadows",
+
+        tabOverview: "Overview",
+        tabFacts: "Telemetry",
+        tabMedia: "Media & Art",
+        obsTitle: "Paleontologist Observation Note",
+        playVoiceMale: "Audio Narration (Male Voice)",
+        playVoiceFemale: "Audio Narration (Female Voice)",
+        voiceMale: "Male",
+        voiceFemale: "Female",
+        audioReady: "Ready",
+        audioPlaying: "Speaking…",
+
+        hudMatrixActive: "PALEO-TELEMETRY // HUD MATRIX ACTIVE",
+        hudLengthLabel: "BODY LENGTH",
+        hudLengthUnit: "METRES",
+        hudMassLabel: "ESTIMATED MASS",
+        hudMassUnit: "TONNES",
+        hudDietLabel: "TROPHIC LEVEL & DIET",
+        hudChronoLabel: "GEO-CHRONOLOGY (CHRONO-SCALE)",
+        hudChronoUnit: "MILLION YEARS (Ma)",
+        hudFormationLabel: "STRATIGRAPHY & FOSSIL LOCALITY",
+        hudCoordsKey: "PALEO COORDS",
+        hudMatrixKey: "ROCK MATRIX",
+
+        videoDocTitle: "🎥 1080p Video Reconstruction",
+        videoPlaceholderText: "1080p field documentary is being reconstructed for this specimen.",
+        artTitle: "🖼️ Archaeological & Environment Art",
+        zoomHint: "🔍 Zoom 2K",
+
+        bgModalTitle: "Prehistoric Environments & Custom Backgrounds",
+        bgModalSub: "23 curated 2K natural habitats or upload from your device",
+        bgUploadTitle: "Upload image from computer or mobile",
+        bgUploadSub: "Supports JPG, PNG, WebP to serve as 3D diorama backdrop",
+        btnChooseDevice: "📂 Choose from device",
+        btnResetDefaultBg: "🔄 Restore original exhibit background",
+        bgGalleryHeading: "🌿 23 Curated 2K Prehistoric Habitats",
+        bgGalleryBadge: "23 Presets",
+        bgGalleryHint: "Click any scene to apply instantly",
+
+        paleoModalTitle: "🌍 Interactive 3D Paleo Globe & Fossil Localities",
+        paleoBtnFs: "⛶ Fullscreen Globe",
+        paleoTriasBtn: "<strong>Triassic Period</strong><span>252–201 Ma • Supercontinent Pangaea</span>",
+        paleoJuraBtn: "<strong>Jurassic Period</strong><span>201–145 Ma • Laurasia & Gondwana</span>",
+        paleoCretaBtn: "<strong>Cretaceous Period</strong><span>145–66 Ma • Fragmenting Continents</span>",
+        paleoPresentBtn: "<strong>Present Day</strong><span>0 Ma • Global Fossil Distribution</span>",
+        paleoDossierTitle: "STRATIGRAPHIC DOSSIER & FOSSIL MATRIX",
+
+        supportTitle: "Support Project",
+        supportDesc: "Scan QR directly to help maintain WebGL servers & 3D research:",
+        btnToggleWatercolor: "Watercolor Edge",
+        copyBtn: "Copy",
+        bankHintTcb: "Compatible with all banking apps",
+        bankHintMomo: "Fast scan via MoMo App",
+        btnCoffeeDetail: "Detailed Donation & Coffee",
+        peelerModalHeader: "🧬 Tri-Layer Anatomical Peeler",
+        peelerModeLabel: "3-Layer Display Mode",
+        peelerLiving: "🦕 Living Skin",
+        peelerSkeleton: "🦴 Skeleton",
+        peelerXray: "🩻 X-Ray",
+        peelerSliderLabel: "X-Ray Peeling Depth (Bone See-Through)",
+        humanHeader: "🧍 Human Scale & Positioning (1.75m)",
+        humanDistLabel: "Distance to Dinosaur",
+        humanPosLabel: "Relative Standing Position",
+        posRight: "👉 Right",
+        posLeft: "👈 Left",
+        posFront: "⬆️ Front",
+        posBehind: "⬇️ Behind",
+        shadowHeader: "☀️ Shadows & Sunlight Controller",
+        shadowSoftness: "Softness / Edge Blur",
+        shadowOpacity: "Shadow Opacity",
+        shadowLength: "Shadow Length (Sun Elevation Angle)",
+        shadowNoon: "☀️ Overhead",
+        shadowNatural: "🌄 Natural",
+        shadowSunset: "🌅 Elongated",
+        shadowAzimuth: "Shadow Direction (360° Compass)",
+        azEast: "East",
+        azWest: "West",
+        azSouth: "South",
+        azNorth: "North",
+        colorHeader: "🎨 3D Model Lighting & Color Balance",
+        colorExposure: "Exposure",
+        colorKeylight: "Key Light",
+        colorAmbient: "Ambient Light"
+      }
+    };
+
+    function setLanguage(lang) {
+      if (lang !== 'vi' && lang !== 'en') lang = 'vi';
+      currentLang = lang;
+      window.currentLang = lang;
+      localStorage.setItem('museum_lang', lang);
+      const isVi = lang === 'vi';
+      const t = UI_TRANSLATIONS[lang];
+
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+
+      // Header
+      const bSub = document.querySelector('.brand-title-sub .badge-exhibits');
+      if (bSub) bSub.textContent = t.brandTitleSub;
+      const bPhone = document.querySelector('.brand-title-sub .badge-phone');
+      if (bPhone) bPhone.innerHTML = t.brandPhone;
+
+      const btnPaleo = document.getElementById('btn-open-paleo-modal');
+      if (btnPaleo) {
+        btnPaleo.title = t.btnPaleoTitle;
+        const spans = btnPaleo.querySelectorAll('span');
+        if (spans.length > 1) spans[1].textContent = t.btnPaleoText;
+      }
+
+      const btnCoffee = document.getElementById('btn-open-coffee-modal');
+      if (btnCoffee) {
+        btnCoffee.title = t.btnCoffeeTitle;
+        const spans = btnCoffee.querySelectorAll('span');
+        if (spans.length > 1) spans[1].textContent = t.btnCoffeeText;
+      }
+
+      const btnLicense = document.getElementById('btn-open-license-modal');
+      if (btnLicense) {
+        btnLicense.title = t.btnLicenseTitle;
+        const spans = btnLicense.querySelectorAll('span');
+        if (spans.length > 1) spans[1].textContent = t.btnLicenseText;
+      }
+
+      const uiBtnFs = document.getElementById('ui-btn-fs');
+      if (uiBtnFs) uiBtnFs.textContent = t.btnFs;
+
+      const sSpring = document.querySelector('[data-season="spring"]');
+      if (sSpring) sSpring.textContent = t.seasonSpring;
+      const sSummer = document.querySelector('[data-season="summer"]');
+      if (sSummer) sSummer.textContent = t.seasonSummer;
+      const sAutumn = document.querySelector('[data-season="autumn"]');
+      if (sAutumn) sAutumn.textContent = t.seasonAutumn;
+      const sWinter = document.querySelector('[data-season="winter"]');
+      if (sWinter) sWinter.textContent = t.seasonWinter;
+
+      const uiBtnCustomBg = document.getElementById('ui-btn-custom-bg');
+      if (uiBtnCustomBg) uiBtnCustomBg.textContent = t.btnCustomBg;
+
+      // Floating toolbar buttons
+      const uiPeeler = document.getElementById('ui-btn-peeler');
+      if (uiPeeler) uiPeeler.textContent = t.btnTogglePeeler;
+      const uiHuman = document.getElementById('ui-btn-human');
+      if (uiHuman) uiHuman.textContent = t.btnToggleHuman;
+      const btnHumanTunerSpan = document.querySelector('#btn-open-human-tuner span');
+      if (btnHumanTunerSpan) btnHumanTunerSpan.textContent = '⚙️ ' + t.btnTogglePos;
+      const uiColor = document.getElementById('ui-btn-color');
+      if (uiColor) uiColor.textContent = t.btnToggleColor;
+      const btnShadowTunerSpan = document.querySelector('#btn-open-shadow-tuner span');
+      if (btnShadowTunerSpan) btnShadowTunerSpan.textContent = '☀️ ' + t.btnToggleShadow;
+      const uiWatercolor = document.getElementById('ui-btn-watercolor');
+      if (uiWatercolor) uiWatercolor.textContent = t.btnToggleWatercolor;
+
+      // Left support card
+      const leftSupportTitle = document.querySelector('#left-support-panel .support-card-title span:last-child');
+      if (leftSupportTitle) leftSupportTitle.textContent = t.supportTitle;
+      const leftSupportSub = document.querySelector('#left-support-panel .support-card-subtitle');
+      if (leftSupportSub) leftSupportSub.textContent = t.supportDesc;
+      document.querySelectorAll('#left-support-panel .btn-copy-acc span:last-child').forEach(s => s.textContent = t.copyBtn);
+      const bankHints = document.querySelectorAll('#left-support-panel .bank-sub-hint');
+      if (bankHints.length >= 2) {
+        bankHints[0].textContent = t.bankHintTcb;
+        bankHints[1].textContent = t.bankHintMomo;
+      }
+      const btnCoffeeDetail = document.querySelector('#btn-open-coffee-detail span:last-child');
+      if (btnCoffeeDetail) btnCoffeeDetail.textContent = t.btnCoffeeDetail;
+      const reopenSupportSpan = document.querySelector('#btn-reopen-support span:last-child');
+      if (reopenSupportSpan) reopenSupportSpan.textContent = t.supportTitle;
+
+      // Popovers localization
+      const peelerH = document.querySelector('#peeler-popover .popover-header span:first-child');
+      if (peelerH) peelerH.textContent = t.peelerModalHeader;
+      const peelerModeLbl = document.querySelector('#peeler-popover .tuner-label span:first-child');
+      if (peelerModeLbl) peelerModeLbl.textContent = t.peelerModeLabel;
+      const pLiving = document.getElementById('btn-layer-living');
+      if (pLiving) pLiving.textContent = t.peelerLiving;
+      const pSkel = document.getElementById('btn-layer-skeleton');
+      if (pSkel) pSkel.textContent = t.peelerSkeleton;
+      const pXray = document.getElementById('btn-layer-xray');
+      if (pXray) pXray.textContent = t.peelerXray;
+      const pSliderLbl = document.querySelector('#peeler-popover .tuner-row:nth-child(3) .tuner-label span:first-child');
+      if (pSliderLbl) pSliderLbl.textContent = t.peelerSliderLabel;
+
+      const humanH = document.querySelector('#human-popover .popover-header span:first-child');
+      if (humanH) humanH.textContent = t.humanHeader;
+      const humanDistLbl = document.querySelector('#human-popover .tuner-label span:first-child');
+      if (humanDistLbl) humanDistLbl.textContent = t.humanDistLabel;
+      const humanPosLbl = document.querySelector('#human-popover .tuner-row:nth-child(3) .tuner-label span:first-child');
+      if (humanPosLbl) humanPosLbl.textContent = t.humanPosLabel;
+      const hRight = document.querySelector('#human-popover [data-hpos="right"]');
+      if (hRight) hRight.textContent = t.posRight;
+      const hLeft = document.querySelector('#human-popover [data-hpos="left"]');
+      if (hLeft) hLeft.textContent = t.posLeft;
+      const hFront = document.querySelector('#human-popover [data-hpos="front"]');
+      if (hFront) hFront.textContent = t.posFront;
+      const hBehind = document.querySelector('#human-popover [data-hpos="behind"]');
+      if (hBehind) hBehind.textContent = t.posBehind;
+
+      const shadowH = document.querySelector('#shadow-popover .popover-header span:first-child');
+      if (shadowH) shadowH.textContent = t.shadowHeader;
+      const sSoftLbl = document.querySelector('#shadow-popover .tuner-row:nth-child(2) .tuner-label span:first-child');
+      if (sSoftLbl) sSoftLbl.textContent = t.shadowSoftness;
+      const sOpLbl = document.querySelector('#shadow-popover .tuner-row:nth-child(3) .tuner-label span:first-child');
+      if (sOpLbl) sOpLbl.textContent = t.shadowOpacity;
+      const sLenLbl = document.querySelector('#shadow-popover .tuner-row:nth-child(4) .tuner-label span:first-child');
+      if (sLenLbl) sLenLbl.textContent = t.shadowLength;
+      const sNoon = document.getElementById('btn-shadow-noon');
+      if (sNoon) sNoon.textContent = t.shadowNoon;
+      const sNat = document.getElementById('btn-shadow-natural');
+      if (sNat) sNat.textContent = t.shadowNatural;
+      const sSunset = document.getElementById('btn-shadow-sunset');
+      if (sSunset) sSunset.textContent = t.shadowSunset;
+      const sAzLbl = document.querySelector('#shadow-popover .tuner-row:nth-child(5) .tuner-label span:first-child');
+      if (sAzLbl) sAzLbl.textContent = t.shadowAzimuth;
+      const azChips = document.querySelectorAll('#shadow-popover .compass-box .preset-chip');
+      if (azChips.length >= 4) {
+        azChips[0].textContent = t.azEast;
+        azChips[1].textContent = t.azWest;
+        azChips[2].textContent = t.azSouth;
+        azChips[3].textContent = t.azNorth;
+      }
+
+      const colorH = document.querySelector('#color-popover .popover-header span:first-child');
+      if (colorH) colorH.textContent = t.colorHeader;
+      const cExpLbl = document.querySelector('#color-popover .tuner-row:nth-child(2) .tuner-label span:first-child');
+      if (cExpLbl) cExpLbl.textContent = t.colorExposure;
+      const cKeyLbl = document.querySelector('#color-popover .tuner-row:nth-child(3) .tuner-label span:first-child');
+      if (cKeyLbl) cKeyLbl.textContent = t.colorKeylight;
+      const cAmbLbl = document.querySelector('#color-popover .tuner-row:nth-child(4) .tuner-label span:first-child');
+      if (cAmbLbl) cAmbLbl.textContent = t.colorAmbient;
+
+      // Sidebar Tabs & Overview
+      const btnTabOverview = document.querySelector('#btn-tab-overview span:nth-child(2)');
+      if (btnTabOverview) btnTabOverview.textContent = t.tabOverview;
+      const btnTabFacts = document.querySelector('#btn-tab-facts span:nth-child(2)');
+      if (btnTabFacts) btnTabFacts.textContent = t.tabFacts;
+      const labelTabMedia = document.getElementById('label-tab-media');
+      if (labelTabMedia) labelTabMedia.textContent = t.tabMedia;
+
+      const obsHeader = document.querySelector('.observation-box strong');
+      if (obsHeader) obsHeader.textContent = t.obsTitle;
+
+      const btnVoiceMale = document.getElementById('btn-voice-male');
+      if (btnVoiceMale) btnVoiceMale.textContent = t.voiceMale;
+      const btnVoiceFemale = document.getElementById('btn-voice-female');
+      if (btnVoiceFemale) btnVoiceFemale.textContent = t.voiceFemale;
+      const uiPlayBtnText = document.getElementById('ui-play-btn-text');
+      if (uiPlayBtnText) {
+        uiPlayBtnText.textContent = selectedVoice === 'male' ? t.playVoiceMale : t.playVoiceFemale;
+      }
+      const audioStatusLabel = document.getElementById('audio-status-label');
+      if (audioStatusLabel && !isPlayingAudio) {
+        audioStatusLabel.textContent = t.audioReady;
+      }
+
+      // Sci-Fi HUD
+      const hudStatusTitle = document.querySelector('.hud-status-title');
+      if (hudStatusTitle) hudStatusTitle.textContent = t.hudMatrixActive;
+      const hudBoxLabels = document.querySelectorAll('.hud-box-label');
+      if (hudBoxLabels.length >= 4) {
+        hudBoxLabels[0].textContent = t.hudLengthLabel;
+        hudBoxLabels[1].textContent = t.hudMassLabel;
+        hudBoxLabels[2].textContent = t.hudDietLabel;
+        hudBoxLabels[3].textContent = t.hudChronoLabel;
+        if (hudBoxLabels[4]) hudBoxLabels[4].textContent = t.hudFormationLabel;
+      }
+      const hudUnitTags = document.querySelectorAll('.hud-unit-tag');
+      if (hudUnitTags.length >= 2) {
+        hudUnitTags[0].textContent = t.hudLengthUnit;
+        hudUnitTags[1].textContent = t.hudMassUnit;
+        if (hudUnitTags[2]) hudUnitTags[2].textContent = t.hudChronoUnit;
+      }
+      const chipKs = document.querySelectorAll('.hud-geo-chip .chip-k');
+      if (chipKs.length >= 2) {
+        chipKs[0].textContent = t.hudCoordsKey;
+        chipKs[1].textContent = t.hudMatrixKey;
+      }
+
+      // Media Tab
+      const mediaArtTitle = document.querySelector('#tab-media .media-block:nth-child(2) .media-block-title span:first-child');
+      if (mediaArtTitle) mediaArtTitle.textContent = t.artTitle;
+      const zoomHint = document.querySelector('.img-zoom-hint span');
+      if (zoomHint) zoomHint.textContent = t.zoomHint;
+      const videoPlaceholderP = document.querySelector('#video-placeholder p');
+      if (videoPlaceholderP) videoPlaceholderP.textContent = t.videoPlaceholderText;
+
+      // Background picker modal text
+      const bgTitle = document.querySelector('#bg-picker-modal .modal-header h2');
+      if (bgTitle) bgTitle.textContent = t.bgModalTitle;
+      const bgSub = document.querySelector('#bg-picker-modal .modal-header p');
+      if (bgSub) bgSub.textContent = t.bgModalSub;
+      const bgActionStrong = document.querySelector('.bg-picker-action-info strong');
+      if (bgActionStrong) bgActionStrong.textContent = t.bgUploadTitle;
+      const bgActionP = document.querySelector('.bg-picker-action-info p');
+      if (bgActionP) bgActionP.textContent = t.bgUploadSub;
+      const bgUploadLabel = document.querySelector('label[for="input-bg-upload"]');
+      if (bgUploadLabel) bgUploadLabel.textContent = t.btnChooseDevice;
+      const btnResetBg = document.getElementById('btn-reset-default-bg');
+      if (btnResetBg) btnResetBg.textContent = t.btnResetDefaultBg;
+      const bgGalleryHeading = document.querySelector('.bg-gallery-header > div > span:first-child');
+      if (bgGalleryHeading) bgGalleryHeading.textContent = t.bgGalleryHeading;
+      const bgGalleryBadge = document.querySelector('.bg-gallery-header .badge');
+      if (bgGalleryBadge) bgGalleryBadge.textContent = t.bgGalleryBadge;
+      const bgGalleryHint = document.querySelector('.bg-gallery-header > span:last-child');
+      if (bgGalleryHint) bgGalleryHint.textContent = t.bgGalleryHint;
+
+      // Paleo modal
+      const paleoTitle = document.querySelector('#paleo-modal .modal-header h2');
+      if (paleoTitle) paleoTitle.textContent = t.paleoModalTitle;
+      const btnGlobeFs = document.getElementById('btn-globe-fullscreen');
+      if (btnGlobeFs) btnGlobeFs.textContent = t.paleoBtnFs;
+      const pBtnTrias = document.querySelector('.strat-period-btn[data-period="triassic"]');
+      if (pBtnTrias) pBtnTrias.innerHTML = t.paleoTriasBtn;
+      const pBtnJura = document.querySelector('.strat-period-btn[data-period="jurassic"]');
+      if (pBtnJura) pBtnJura.innerHTML = t.paleoJuraBtn;
+      const pBtnCreta = document.querySelector('.strat-period-btn[data-period="cretaceous"]');
+      if (pBtnCreta) pBtnCreta.innerHTML = t.paleoCretaBtn;
+      const pBtnPresent = document.querySelector('.strat-period-btn[data-period="present"]');
+      if (pBtnPresent) pBtnPresent.innerHTML = t.paleoPresentBtn;
+
+      // Support widget
+      const supTitle = document.querySelector('#left-support-panel h3') || document.querySelector('.support-card-head strong');
+      if (supTitle) supTitle.textContent = t.supportTitle;
+      const supDesc = document.querySelector('#left-support-panel p') || document.querySelector('.support-card-head p');
+      if (supDesc) supDesc.textContent = t.supportDesc;
+
+      // Re-render
+      renderDinoRail();
+      renderBgGallery();
+      updateUIContent();
+    }
+    window.setLanguage = setLanguage;
+
+
+    // =========================================================================
+    // NÚT CHUYỂN ĐỔI NGÔN NGỮ TRÊN HEADER (VI / EN)
+    // =========================================================================
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const lang = btn.getAttribute('data-lang');
+        if (lang && lang !== currentLang) {
+          if (isPlayingAudio) stopExhibitAudio();
+          setLanguage(lang);
+        }
+      });
+    });
+
     window.loadExhibit = loadExhibit;
 
     /* ==========================================================================
@@ -5245,11 +5730,12 @@
     });
 
     /* ==========================================================================
-       8. THUYẾT MINH ÂM THANH TIẾNG VIỆT CHUẨN NAM/NỮ MIỀN BẮC
+       8. THUYẾT MINH ÂM THANH SONG NGỮ (VI: STUDIO MP3 NAM/NỮ | EN: WEB SPEECH API CHUẨN)
        ========================================================================== */
     let selectedVoice = "male";
     let isPlayingAudio = false;
     let audioPlayer = new Audio();
+    let currentSpeechUtterance = null;
 
     const btnVoiceMale = document.getElementById('btn-voice-male');
     const btnVoiceFemale = document.getElementById('btn-voice-female');
@@ -5259,11 +5745,38 @@
     const audioStatusLabel = document.getElementById('audio-status-label');
     const uiPlayBtnText = document.getElementById('ui-play-btn-text');
 
+    // Nạp sẵn giọng đọc tiếng Anh của hệ điều hành
+    let availableEnVoices = [];
+    function loadVoices() {
+      if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices();
+        availableEnVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+      }
+    }
+    if ('speechSynthesis' in window) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function getBestEnglishVoice(gender) {
+      if (availableEnVoices.length === 0) loadVoices();
+      if (availableEnVoices.length === 0) return null;
+
+      if (gender === 'female') {
+        const female = availableEnVoices.find(v => /female|zira|samantha|victoria|karen|catherine|susan/i.test(v.name));
+        if (female) return female;
+      } else {
+        const male = availableEnVoices.find(v => /male|david|george|daniel|guy|mark|oliver/i.test(v.name));
+        if (male) return male;
+      }
+      return availableEnVoices[0];
+    }
+
     btnVoiceMale.addEventListener('click', () => {
       selectedVoice = "male";
       btnVoiceMale.classList.add('active');
       btnVoiceFemale.classList.remove('active');
-      uiPlayBtnText.textContent = "Nghe thuyết minh (Giọng Nam)";
+      uiPlayBtnText.textContent = currentLang === 'vi' ? "Nghe thuyết minh (Giọng Nam)" : "Audio Narration (Male Voice)";
       if (isPlayingAudio) playExhibitAudio();
     });
 
@@ -5271,21 +5784,64 @@
       selectedVoice = "female";
       btnVoiceFemale.classList.add('active');
       btnVoiceMale.classList.remove('active');
-      uiPlayBtnText.textContent = "Nghe thuyết minh (Giọng Nữ)";
+      uiPlayBtnText.textContent = currentLang === 'vi' ? "Nghe thuyết minh (Giọng Nữ)" : "Audio Narration (Female Voice)";
       if (isPlayingAudio) playExhibitAudio();
     });
 
     function playExhibitAudio() {
       stopExhibitAudio();
       isPlayingAudio = true;
-      iconPlay.style.display = 'none';
-      iconStop.style.display = 'block';
-      audioStatusLabel.textContent = "Đang phát…";
+      if (iconPlay) iconPlay.style.display = 'none';
+      if (iconStop) iconStop.style.display = 'block';
 
+      // -------------------------------------------------------------
+      // 1. NHÁNH TIẾNG ANH (ENGLISH NARRATION: NATIVE SPEECH SYNTHESIS)
+      // -------------------------------------------------------------
+      if (currentLang === 'en') {
+        if ('speechSynthesis' in window) {
+          if (audioStatusLabel) audioStatusLabel.textContent = "Speaking…";
+          const ex = currentExhibit;
+          const textToSpeak = `${ex.nameEn}. ${ex.en.subtitle}. ${ex.en.intro} ${ex.en.obs}`;
+
+          const utter = new SpeechSynthesisUtterance(textToSpeak);
+          utter.lang = 'en-US';
+          utter.rate = 0.94; // Nhịp điệu đọc thuyết minh bảo tàng trang trọng, truyền cảm
+          utter.pitch = selectedVoice === 'male' ? 0.92 : 1.05;
+
+          const voice = getBestEnglishVoice(selectedVoice);
+          if (voice) utter.voice = voice;
+
+          utter.onstart = () => {
+            isPlayingAudio = true;
+            if (iconPlay) iconPlay.style.display = 'none';
+            if (iconStop) iconStop.style.display = 'block';
+            if (audioStatusLabel) audioStatusLabel.textContent = "Speaking…";
+          };
+
+          utter.onend = () => {
+            stopExhibitAudio();
+          };
+
+          utter.onerror = (e) => {
+            console.warn("SpeechSynthesis error:", e);
+            stopExhibitAudio();
+          };
+
+          currentSpeechUtterance = utter;
+          window.speechSynthesis.speak(utter);
+          return;
+        }
+      }
+
+      // -------------------------------------------------------------
+      // 2. NHÁNH TIẾNG VIỆT (GIỮ NGUYÊN 100% STUDIO MP3 CHUẨN NAM/NỮ BẮC)
+      // -------------------------------------------------------------
+      if (audioStatusLabel) audioStatusLabel.textContent = "Đang phát…";
       const mp3Url = `./assets/audio/${currentExhibit.id}_vi_${selectedVoice}.mp3`;
       audioPlayer.src = mp3Url;
       audioPlayer.play().catch(err => {
-        console.warn("Lỗi phát audio:", err);
+        console.warn("Lỗi phát audio tiếng Việt:", err);
+        stopExhibitAudio();
       });
 
       audioPlayer.onended = () => {
@@ -5294,12 +5850,18 @@
     }
 
     function stopExhibitAudio() {
+      if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      currentSpeechUtterance = null;
       audioPlayer.pause();
       audioPlayer.currentTime = 0;
       isPlayingAudio = false;
-      iconPlay.style.display = 'block';
-      iconStop.style.display = 'none';
-      audioStatusLabel.textContent = "Sẵn sàng";
+      if (iconPlay) iconPlay.style.display = 'block';
+      if (iconStop) iconStop.style.display = 'none';
+      if (audioStatusLabel) {
+        audioStatusLabel.textContent = currentLang === 'vi' ? "Sẵn sàng" : "Ready";
+      }
     }
 
     btnPlayAudio.addEventListener('click', () => {
@@ -5497,13 +6059,42 @@
 
       // 5. Hệ tầng địa chất & Mỏ hóa thạch (Stratigraphy)
       const fForm = document.getElementById('fact-val-formation');
-      if (fForm) fForm.textContent = ex.formation || (isVi ? "Hệ tầng địa chất bảo tàng" : "Museum Geological Matrix");
+      if (fForm) {
+        if (!isVi && data.loc) {
+          fForm.textContent = `${data.loc} (${data.locSub || ''})`.replace(/\(\s*\)/, '').trim();
+        } else {
+          fForm.textContent = ex.formation || (isVi ? "Hệ tầng địa chất bảo tàng" : "Museum Geological Matrix");
+        }
+      }
 
       const hudCoords = document.getElementById('hud-val-coords');
-      if (hudCoords) hudCoords.textContent = ex.paleoCoords || (isVi ? "Tọa độ viễn thám cổ" : "Paleo coordinates");
+      if (hudCoords) {
+        let coords = ex.paleoCoords || (isVi ? "Tọa độ viễn thám cổ" : "Paleo coordinates");
+        if (!isVi) {
+          coords = coords.replace(/Bắc/g, 'N').replace(/Nam/g, 'S').replace(/Tây/g, 'W').replace(/Đông/g, 'E');
+        }
+        hudCoords.textContent = coords;
+      }
 
       const hudMatrix = document.getElementById('hud-val-matrix');
-      if (hudMatrix) hudMatrix.textContent = ex.rockMatrix || (isVi ? "Trầm tích sa thạch & bùn kết" : "Sedimentary rock matrix");
+      if (hudMatrix) {
+        let matrix = ex.rockMatrix || (isVi ? "Trầm tích sa thạch & bùn kết" : "Sedimentary rock matrix");
+        if (!isVi) {
+          matrix = matrix
+            .replace(/Sa thạch xám mịn, sét bùn ven sông/g, "Fine gray sandstone, fluvial floodplain mudstone")
+            .replace(/Sa thạch hạt thô, bãi bồi ven sông/g, "Coarse-grained fluvial sandstone & channel lag")
+            .replace(/Trầm tích hồ, bùn sét kết giàu hữu cơ/g, "Lacustrine organic-rich mudstone & shale")
+            .replace(/Trầm tích tro bụi núi lửa, sa thạch kết/g, "Volcaniclastic tuffaceous sandstone")
+            .replace(/Sa thạch hạt mịn, bùn kết lục địa/g, "Fine sandstone & continental siltstone")
+            .replace(/Bùn kết ven biển, sét xám chứa hữu cơ/g, "Coastal marine mudstone & organic gray clay")
+            .replace(/Đá vôi bùn kết biển nông, sét biển/g, "Shallow marine limestone & bituminous shale")
+            .replace(/Sa thạch bãi bồi, tầng đất cổ/g, "Fluvial sandstone & paleosol sequence")
+            .replace(/Trầm tích lòng chảo sa mạc, cồn cát cổ/g, "Eolian sand dune & arid desert basin")
+            .replace(/Trầm tích sa thạch kết & sét bùn ven sông/g, "Fluvial sandstone & floodplain siltstone")
+            .replace(/Trầm tích sa thạch & bùn kết/g, "Sedimentary sandstone & mudstone matrix");
+        }
+        hudMatrix.textContent = matrix;
+      }
 
       // Tab 3 Video & Images
       const videoPlayer = document.getElementById('exhibit-video-player');
@@ -5684,140 +6275,209 @@
       {
         file: "./assets/image/Anh Nen/Arid_desert_landscape_and_dunes_2K_20261002155631-clean.png",
         nameVi: "Sa Mạc & Cồn Cát Cổ Đại",
+        nameEn: "Ancient Arid Dunes & Desert",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Sa mạc"
+        periodEn: "Cretaceous Period",
+        tagVi: "Sa mạc",
+        tagEn: "Desert"
       },
       {
         file: "./assets/image/Anh Nen/Arid_red_sandstone_canyon_2K_20261002155823-clean.png",
         nameVi: "Hẻm Núi Sa Thạch Đỏ",
+        nameEn: "Red Sandstone Canyon",
         periodVi: "Kỷ Jura",
-        tag: "Hẻm núi"
+        periodEn: "Jurassic Period",
+        tagVi: "Hẻm núi",
+        tagEn: "Canyon"
       },
       {
         file: "./assets/image/Anh Nen/Cretaceous_inland_sea_underwater…_2K_20261002154750-clean.png",
         nameVi: "Đáy Biển Nội Địa Tây Bắc Creta",
+        nameEn: "Western Cretaceous Inland Sea",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Đại dương"
+        periodEn: "Cretaceous Period",
+        tagVi: "Đại dương",
+        tagEn: "Ocean"
       },
       {
         file: "./assets/image/Anh Nen/Cretaceous_ocean_coastline_and_c…_2K_20261002155155.jpg",
         nameVi: "Bờ Biển & Vách Đá Sóng Vỗ",
+        nameEn: "Cretaceous Ocean Coastline & Cliffs",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Bờ biển"
+        periodEn: "Cretaceous Period",
+        tagVi: "Bờ biển",
+        tagEn: "Coastline"
       },
       {
         file: "./assets/image/Anh Nen/Cretaceous_river_delta_swamp_forest_2K_20261002155846-clean.png",
         nameVi: "Rừng Đầm Lầy Châu Thổ Sông",
+        nameEn: "River Delta Swamp Forest",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Đầm lầy"
+        periodEn: "Cretaceous Period",
+        tagVi: "Đầm lầy",
+        tagEn: "Swamp"
       },
       {
         file: "./assets/image/Anh Nen/Cretaceous_tropical_delta_river_…_2K_20261002155231-clean.png",
         nameVi: "Châu Thổ Sông Nhiệt Đới Patagonia",
+        nameEn: "Patagonian Tropical Delta River",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Châu thổ"
+        periodEn: "Cretaceous Period",
+        tagVi: "Châu thổ",
+        tagEn: "Delta"
       },
       {
         file: "./assets/image/Anh Nen/Cretaceous_tropical_delta_river_…_2K_20261002155238.jpg",
         nameVi: "Hạ Lưu Sông Phù Sa Cổ Đại",
+        nameEn: "Ancient Alluvial River Basin",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Châu thổ"
+        periodEn: "Cretaceous Period",
+        tagVi: "Châu thổ",
+        tagEn: "Delta"
       },
       {
         file: "./assets/image/Anh Nen/Late_Cretaceous_fern_prairie_woo…_2K_20261002155204-clean (1)-clean.png",
         nameVi: "Đồng Cỏ Dương Xỉ Hell Creek",
+        nameEn: "Late Cretaceous Fern Prairie",
         periodVi: "Kỷ Phấn Trắng Muộn",
-        tag: "Thảo nguyên"
+        periodEn: "Late Cretaceous",
+        tagVi: "Thảo nguyên",
+        tagEn: "Prairie"
       },
       {
         file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155711-clean.png",
         nameVi: "Sương Sớm Bãi Bồi Ven Sông 1",
+        nameEn: "Morning Mist Over Ancient Floodplain I",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Bãi bồi"
+        periodEn: "Cretaceous Period",
+        tagVi: "Bãi bồi",
+        tagEn: "Floodplain"
       },
       {
         file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155732-clean-clean.png",
         nameVi: "Sương Sớm Bãi Bồi Ven Sông 2",
+        nameEn: "Morning Mist Over Ancient Floodplain II",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Bãi bồi"
+        periodEn: "Cretaceous Period",
+        tagVi: "Bãi bồi",
+        tagEn: "Floodplain"
       },
       {
         file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155750-clean.png",
         nameVi: "Thung Lũng Sương Mù Bình Minh",
+        nameEn: "Dawn Mist River Valley",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Thung lũng"
+        periodEn: "Cretaceous Period",
+        tagVi: "Thung lũng",
+        tagEn: "Valley"
       },
       {
         file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155803-clean-clean.png",
         nameVi: "Bình Minh Đất Ngập Nước Cổ Đại",
+        nameEn: "Dawn Over Prehistoric Wetlands",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Đất ngập nước"
+        periodEn: "Cretaceous Period",
+        tagVi: "Đất ngập nước",
+        tagEn: "Wetlands"
       },
       {
         file: "./assets/image/Anh Nen/Museum_exhibition_hall_platform_…_2K_20261002155933-clean.png",
         nameVi: "Khán Phòng Trưng Bày Bảo Tàng",
+        nameEn: "Grand Museum Exhibition Hall",
         periodVi: "Bảo Tàng",
-        tag: "Bảo tàng"
+        periodEn: "Museum Hall",
+        tagVi: "Bảo tàng",
+        tagEn: "Museum"
       },
       {
         file: "./assets/image/Anh Nen/Prehistoric_Antarctic_rainforest…_2K_20261002155252.jpg",
         nameVi: "Rừng Mưa Nam Cực Cổ Sinh",
+        nameEn: "Prehistoric Antarctic Rainforest",
         periodVi: "Kỷ Jura",
-        tag: "Nam cực"
+        periodEn: "Jurassic Period",
+        tagVi: "Nam cực",
+        tagEn: "Antarctic"
       },
       {
         file: "./assets/image/Anh Nen/Prehistoric_landscape_with_river…_2K_20261002154722-clean.png",
         nameVi: "Bờ Sông Tiền Sử Hoàng Hôn",
+        nameEn: "Prehistoric River At Sunset",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Hoàng hôn"
+        periodEn: "Cretaceous Period",
+        tagVi: "Hoàng hôn",
+        tagEn: "Dusk"
       },
       {
         file: "./assets/image/Anh Nen/Prehistoric_landscape_with_river…_2K_20261002154744-clean.png",
         nameVi: "Lưu Vực Sông Tiền Sử Nắng Chiếu",
+        nameEn: "Sunlit Ancient River Basin",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Lưu vực sông"
+        periodEn: "Cretaceous Period",
+        tagVi: "Lưu vực sông",
+        tagEn: "River Basin"
       },
       {
         file: "./assets/image/Anh Nen/Prehistoric_landscape_with_trees…_2K_20261002160001-clean.png",
         nameVi: "Rừng Cổ Sinh Shishugou",
+        nameEn: "Jurassic Shishugou Primeval Forest",
         periodVi: "Kỷ Jura Muộn",
-        tag: "Rừng Jura"
+        periodEn: "Late Jurassic",
+        tagVi: "Rừng Jura",
+        tagEn: "Jurassic"
       },
       {
         file: "./assets/image/Anh Nen/Prehistoric_woodland_clearing_in…_2K_20261002155110.jpg",
         nameVi: "Rừng Thưa Cổ Đại Nắng Sớm",
+        nameEn: "Ancient Woodland Clearing in Sunlight",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Rừng thưa"
+        periodEn: "Cretaceous Period",
+        tagVi: "Rừng thưa",
+        tagEn: "Woodland"
       },
       {
         file: "./assets/image/Anh Nen/Prehistoric_woodland_clearing_in…_2K_20261002155130-clean-clean-clean.png",
         nameVi: "Trảng Cây Bách Tiền Sử",
+        nameEn: "Ancient Conifer Glade",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Trảng cây"
+        periodEn: "Cretaceous Period",
+        tagVi: "Trảng cây",
+        tagEn: "Glade"
       },
       {
         file: "./assets/image/Anh Nen/Subtropical_floodplain_at_dusk_2K_20261002154511-clean.png",
         nameVi: "Thảo Nguyên Cận Nhiệt Hoàng Hôn 1",
+        nameEn: "Subtropical Floodplain at Dusk I",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Bãi bồi"
+        periodEn: "Cretaceous Period",
+        tagVi: "Bãi bồi",
+        tagEn: "Floodplain"
       },
       {
         file: "./assets/image/Anh Nen/Subtropical_floodplain_at_dusk_2K_20261002154536-clean-clean.png",
         nameVi: "Thảo Nguyên Cận Nhiệt Hoàng Hôn 2",
+        nameEn: "Subtropical Floodplain at Dusk II",
         periodVi: "Kỷ Phấn Trắng",
-        tag: "Bãi bồi"
+        periodEn: "Cretaceous Period",
+        tagVi: "Bãi bồi",
+        tagEn: "Floodplain"
       },
       {
         file: "./assets/image/Anh Nen/Vast_cinematic_prehistoric_landscape_of_2K_20261002155326-clean.png",
         nameVi: "Toàn Cảnh Bãi Ngập Nước Hell Creek",
+        nameEn: "Vast Hell Creek Wetland Panorama",
         periodVi: "Kỷ Phấn Trắng Muộn",
-        tag: "Hell Creek"
+        periodEn: "Late Cretaceous",
+        tagVi: "Hell Creek",
+        tagEn: "Hell Creek"
       },
       {
         file: "./assets/image/Anh Nen/🌸_Xuân__Ánh_sáng_tươi_2K_20261002155336-clean.png",
         nameVi: "Mùa Xuân Tiền Sử Ánh Sáng Tươi",
+        nameEn: "Prehistoric Spring Sunlit Flora",
         periodVi: "Mùa Xuân",
-        tag: "Mùa xuân"
+        periodEn: "Spring Season",
+        tagVi: "Mùa xuân",
+        tagEn: "Spring"
       }
     ];
 
@@ -5830,18 +6490,22 @@
 
     function renderBgGallery() {
       if (!bgGalleryGrid) return;
+      const isVi = currentLang === 'vi';
       bgGalleryGrid.innerHTML = PRESET_BACKGROUNDS.map((bg, idx) => {
         const isActive = currentSelectedBgFile === bg.file;
+        const title = isVi ? bg.nameVi : (bg.nameEn || bg.nameVi);
+        const period = isVi ? bg.periodVi : (bg.periodEn || bg.periodVi);
+        const tag = isVi ? bg.tagVi : (bg.tagEn || bg.tagVi);
         return `
-          <div class="bg-card-item ${isActive ? 'active' : ''}" data-file="${bg.file}" data-idx="${idx}" title="${bg.nameVi}">
+          <div class="bg-card-item ${isActive ? 'active' : ''}" data-file="${bg.file}" data-idx="${idx}" title="${title}">
             <div class="bg-card-thumb-wrap">
-              <img src="${encodeURI(bg.file)}" loading="lazy" class="bg-card-thumb" alt="${bg.nameVi}">
-              <span class="bg-card-badge">${bg.tag}</span>
+              <img src="${encodeURI(bg.file)}" loading="lazy" class="bg-card-thumb" alt="${title}">
+              <span class="bg-card-badge">${tag}</span>
               <div class="bg-card-active-check">✓</div>
             </div>
             <div class="bg-card-meta">
-              <span class="bg-card-title">${bg.nameVi}</span>
-              <span class="bg-card-period">${bg.periodVi}</span>
+              <span class="bg-card-title">${title}</span>
+              <span class="bg-card-period">${period}</span>
             </div>
           </div>
         `;
