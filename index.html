@@ -2266,7 +2266,429 @@
       font-style: italic;
     }
 
-  </style>
+  
+    /* ==========================================================================
+       SCI-FI TELEMETRY HUD (TAB CHỈ SỐ KHOA HỌC)
+       ========================================================================== */
+    .scifi-hud-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hud-status-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(26, 122, 130, 0.08);
+      border: 1px solid rgba(26, 122, 130, 0.25);
+      border-radius: var(--radius-sm);
+      font-size: 0.64rem;
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    }
+    .hud-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 6px var(--accent-cyan);
+      animation: hudPulse 1.8s infinite alternate ease-in-out;
+    }
+    @keyframes hudPulse {
+      0% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1.15); }
+    }
+    .hud-status-title {
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.06em;
+      flex: 1;
+    }
+    .hud-status-badge {
+      background: rgba(43, 76, 63, 0.1);
+      color: var(--accent-forest);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 800;
+    }
+    .hud-metrics-duo {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .hud-stat-box {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    .hud-box-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .hud-box-icon {
+      font-size: 0.82rem;
+    }
+    .hud-box-label {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--text-faint);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hud-number-row {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin: 1px 0;
+    }
+    .hud-num-hero {
+      font-size: 1.35rem;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+    .hud-unit-tag {
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--accent-cyan);
+      background: rgba(26, 122, 130, 0.1);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    }
+    .hud-gauge-bar-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(0,0,0,0.06);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 1px;
+    }
+    .hud-gauge-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hud-gauge-bar.cyan {
+      background: linear-gradient(90deg, #1a7a82, #00f0ff);
+      box-shadow: 0 0 6px rgba(0,240,255,0.4);
+    }
+    .hud-gauge-bar.amber {
+      background: linear-gradient(90deg, #c89d47, #f59e0b);
+      box-shadow: 0 0 6px rgba(245,158,11,0.4);
+    }
+    .hud-gauge-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.58rem;
+      color: var(--text-faint);
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+      padding: 0 1px;
+    }
+    .hud-box-sub {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .hud-card-wide {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+    .hud-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hud-trophic-pill {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+      background: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .hud-trophic-pill.carnivore {
+      background: rgba(239, 68, 68, 0.12);
+      color: #dc2626;
+      border-color: rgba(239, 68, 68, 0.25);
+    }
+    .hud-trophic-pill.piscivore {
+      background: rgba(6, 182, 212, 0.12);
+      color: #0891b2;
+      border-color: rgba(6, 182, 212, 0.25);
+    }
+    .hud-led-bar {
+      display: flex;
+      gap: 4px;
+      width: 100%;
+      height: 7px;
+      margin-top: 2px;
+    }
+    .hud-led-segment {
+      flex: 1;
+      border-radius: 2px;
+      background: rgba(0,0,0,0.07);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .hud-led-segment.active.herbivore {
+      background: #10b981;
+      box-shadow: 0 0 5px rgba(16, 185, 129, 0.6);
+    }
+    .hud-led-segment.active.carnivore {
+      background: #ef4444;
+      box-shadow: 0 0 5px rgba(239, 68, 68, 0.6);
+    }
+    .hud-led-segment.active.piscivore {
+      background: #06b6d4;
+      box-shadow: 0 0 5px rgba(6, 182, 212, 0.6);
+    }
+    .hud-number-inline {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .hud-num-mid {
+      font-size: 0.98rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+      color: var(--text-main);
+    }
+    .hud-era-tracker {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .hud-era-tab {
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+      background: rgba(0,0,0,0.02);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.25s ease;
+    }
+    .hud-era-tab.active {
+      background: rgba(26, 122, 130, 0.12);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 8px rgba(26, 122, 130, 0.2);
+    }
+    .hud-era-tab .era-name {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+    .hud-era-tab.active .era-name {
+      color: var(--accent-cyan);
+    }
+    .hud-era-tab .era-range {
+      font-size: 0.58rem;
+      color: var(--text-faint);
+      font-family: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    }
+    .hud-formation-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--accent-forest);
+      line-height: 1.3;
+    }
+    .hud-geo-chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .hud-geo-chip {
+      background: rgba(43, 76, 63, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 4px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .hud-geo-chip .chip-k {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: var(--text-faint);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .hud-geo-chip .chip-v {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ==========================================================================
+       MODAL THƯ VIỆN 23 BỐI CẢNH CỔ SINH 2K & TẢI ẢNH TÙY BIẾN
+       ========================================================================== */
+    .bg-picker-container {
+      max-width: 940px !important;
+      max-height: 88vh !important;
+    }
+    .bg-picker-body {
+      padding: 16px 22px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 14px !important;
+      overflow-y: auto !important;
+    }
+    .bg-picker-custom-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .bg-picker-action-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      min-width: 260px;
+    }
+    .bg-picker-action-icon {
+      font-size: 1.7rem;
+    }
+    .bg-picker-action-info strong {
+      font-size: 0.86rem;
+      color: var(--text-main);
+      display: block;
+    }
+    .bg-picker-action-info p {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin: 2px 0 0;
+    }
+    .bg-gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .bg-gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 12px;
+    }
+    .bg-card-item {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 2px solid var(--border-subtle);
+      background: #ffffff;
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .bg-card-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+    .bg-card-item.active {
+      border-color: #00f0ff;
+      box-shadow: 0 0 0 2px #00f0ff, 0 8px 24px rgba(0,240,255,0.3);
+    }
+    .bg-card-thumb-wrap {
+      width: 100%;
+      height: 110px;
+      position: relative;
+      overflow: hidden;
+      background: #1c1a17;
+    }
+    .bg-card-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.32s ease;
+    }
+    .bg-card-item:hover .bg-card-thumb {
+      transform: scale(1.06);
+    }
+    .bg-card-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: rgba(0,0,0,0.72);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .bg-card-active-check {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: #00f0ff;
+      color: #000000;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 900;
+      box-shadow: 0 0 8px rgba(0,240,255,0.6);
+    }
+    .bg-card-item.active .bg-card-active-check {
+      display: flex;
+    }
+    .bg-card-meta {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .bg-card-title {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bg-card-period {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+</style>
 </head>
 <body>
 
@@ -2469,9 +2891,9 @@
           </div>
 
           <!-- Tải ảnh nền cá nhân -->
-          <label class="pill-btn" for="input-bg-upload" style="cursor: pointer;" title="Tải ảnh nền tùy ý từ máy tính">
+          <button class="pill-btn" id="btn-open-bg-modal" style="cursor: pointer;" title="Thư viện 23 bối cảnh tiền sử 2K hoặc tải ảnh từ máy tính/điện thoại">
             🖼️ <span id="ui-btn-custom-bg">Đổi ảnh nền</span>
-          </label>
+          </button>
           <input type="file" id="input-bg-upload" class="upload-input-hidden" accept="image/*">
         </div>
       </div>
@@ -2771,37 +3193,129 @@
         </div>
       </div>
 
-      <!-- TAB 2: CHỈ SỐ KHOA HỌC & ĐỊA TẦNG -->
+      <!-- TAB 2: CHỈ SỐ KHOA HỌC & ĐỊA TẦNG (SCI-FI TELEMETRY HUD) -->
       <div class="sidebar-tab-content" id="tab-facts">
-        <div class="facts-grid-compact">
-          <div class="fact-card-compact">
-            <div class="fact-label">Thời kỳ</div>
-            <div class="fact-val" id="fact-val-period">Kỷ Phấn Trắng</div>
-            <div class="fact-sub" id="fact-sub-period">68–66 Ma (Maastrichtian)</div>
+        <div class="scifi-hud-container">
+          <!-- Radar Header / Status Ticker -->
+          <div class="hud-status-strip">
+            <div class="hud-status-dot"></div>
+            <span class="hud-status-title">PALEO-TELEMETRY // HUD MATRIX ACTIVE</span>
+            <span class="hud-status-badge" id="hud-specimen-code">SPECIMEN #01</span>
           </div>
 
-          <div class="fact-card-compact">
-            <div class="fact-label">Chế độ ăn</div>
-            <div class="fact-val" id="fact-val-diet">Thực vật</div>
-            <div class="fact-sub" id="fact-sub-diet">Dương xỉ, lá kim, mè gai</div>
+          <!-- Nhóm 1: Kích thước vật lý & Trọng lượng (2 cột đối xứng) -->
+          <div class="hud-metrics-duo">
+            <!-- Chiều dài thực tế -->
+            <div class="hud-stat-box">
+              <div class="hud-box-header">
+                <span class="hud-box-icon">📏</span>
+                <span class="hud-box-label">CHIỀU DÀI THỰC TẾ</span>
+              </div>
+              <div class="hud-number-row">
+                <span class="hud-num-hero" id="fact-val-length">8.5</span>
+                <span class="hud-unit-tag">MÉT</span>
+              </div>
+              <div class="hud-gauge-bar-wrap" title="Thước đo chiều dài (tỉ lệ tối đa 35 mét)">
+                <div class="hud-gauge-bar cyan" id="hud-gauge-len" style="width: 24%;"></div>
+              </div>
+              <div class="hud-gauge-ticks">
+                <span>0m</span><span>15m</span><span>35m</span>
+              </div>
+              <div class="hud-box-sub" id="fact-sub-length">Cao 3.0m tại hông</div>
+            </div>
+
+            <!-- Khối lượng ước tính -->
+            <div class="hud-stat-box">
+              <div class="hud-box-header">
+                <span class="hud-box-icon">⚖️</span>
+                <span class="hud-box-label">KHỐI LƯỢNG ƯỚC TÍNH</span>
+              </div>
+              <div class="hud-number-row">
+                <span class="hud-num-hero" id="fact-val-mass">8.0</span>
+                <span class="hud-unit-tag">TẤN</span>
+              </div>
+              <div class="hud-gauge-bar-wrap" title="Thước đo khối lượng (tỉ lệ tối đa 40 tấn)">
+                <div class="hud-gauge-bar amber" id="hud-gauge-mass" style="width: 20%;"></div>
+              </div>
+              <div class="hud-gauge-ticks">
+                <span>0t</span><span>20t</span><span>40t</span>
+              </div>
+              <div class="hud-box-sub" id="fact-sub-mass">Gấp đôi voi châu Phi</div>
+            </div>
           </div>
 
-          <div class="fact-card-compact">
-            <div class="fact-label">Chiều dài thật</div>
-            <div class="fact-val" id="fact-val-length">8.5 mét</div>
-            <div class="fact-sub" id="fact-sub-length">Cao 3.0m tại hông</div>
+          <!-- Nhóm 2: Chế độ ăn & Tháp sinh thái (Trophic Level) -->
+          <div class="hud-card-wide">
+            <div class="hud-card-head">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="hud-box-icon" id="hud-diet-icon">🌿</span>
+                <span class="hud-box-label">KHẨU PHẦN & BẬC DINH DƯỠNG</span>
+              </div>
+              <span class="hud-trophic-pill" id="fact-val-diet">CẤP II • THỰC VẬT</span>
+            </div>
+            <!-- 5-LED glowing meter -->
+            <div class="hud-led-bar" id="hud-led-diet" title="Bậc tháp dinh dưỡng sinh học">
+              <span class="hud-led-segment active herbivore"></span>
+              <span class="hud-led-segment active herbivore"></span>
+              <span class="hud-led-segment"></span>
+              <span class="hud-led-segment"></span>
+              <span class="hud-led-segment"></span>
+            </div>
+            <div class="hud-box-sub" id="fact-sub-diet" style="margin-top: 4px;">Dương xỉ, lá kim, mè gai</div>
           </div>
 
-          <div class="fact-card-compact">
-            <div class="fact-label">Khối lượng</div>
-            <div class="fact-val" id="fact-val-mass">6–10 tấn</div>
-            <div class="fact-sub" id="fact-sub-mass">Gấp đôi voi châu Phi</div>
+          <!-- Nhóm 3: Niên đại địa chất & Trục thời gian 3 Kỷ (Chrono-Scale) -->
+          <div class="hud-card-wide">
+            <div class="hud-card-head">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="hud-box-icon">⏳</span>
+                <span class="hud-box-label">NIÊN ĐẠI ĐỊA CHẤT (GEO-CHRONO)</span>
+              </div>
+              <div class="hud-number-inline">
+                <span class="hud-num-mid" id="hud-val-ma">68–66</span>
+                <span class="hud-unit-tag">TRIỆU NĂM (Ma)</span>
+              </div>
+            </div>
+            <!-- Trục 3 Kỷ Mesozoic -->
+            <div class="hud-era-tracker">
+              <div class="hud-era-tab" id="hud-era-trias">
+                <span class="era-name">TRIAS</span>
+                <span class="era-range">252–201 Ma</span>
+              </div>
+              <div class="hud-era-tab" id="hud-era-jura">
+                <span class="era-name">JURA</span>
+                <span class="era-range">201–145 Ma</span>
+              </div>
+              <div class="hud-era-tab active" id="hud-era-creta">
+                <span class="era-name">CRETA</span>
+                <span class="era-range">145–66 Ma</span>
+              </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span class="hud-box-sub" id="fact-val-period" style="font-weight: 700; color: var(--accent-cyan);">Kỷ Phấn Trắng Muộn</span>
+              <span class="hud-box-sub" id="fact-sub-period">68–66 Ma (Maastrichtian)</span>
+            </div>
           </div>
 
-          <div class="fact-card-compact" style="grid-column: span 2;">
-            <div class="fact-label">Hệ tầng địa chất & Mỏ hóa thạch</div>
-            <div class="fact-val" id="fact-val-loc">Hệ tầng Hell Creek</div>
-            <div class="fact-sub" id="fact-sub-loc">Bắc Mỹ (Montana, Wyoming, Alberta)</div>
+          <!-- Nhóm 4: Hệ tầng địa chất & Mỏ hóa thạch (Stratigraphic Site) -->
+          <div class="hud-card-wide" style="margin-bottom: 2px;">
+            <div class="hud-card-head">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="hud-box-icon">🪨</span>
+                <span class="hud-box-label">HỆ TẦNG ĐỊA CHẤT & MỎ HÓA THẠCH</span>
+              </div>
+            </div>
+            <div class="hud-formation-title" id="fact-val-formation">Hệ tầng Hell Creek (Montana, Bắc Mỹ)</div>
+            <div class="hud-geo-chips">
+              <div class="hud-geo-chip">
+                <span class="chip-k">TỌA ĐỘ CỔ</span>
+                <span class="chip-v" id="hud-val-coords">52.4° Bắc • 68.2° Tây</span>
+              </div>
+              <div class="hud-geo-chip">
+                <span class="chip-k">TẦNG ĐÁ CHỨA</span>
+                <span class="chip-v" id="hud-val-matrix">Sa thạch xám mịn, bùn kết ven sông</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2828,7 +3342,7 @@
         <!-- Khung Hình Ảnh Phục Dựng 2K -->
         <div class="media-block">
           <div class="media-block-title">
-            <span>🖼️ Tranh Khảo Cổ & Môi Trường 2K</span>
+            <span>🖼️ Tranh Khảo Cổ & Môi Trường</span>
             <span class="media-tag-pill">2K Ultra HD</span>
           </div>
           <div class="image-preview-wrapper" id="btn-open-lightbox" title="Bấm để phóng to toàn màn hình xem chi tiết 2K">
@@ -2980,8 +3494,8 @@
         nameVi: "Triceratops",
         videoFile: "./assets/video/Triceratops_bulls_fighting_in_gr…_20261002111846_gwr_video_mvp.mp4",
         videoTitle: "Triceratops húc sừng tranh chấp lãnh thổ (1080p HD)",
-        imageFile: "./assets/image/Anh Nen/Vast_cinematic_prehistoric_landscape_of_2K_20261002155326-clean.png",
-        imageTitle: "Bối cảnh thảo nguyên ngập nước Hell Creek Kỷ Phấn Trắng (2K)",
+        imageFile: "./assets/image/Anh KL/Bảng thông tin Triceratops horridus.png",
+        imageTitle: "Bảng thông tin giải phẫu Triceratops horridus",
         nameEn: "Triceratops",
         periodVi: "Kỷ Phấn Trắng Muộn",
         periodEn: "Late Cretaceous",
@@ -3033,8 +3547,8 @@
         nameVi: "Triceratops (Khung xương)",
         videoFile: "",
         videoTitle: "",
-        imageFile: "./assets/image/Anh Nen/Museum_exhibition_hall_platform_…_2K_20261002155933-clean.png",
-        imageTitle: "Khán phòng trưng bày tiêu bản hóa thạch bảo tàng cổ sinh học (2K)",
+        imageFile: "./assets/image/Anh KL/Áp-phích giải phẫu Triceratops horridus.png",
+        imageTitle: "Áp-phích giải phẫu & bộ xương hóa thạch Triceratops horridus",
         nameEn: "Triceratops (Skeleton)",
         periodVi: "Bảo tàng Hoàng gia",
         periodEn: "Museum Exhibition",
@@ -3190,8 +3704,8 @@
         nameVi: "Giganotosaurus",
         videoFile: "./assets/video/giganotosaurus_argentinosaurus_hunt_gwr_video_mvp.mp4",
         videoTitle: "Giganotosaurus phối hợp săn lùng Argentinosaurus khổng lồ (1080p HD)",
-        imageFile: "./assets/image/Anh Nen/Cretaceous_tropical_delta_river_…_2K_20261002155231-clean.png",
-        imageTitle: "Lưu vực châu thổ sông nhiệt đới Nam Mỹ thời Creta (2K)",
+        imageFile: "./assets/image/Anh KL/Giganotosaurus carolinii_ Người khổng lồ Patagonia.png",
+        imageTitle: "Giganotosaurus carolinii — Người khổng lồ Patagonia",
         nameEn: "Giganotosaurus",
         periodVi: "Kỷ Phấn Trắng Giữa",
         periodEn: "Late Cretaceous",
@@ -3242,8 +3756,8 @@
         nameVi: "Mamenchisaurus",
         videoFile: "./assets/video/Mamenchisaurus_herd_walking_thro…_1080p_20261002111421_gwr_video_mvp.mp4",
         videoTitle: "Đàn Mamenchisaurus cổ dài di cư qua rừng cổ sinh (1080p HD)",
-        imageFile: "./assets/image/Anh Nen/Prehistoric_landscape_with_trees…_2K_20261002160001-clean.png",
-        imageTitle: "Rừng cây lá kim cổ sinh cao vút bách thảo nguyên (2K)",
+        imageFile: "./assets/image/Anh KL/Infographic Mamenchisaurus_ Khổng lồ kỷ Jura.png",
+        imageTitle: "Infographic Mamenchisaurus — Khổng lồ Kỷ Jura",
         nameEn: "Mamenchisaurus",
         periodVi: "Kỷ Jura Muộn",
         periodEn: "Late Jurassic",
@@ -4170,6 +4684,7 @@
 
     function loadExhibit(exhibit) {
       currentExhibit = exhibit;
+      window.currentExhibit = exhibit;
       updateUIContent();
 
       document.getElementById('stage-bg-layer').style.backgroundImage = `url('${exhibit.background}')`;
@@ -4338,6 +4853,7 @@
         }
       );
     }
+    window.loadExhibit = loadExhibit;
 
     /* ==========================================================================
        6. HỆ THỐNG POPOVER ĐỘNG (BÓC TÁCH, VỊ TRÍ NGƯỜI, CÂN BẰNG SÁNG, BÓNG ĐỔ)
@@ -4873,36 +5389,121 @@
       const obsEl = document.getElementById('exhibit-observation');
       if (obsEl) obsEl.textContent = data.obs;
 
-      // Tab 2 Facts Grid
+      // Tab 2: SCI-FI TELEMETRY HUD & FACT MATRIX
+      const isSpecimenVi = isVi;
+      const specimenCode = document.getElementById('hud-specimen-code');
+      if (specimenCode) {
+        specimenCode.textContent = `SPECIMEN #${String(currentExhibitIndex + 1).padStart(2, '0')} // ${(ex.id || '').toUpperCase()}`;
+      }
+
+      // 1. Chiều dài thực tế (Length)
+      const fLen = document.getElementById('fact-val-length');
+      if (fLen) fLen.textContent = ex.realLengthMeters ? ex.realLengthMeters.toFixed(1) : (data.length || '8.5');
+      const fSubLen = document.getElementById('fact-sub-length');
+      if (fSubLen) fSubLen.textContent = data.lengthSub || (isVi ? `Cao ~${((ex.realLengthMeters || 8.5) * 0.35).toFixed(1)}m tại hông` : `Hip height ~${((ex.realLengthMeters || 8.5) * 0.35).toFixed(1)}m`);
+      const gaugeLen = document.getElementById('hud-gauge-len');
+      if (gaugeLen && ex.realLengthMeters) {
+        const lenPct = Math.min(100, Math.max(5, (ex.realLengthMeters / 35.0) * 100));
+        gaugeLen.style.width = `${lenPct.toFixed(1)}%`;
+      }
+
+      // 2. Khối lượng ước tính (Mass)
+      const fMass = document.getElementById('fact-val-mass');
+      let massNum = data.mass || '8.0';
+      const massMatch = massNum.match(/([0-9.]+)[–-]?([0-9.]+)?/);
+      let estTons = 8.0;
+      if (massMatch) {
+        estTons = massMatch[2] ? (parseFloat(massMatch[1]) + parseFloat(massMatch[2])) / 2.0 : parseFloat(massMatch[1]);
+        if (massNum.includes('kg')) estTons = estTons / 1000.0;
+      }
+      if (fMass) fMass.textContent = data.mass || '8.0 tấn';
+      const fSubMass = document.getElementById('fact-sub-mass');
+      if (fSubMass) fSubMass.textContent = data.massSub || (isVi ? `Tương đương ~${(estTons / 4.0).toFixed(1)} voi châu Phi` : `~${(estTons / 4.0).toFixed(1)} African elephants`);
+      const gaugeMass = document.getElementById('hud-gauge-mass');
+      if (gaugeMass) {
+        const massPct = Math.min(100, Math.max(4, (estTons / 40.0) * 100));
+        gaugeMass.style.width = `${massPct.toFixed(1)}%`;
+      }
+
+      // 3. Khẩu phần & Bậc dinh dưỡng (Trophic Level)
+      const fDiet = document.getElementById('fact-val-diet');
+      const fSubDiet = document.getElementById('fact-sub-diet');
+      const dietIcon = document.getElementById('hud-diet-icon');
+      const ledBar = document.getElementById('hud-led-diet');
+      const dietStr = (data.diet || '').toLowerCase();
+
+      let dietType = 'herbivore';
+      let trophicPillText = isVi ? 'CẤP II • THỰC VẬT' : 'TIER II • HERBIVORE';
+      let ledActiveCount = 2;
+
+      if (dietStr.includes('cá') || dietStr.includes('fish') || dietStr.includes('thủy sinh')) {
+        dietType = 'piscivore';
+        trophicPillText = isVi ? 'CẤP IV • ĂN CÁ (PISCIVORE)' : 'TIER IV • PISCIVORE';
+        ledActiveCount = 4;
+        if (dietIcon) dietIcon.textContent = '🐟';
+      } else if (dietStr.includes('thịt') || dietStr.includes('carnivore') || dietStr.includes('săn mồi') || dietStr.includes('predator')) {
+        dietType = 'carnivore';
+        trophicPillText = isVi ? 'CẤP V • SĂN MỒI ĐỈNH CAO' : 'TIER V • APEX PREDATOR';
+        ledActiveCount = 5;
+        if (dietIcon) dietIcon.textContent = '🥩';
+      } else {
+        dietType = 'herbivore';
+        trophicPillText = isVi ? 'CẤP II • THỰC VẬT' : 'TIER II • HERBIVORE';
+        ledActiveCount = 2;
+        if (dietIcon) dietIcon.textContent = '🌿';
+      }
+
+      if (fDiet) {
+        fDiet.textContent = trophicPillText;
+        fDiet.className = `hud-trophic-pill ${dietType}`;
+      }
+      if (fSubDiet) fSubDiet.textContent = data.dietSub || data.diet;
+
+      if (ledBar) {
+        ledBar.innerHTML = [1, 2, 3, 4, 5].map(i => {
+          const isActive = i <= ledActiveCount;
+          return `<span class="hud-led-segment ${isActive ? 'active ' + dietType : ''}"></span>`;
+        }).join('');
+      }
+
+      // 4. Niên đại địa chất & Trục thời gian 3 Kỷ (Chrono-Scale)
       const fPeriod = document.getElementById('fact-val-period');
       if (fPeriod) fPeriod.textContent = isVi ? ex.periodVi : ex.periodEn;
       const fSubPeriod = document.getElementById('fact-sub-period');
       if (fSubPeriod) fSubPeriod.textContent = isVi ? ex.timeScaleVi : ex.timeScaleEn;
 
-      const fDiet = document.getElementById('fact-val-diet');
-      if (fDiet) fDiet.textContent = data.diet;
-      const fSubDiet = document.getElementById('fact-sub-diet');
-      if (fSubDiet) fSubDiet.textContent = data.dietSub;
+      const hudMa = document.getElementById('hud-val-ma');
+      if (hudMa) {
+        const maMatch = (ex.timeScaleVi || '').match(/([0-9.]+–[0-9.]+|[0-9.]+)\s*Ma/);
+        hudMa.textContent = maMatch ? maMatch[1] : (ex.datingMethod ? ex.datingMethod.split('•')[0].trim() : '68–66');
+      }
 
-      const fLen = document.getElementById('fact-val-length');
-      if (fLen) fLen.textContent = data.length;
-      const fSubLen = document.getElementById('fact-sub-length');
-      if (fSubLen) fSubLen.textContent = data.lengthSub;
+      const pStr = ((ex.periodVi || '') + ' ' + (ex.timeScaleVi || '')).toLowerCase();
+      const eraTrias = document.getElementById('hud-era-trias');
+      const eraJura = document.getElementById('hud-era-jura');
+      const eraCreta = document.getElementById('hud-era-creta');
 
-      const fMass = document.getElementById('fact-val-mass');
-      if (fMass) fMass.textContent = data.mass;
-      const fSubMass = document.getElementById('fact-sub-mass');
-      if (fSubMass) fSubMass.textContent = data.massSub;
+      if (eraTrias) eraTrias.classList.remove('active');
+      if (eraJura) eraJura.classList.remove('active');
+      if (eraCreta) eraCreta.classList.remove('active');
 
-      const fLoc = document.getElementById('fact-val-loc');
-      if (fLoc) fLoc.textContent = data.loc;
-      const fSubLoc = document.getElementById('fact-sub-loc');
-      if (fSubLoc) fSubLoc.textContent = data.locSub;
+      if (pStr.includes('trias') || pStr.includes('tam điệp')) {
+        if (eraTrias) eraTrias.classList.add('active');
+      } else if (pStr.includes('jura') || pStr.includes('jurassic')) {
+        if (eraJura) eraJura.classList.add('active');
+      } else {
+        if (eraCreta) eraCreta.classList.add('active');
+      }
 
+      // 5. Hệ tầng địa chất & Mỏ hóa thạch (Stratigraphy)
       const fForm = document.getElementById('fact-val-formation');
-      if (fForm) fForm.textContent = ex.formation || (isVi ? "Chưa cập nhật" : "N/A");
-      const fSubForm = document.getElementById('fact-sub-formation');
-      if (fSubForm) fSubForm.textContent = ex.rockMatrix || (isVi ? "Tầng sa thạch & bùn kết" : "Sedimentary rock");
+      if (fForm) fForm.textContent = ex.formation || (isVi ? "Hệ tầng địa chất bảo tàng" : "Museum Geological Matrix");
+
+      const hudCoords = document.getElementById('hud-val-coords');
+      if (hudCoords) hudCoords.textContent = ex.paleoCoords || (isVi ? "Tọa độ viễn thám cổ" : "Paleo coordinates");
+
+      const hudMatrix = document.getElementById('hud-val-matrix');
+      if (hudMatrix) hudMatrix.textContent = ex.rockMatrix || (isVi ? "Trầm tích sa thạch & bùn kết" : "Sedimentary rock matrix");
 
       // Tab 3 Video & Images
       const videoPlayer = document.getElementById('exhibit-video-player');
@@ -5029,6 +5630,7 @@
         openLightbox(imgElem.src, capElem ? capElem.textContent : '');
       }
     }
+    window.triggerLightboxFromSidebar = triggerLightboxFromSidebar;
 
     // Hỗ trợ Bấm chuột thông thường và Bấm đúp (Double-click) trực tiếp vào ảnh
     if (btnOpenLightbox) {
@@ -5063,6 +5665,10 @@
       });
     }
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modalBgPicker && (modalBgPicker.classList.contains('open') || modalBgPicker.classList.contains('active'))) {
+        modalBgPicker.classList.remove('open', 'active');
+        modalBgPicker.setAttribute('aria-hidden', 'true');
+      }
       if (e.key === 'Escape' && modalLightbox && (modalLightbox.classList.contains('open') || modalLightbox.classList.contains('active'))) {
         closeLightbox();
       }
@@ -5070,69 +5676,260 @@
 
 
 
-    // Tải ảnh nền tùy ý từ máy tính
-    document.getElementById('input-bg-upload').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          stageBgLayer.style.backgroundImage = `url('${event.target.result}')`;
-        };
-        reader.readAsDataURL(file);
+
+    // =========================================================================
+    // THƯ VIỆN 23 BỐI CẢNH CỔ SINH 2K & ĐỔI ẢNH NỀN TÙY BIẾN
+    // =========================================================================
+    const PRESET_BACKGROUNDS = [
+      {
+        file: "./assets/image/Anh Nen/Arid_desert_landscape_and_dunes_2K_20261002155631-clean.png",
+        nameVi: "Sa Mạc & Cồn Cát Cổ Đại",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Sa mạc"
+      },
+      {
+        file: "./assets/image/Anh Nen/Arid_red_sandstone_canyon_2K_20261002155823-clean.png",
+        nameVi: "Hẻm Núi Sa Thạch Đỏ",
+        periodVi: "Kỷ Jura",
+        tag: "Hẻm núi"
+      },
+      {
+        file: "./assets/image/Anh Nen/Cretaceous_inland_sea_underwater…_2K_20261002154750-clean.png",
+        nameVi: "Đáy Biển Nội Địa Tây Bắc Creta",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Đại dương"
+      },
+      {
+        file: "./assets/image/Anh Nen/Cretaceous_ocean_coastline_and_c…_2K_20261002155155.jpg",
+        nameVi: "Bờ Biển & Vách Đá Sóng Vỗ",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Bờ biển"
+      },
+      {
+        file: "./assets/image/Anh Nen/Cretaceous_river_delta_swamp_forest_2K_20261002155846-clean.png",
+        nameVi: "Rừng Đầm Lầy Châu Thổ Sông",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Đầm lầy"
+      },
+      {
+        file: "./assets/image/Anh Nen/Cretaceous_tropical_delta_river_…_2K_20261002155231-clean.png",
+        nameVi: "Châu Thổ Sông Nhiệt Đới Patagonia",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Châu thổ"
+      },
+      {
+        file: "./assets/image/Anh Nen/Cretaceous_tropical_delta_river_…_2K_20261002155238.jpg",
+        nameVi: "Hạ Lưu Sông Phù Sa Cổ Đại",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Châu thổ"
+      },
+      {
+        file: "./assets/image/Anh Nen/Late_Cretaceous_fern_prairie_woo…_2K_20261002155204-clean (1)-clean.png",
+        nameVi: "Đồng Cỏ Dương Xỉ Hell Creek",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        tag: "Thảo nguyên"
+      },
+      {
+        file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155711-clean.png",
+        nameVi: "Sương Sớm Bãi Bồi Ven Sông 1",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Bãi bồi"
+      },
+      {
+        file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155732-clean-clean.png",
+        nameVi: "Sương Sớm Bãi Bồi Ven Sông 2",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Bãi bồi"
+      },
+      {
+        file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155750-clean.png",
+        nameVi: "Thung Lũng Sương Mù Bình Minh",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Thung lũng"
+      },
+      {
+        file: "./assets/image/Anh Nen/Mist_rising_over_ancient_floodplain_2K_20261002155803-clean-clean.png",
+        nameVi: "Bình Minh Đất Ngập Nước Cổ Đại",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Đất ngập nước"
+      },
+      {
+        file: "./assets/image/Anh Nen/Museum_exhibition_hall_platform_…_2K_20261002155933-clean.png",
+        nameVi: "Khán Phòng Trưng Bày Bảo Tàng",
+        periodVi: "Bảo Tàng",
+        tag: "Bảo tàng"
+      },
+      {
+        file: "./assets/image/Anh Nen/Prehistoric_Antarctic_rainforest…_2K_20261002155252.jpg",
+        nameVi: "Rừng Mưa Nam Cực Cổ Sinh",
+        periodVi: "Kỷ Jura",
+        tag: "Nam cực"
+      },
+      {
+        file: "./assets/image/Anh Nen/Prehistoric_landscape_with_river…_2K_20261002154722-clean.png",
+        nameVi: "Bờ Sông Tiền Sử Hoàng Hôn",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Hoàng hôn"
+      },
+      {
+        file: "./assets/image/Anh Nen/Prehistoric_landscape_with_river…_2K_20261002154744-clean.png",
+        nameVi: "Lưu Vực Sông Tiền Sử Nắng Chiếu",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Lưu vực sông"
+      },
+      {
+        file: "./assets/image/Anh Nen/Prehistoric_landscape_with_trees…_2K_20261002160001-clean.png",
+        nameVi: "Rừng Cổ Sinh Shishugou",
+        periodVi: "Kỷ Jura Muộn",
+        tag: "Rừng Jura"
+      },
+      {
+        file: "./assets/image/Anh Nen/Prehistoric_woodland_clearing_in…_2K_20261002155110.jpg",
+        nameVi: "Rừng Thưa Cổ Đại Nắng Sớm",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Rừng thưa"
+      },
+      {
+        file: "./assets/image/Anh Nen/Prehistoric_woodland_clearing_in…_2K_20261002155130-clean-clean-clean.png",
+        nameVi: "Trảng Cây Bách Tiền Sử",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Trảng cây"
+      },
+      {
+        file: "./assets/image/Anh Nen/Subtropical_floodplain_at_dusk_2K_20261002154511-clean.png",
+        nameVi: "Thảo Nguyên Cận Nhiệt Hoàng Hôn 1",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Bãi bồi"
+      },
+      {
+        file: "./assets/image/Anh Nen/Subtropical_floodplain_at_dusk_2K_20261002154536-clean-clean.png",
+        nameVi: "Thảo Nguyên Cận Nhiệt Hoàng Hôn 2",
+        periodVi: "Kỷ Phấn Trắng",
+        tag: "Bãi bồi"
+      },
+      {
+        file: "./assets/image/Anh Nen/Vast_cinematic_prehistoric_landscape_of_2K_20261002155326-clean.png",
+        nameVi: "Toàn Cảnh Bãi Ngập Nước Hell Creek",
+        periodVi: "Kỷ Phấn Trắng Muộn",
+        tag: "Hell Creek"
+      },
+      {
+        file: "./assets/image/Anh Nen/🌸_Xuân__Ánh_sáng_tươi_2K_20261002155336-clean.png",
+        nameVi: "Mùa Xuân Tiền Sử Ánh Sáng Tươi",
+        periodVi: "Mùa Xuân",
+        tag: "Mùa xuân"
       }
-    });
+    ];
 
-    // Tham chiếu appWorkspace cho toggle handler
-    const appWorkspace = document.getElementById('app-workspace');
+    const modalBgPicker = document.getElementById('bg-picker-modal');
+    const btnOpenBgModal = document.getElementById('btn-open-bg-modal');
+    const btnCloseBgModal = document.getElementById('close-bg-modal');
+    const btnResetDefaultBg = document.getElementById('btn-reset-default-bg');
+    const bgGalleryGrid = document.getElementById('bg-gallery-grid');
+    let currentSelectedBgFile = null;
 
-    // Toàn màn hình
-    document.getElementById('btn-fullscreen').addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => console.warn(err));
-      } else {
-        document.exitFullscreen();
-      }
-    });
+    function renderBgGallery() {
+      if (!bgGalleryGrid) return;
+      bgGalleryGrid.innerHTML = PRESET_BACKGROUNDS.map((bg, idx) => {
+        const isActive = currentSelectedBgFile === bg.file;
+        return `
+          <div class="bg-card-item ${isActive ? 'active' : ''}" data-file="${bg.file}" data-idx="${idx}" title="${bg.nameVi}">
+            <div class="bg-card-thumb-wrap">
+              <img src="${encodeURI(bg.file)}" loading="lazy" class="bg-card-thumb" alt="${bg.nameVi}">
+              <span class="bg-card-badge">${bg.tag}</span>
+              <div class="bg-card-active-check">✓</div>
+            </div>
+            <div class="bg-card-meta">
+              <span class="bg-card-title">${bg.nameVi}</span>
+              <span class="bg-card-period">${bg.periodVi}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
 
-    // Bật/Tắt Tỉ lệ người thật 1.75m (Tối ưu: Mượt mà, tức thì, KHÔNG GIẬT CỤC, KHÔNG RELOAD CAMERA)
-    const btnToggleHuman = document.getElementById('btn-toggle-human');
-    btnToggleHuman.addEventListener('click', () => {
-      isHumanVisible = !isHumanVisible;
-      humanGroup.visible = isHumanVisible;
-      if (groundRulerLine) groundRulerLine.visible = isHumanVisible;
-      const rBadge = document.getElementById('ruler-badge');
-      if (rBadge) rBadge.style.display = isHumanVisible ? 'flex' : 'none';
-      btnToggleHuman.classList.toggle('active', isHumanVisible);
-      // GIỮ NGUYÊN GÓC NHÌN HIỆN TẠI CỦA NGƯỜI DÙNG: Chỉ hiện người ra đơn giản, không giật cục!
-    });
-
-    function smoothMoveCamera(newPos, newLookAt) {
-      targetCamPos.copy(newPos);
-      targetCamLookAt.copy(newLookAt);
-      isTransitioningCam = true;
+      bgGalleryGrid.querySelectorAll('.bg-card-item').forEach(card => {
+        card.addEventListener('click', () => {
+          const file = card.getAttribute('data-file');
+          if (file) {
+            currentSelectedBgFile = file;
+            stageBgLayer.style.backgroundImage = `url('${encodeURI(file)}')`;
+            bgGalleryGrid.querySelectorAll('.bg-card-item').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+            setTimeout(() => {
+              if (modalBgPicker) {
+                modalBgPicker.classList.remove('open', 'active');
+                modalBgPicker.setAttribute('aria-hidden', 'true');
+              }
+            }, 240);
+          }
+        });
+      });
     }
 
-    // Zoom Buttons
-    document.getElementById('btn-zoom-in').addEventListener('click', () => {
-      camera.position.addScaledVector(camera.getWorldDirection(new THREE.Vector3()), 1.4);
-      controls.update();
-    });
-    document.getElementById('btn-zoom-out').addEventListener('click', () => {
-      camera.position.addScaledVector(camera.getWorldDirection(new THREE.Vector3()), -1.4);
-      controls.update();
-    });
-
-    // Chuyển đổi ngôn ngữ VI / EN
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentLang = btn.dataset.lang;
-        localStorage.setItem('museum_lang', currentLang);
-        renderDinoRail();
-        updateUIContent();
+    if (btnOpenBgModal) {
+      btnOpenBgModal.addEventListener('click', () => {
+        if (modalBgPicker) {
+          renderBgGallery();
+          modalBgPicker.classList.add('open', 'active');
+          modalBgPicker.setAttribute('aria-hidden', 'false');
+        }
       });
-    });
+    }
+
+    if (btnCloseBgModal) {
+      btnCloseBgModal.addEventListener('click', () => {
+        if (modalBgPicker) {
+          modalBgPicker.classList.remove('open', 'active');
+          modalBgPicker.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    if (modalBgPicker) {
+      modalBgPicker.addEventListener('click', (e) => {
+        if (e.target === modalBgPicker) {
+          modalBgPicker.classList.remove('open', 'active');
+          modalBgPicker.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    if (btnResetDefaultBg) {
+      btnResetDefaultBg.addEventListener('click', () => {
+        if (currentExhibit && currentExhibit.background) {
+          currentSelectedBgFile = null;
+          stageBgLayer.style.backgroundImage = `url('${encodeURI(currentExhibit.background)}')`;
+          if (bgGalleryGrid) {
+            bgGalleryGrid.querySelectorAll('.bg-card-item').forEach(c => c.classList.remove('active'));
+          }
+          if (modalBgPicker) {
+            modalBgPicker.classList.remove('open', 'active');
+            modalBgPicker.setAttribute('aria-hidden', 'true');
+          }
+        }
+      });
+    }
+
+    // Tải ảnh nền tùy ý từ máy tính / điện thoại
+    const inputBgUpload = document.getElementById('input-bg-upload');
+    if (inputBgUpload) {
+      inputBgUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            currentSelectedBgFile = 'custom';
+            stageBgLayer.style.backgroundImage = `url('${event.target.result}')`;
+            if (modalBgPicker) {
+              modalBgPicker.classList.remove('open', 'active');
+              modalBgPicker.setAttribute('aria-hidden', 'true');
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
 
     /* ==========================================================================
        10. QUẢ ĐỊA CẦU CỔ SINH 3D (INTERACTIVE 3D PALEO-GLOBE)
@@ -5864,6 +6661,58 @@
 
 
   <!-- MODAL 4: LIGHTBOX XEM ẢNH 2K SIÊU SẮC NÉT TOÀN MÀN HÌNH (HỖ TRỢ DOUBLE CLICK PHÓNG TO) -->
+  
+  <!-- ==========================================================================
+       MODAL: BỘ CHỌN 23 BỐI CẢNH CỔ SINH 2K & TẢI ẢNH TÙY BIẾN
+       ========================================================================== -->
+  <div class="app-modal-backdrop" id="bg-picker-modal">
+    <div class="modal-container bg-picker-container">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 1.25rem;">🖼️</span>
+          <div>
+            <h2 style="margin: 0; font-size: 1.05rem;">Thư Viện Bối Cảnh Tiền Sử & Đổi Ảnh Nền</h2>
+            <p style="margin: 2px 0 0; font-size: 0.74rem; color: var(--text-muted);">23 bối cảnh cổ sinh 2K có sẵn hoặc tùy biến từ thiết bị người dùng</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="close-bg-modal">&times;</button>
+      </div>
+
+      <div class="modal-body bg-picker-body">
+        <!-- PHẦN 1: TÙY BIẾN TỪ THIẾT BỊ / MẶC ĐỊNH -->
+        <div class="bg-picker-custom-bar">
+          <div class="bg-picker-action-card">
+            <div class="bg-picker-action-icon">📱💻</div>
+            <div class="bg-picker-action-info">
+              <strong>Tải ảnh từ máy tính hoặc điện thoại</strong>
+              <p>Hỗ trợ ảnh cá nhân (JPG, PNG, WebP) làm bối cảnh 3D trực quan</p>
+            </div>
+            <label class="pill-btn active" for="input-bg-upload" style="cursor: pointer; white-space: nowrap; margin-left: auto;">
+              📂 Chọn ảnh từ thiết bị
+            </label>
+          </div>
+
+          <button class="pill-btn" id="btn-reset-default-bg" style="white-space: nowrap; justify-content: center;">
+            🔄 Khôi phục bối cảnh gốc của loài này
+          </button>
+        </div>
+
+        <!-- PHẦN 2: THƯ VIỆN 23 BỐI CẢNH 2K CÓ SẴN -->
+        <div class="bg-gallery-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-weight: 700; font-size: 0.88rem; color: var(--text-main);">🌿 Thư Viện 23 Bối Cảnh Cổ Sinh 2K Chuẩn</span>
+            <span class="badge" style="background: rgba(43,76,63,0.1); color: var(--accent-forest); padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;">23 Bối Cảnh</span>
+          </div>
+          <span style="font-size: 0.74rem; color: var(--text-muted);">Bấm vào bất kỳ bối cảnh nào để áp dụng tức thì</span>
+        </div>
+
+        <div class="bg-gallery-grid" id="bg-gallery-grid">
+          <!-- Render 23 thumbnail cards via JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="app-modal-backdrop" id="modal-lightbox" style="z-index: 99999;">
     <div id="lightbox-container-wrap" style="position: relative; max-width: 95vw; max-height: 95vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
       <button class="modal-close-btn" id="close-lightbox" title="Đóng cửa sổ ảnh (Esc)" style="position: absolute; top: -16px; right: -16px; z-index: 100000; width: 38px; height: 38px; border-radius: 50%; background: #ffffff; color: #1e293b; font-size: 24px; font-weight: 700; border: 2px solid rgba(0,0,0,0.15); box-shadow: 0 4px 16px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">&times;</button>

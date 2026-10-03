@@ -17,3 +17,4 @@ scratch_*
 
 # Raw/heavy model archive (not served in production web)
 assets/models_archive/
+.env*.local
