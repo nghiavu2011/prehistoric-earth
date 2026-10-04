@@ -11,6 +11,7 @@ __pycache__/
 *.pyc
 
 # Local scratch / test files
+scratch/
 scratch_*
 *.log
 *.tmp

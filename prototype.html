@@ -2729,6 +2729,282 @@
       color: var(--text-muted);
     }
 
+    /* ==========================================================================
+       RESPONSIVE DESIGN CHO MÁY TÍNH BẢNG (TABLETS) & ĐIỆN THOẠI (SMARTPHONES)
+       ========================================================================== */
+
+    /* 1. MÁY TÍNH BẢNG & MÀN HÌNH VỪA (<= 1024px) */
+    @media (max-width: 1024px) {
+      .app-header {
+        padding: 0 14px;
+        gap: 8px;
+      }
+      .brand-title-sub .badge-phone {
+        display: none !important;
+      }
+      .info-sidebar {
+        width: 360px !important;
+        right: 12px !important;
+        max-width: 85vw !important;
+      }
+      .sidebar-toggle-btn {
+        right: 382px !important;
+      }
+      .sidebar-toggle-btn.collapsed {
+        right: 12px !important;
+      }
+      .stage-top-bar {
+        left: 12px !important;
+        right: 12px !important;
+        max-width: calc(100vw - 24px) !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        padding-bottom: 4px !important;
+      }
+      .stage-top-bar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .cluster-group {
+        flex-wrap: nowrap !important;
+      }
+      .left-support-card {
+        width: 260px !important;
+        left: 12px !important;
+      }
+      .mini-support-chip {
+        left: 12px !important;
+      }
+      .paleo-view-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+      .globe-canvas-wrap {
+        height: 280px !important;
+      }
+    }
+
+    /* 2. ĐIỆN THOẠI THÔNG MINH (SMARTPHONES <= 768px) */
+    @media (max-width: 768px) {
+      .app-header {
+        height: 50px !important;
+        padding: 0 10px !important;
+        gap: 6px !important;
+      }
+      .brand-title {
+        font-size: 0.88rem !important;
+        gap: 6px !important;
+      }
+      .brand-title-sub {
+        display: none !important;
+      }
+      .header-actions {
+        gap: 4px !important;
+      }
+      .header-actions .pill-btn {
+        padding: 4px 7px !important;
+        font-size: 0.7rem !important;
+        min-height: 32px !important;
+      }
+      #ui-btn-fs {
+        display: none !important;
+      }
+      .header-toggle-tab {
+        top: 50px !important;
+        width: 40px !important;
+        height: 20px !important;
+      }
+
+      /* Thanh điều khiển trên: Cuộn ngang mượt mà bằng ngón tay */
+      .stage-top-bar {
+        top: 56px !important;
+        left: 8px !important;
+        right: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        padding: 4px 0 !important;
+        gap: 6px !important;
+        justify-content: flex-start !important;
+      }
+      .stage-top-bar::-webkit-scrollbar {
+        display: none !important;
+      }
+      .cluster-group {
+        display: inline-flex !important;
+        flex-wrap: nowrap !important;
+        gap: 5px !important;
+      }
+      .stage-top-bar .pill-btn {
+        padding: 5px 9px !important;
+        font-size: 0.7rem !important;
+        min-height: 34px !important;
+        border-radius: 999px !important;
+        flex-shrink: 0 !important;
+      }
+
+      /* Bảng thông tin: Dạng Bottom Sheet vuốt lên thanh lịch */
+      .info-sidebar {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 66px !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        max-height: 64vh !important;
+        border-radius: 20px 20px 14px 14px !important;
+        padding: 16px 14px !important;
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35) !important;
+        z-index: 45 !important;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease !important;
+      }
+      .info-sidebar.collapsed {
+        transform: translateY(calc(100% + 40px)) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      .sidebar-toggle-btn {
+        position: fixed !important;
+        bottom: 74px !important;
+        right: 12px !important;
+        top: auto !important;
+        transform: none !important;
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 50% !important;
+        border: 1px solid rgba(43, 76, 63, 0.3) !important;
+        z-index: 48 !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+      }
+      .sidebar-toggle-btn.collapsed {
+        right: 12px !important;
+        bottom: 74px !important;
+      }
+
+      /* Thẻ ủng hộ dự án bên trái */
+      .left-support-card {
+        position: fixed !important;
+        bottom: 72px !important;
+        left: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: 320px !important;
+        max-height: 65vh !important;
+        z-index: 46 !important;
+        border-radius: 18px !important;
+        padding: 14px !important;
+      }
+      .mini-support-chip {
+        position: fixed !important;
+        bottom: 74px !important;
+        left: 12px !important;
+        top: auto !important;
+        z-index: 42 !important;
+        padding: 7px 12px !important;
+        font-size: 0.74rem !important;
+      }
+
+      /* Thanh trượt chọn khủng long dưới đáy */
+      .stage-dino-rail {
+        position: fixed !important;
+        bottom: 8px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: calc(100vw - 12px) !important;
+        padding: 5px 6px !important;
+        border-radius: 24px !important;
+        gap: 5px !important;
+        -webkit-overflow-scrolling: touch !important;
+        z-index: 40 !important;
+      }
+      .stage-dino-rail.collapsed {
+        transform: translateX(-50%) translateY(calc(100% + 20px)) !important;
+      }
+      .dino-tab {
+        padding: 4px 9px !important;
+        font-size: 0.68rem !important;
+        border-radius: 16px !important;
+        flex-shrink: 0 !important;
+        min-height: 34px !important;
+      }
+      .rail-toggle-tab {
+        position: fixed !important;
+        bottom: 52px !important;
+        z-index: 41 !important;
+        width: 40px !important;
+        height: 18px !important;
+      }
+
+      /* Cửa sổ Modal & Popover trên điện thoại */
+      .modal-container {
+        width: 95vw !important;
+        max-width: 95vw !important;
+        max-height: 88vh !important;
+        margin: 6px auto !important;
+        border-radius: 16px !important;
+      }
+      .modal-header {
+        padding: 12px 16px !important;
+      }
+      .modal-body {
+        padding: 12px 14px !important;
+      }
+      .app-popover {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 80px !important;
+        left: 10px !important;
+        right: 10px !important;
+        width: auto !important;
+        max-width: calc(100vw - 20px) !important;
+        border-radius: 16px !important;
+        max-height: 60vh !important;
+        overflow-y: auto !important;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.5) !important;
+      }
+      .bg-gallery-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+      .license-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+      }
+      .bg-picker-custom-bar {
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+      .bg-picker-action-card {
+        width: 100% !important;
+      }
+
+      /* Tương tác cảm ứng WebGL không bị giật / zoom trang ngoài ý muốn */
+      #webgl-canvas-wrap canvas {
+        touch-action: none !important;
+        -webkit-touch-callout: none !important;
+      }
+    }
+
+    /* 3. MÀN HÌNH SIÊU NHỎ (<= 480px) */
+    @media (max-width: 480px) {
+      .header-actions .pill-btn span:last-child {
+        display: none !important;
+      }
+      .header-actions .pill-btn {
+        padding: 4px 6px !important;
+      }
+      .brand-title {
+        font-size: 0.82rem !important;
+      }
+      .bg-gallery-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
 </style>
 </head>
 <body>
@@ -3473,14 +3749,14 @@
        MODAL 2: BẢN QUYỀN MỞ & NGUỒN GỐC BẢO TÀNG (OPEN ACCESS LICENSES)
        ========================================================================== -->
   <div class="app-modal-backdrop" id="license-modal">
-    <div class="modal-container" style="max-width: 800px;">
+    <div class="modal-container" style="max-width: 840px;">
       <div class="modal-header">
-        <h2>🏛️ Thẩm Định Bản Quyền Mở & Ghi Công Bảo Tàng (Open Science)</h2>
+        <h2 id="ui-license-modal-title">🏛️ Hồ Sơ Pháp Lý, Bản Quyền & Thẩm Định Bảo Tàng Mở</h2>
         <button class="modal-close-btn" id="close-license-modal">&times;</button>
       </div>
       <div class="modal-body">
         
-        <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-muted);">
+        <p style="font-size: 0.85rem; line-height: 1.5; color: var(--text-muted);" id="ui-license-modal-sub">
           Toàn bộ các tiêu bản 3D sử dụng trong Bảo Tàng Tri Thức 3D được tuyển chọn nghiêm ngặt từ các viện bảo tàng và chương trình số hóa di sản văn hóa mở hàng đầu thế giới với giấy phép kiểm chứng minh bạch:
         </p>
 
@@ -3488,25 +3764,53 @@
           <div class="license-card">
             <span class="license-badge">CC0 1.0 Universal</span>
             <h3>Smithsonian Institution 3D</h3>
-            <p>Bản quét 3D giải phẫu tiêu bản Triceratops và các mẫu vật cổ sinh vật học thuộc phạm vi công cộng (Public Domain), toàn quyền sử dụng phi thương mại và nghiên cứu khoa học.</p>
+            <p id="ui-lic-card1-p">Bản quét 3D giải phẫu tiêu bản Triceratops và các mẫu vật cổ sinh vật học thuộc phạm vi công cộng (Public Domain), toàn quyền sử dụng phi thương mại và nghiên cứu khoa học.</p>
           </div>
 
           <div class="license-card">
             <span class="license-badge">CC-BY 4.0 International</span>
             <h3>Naturhistorisches Museum Wien</h3>
-            <p>Bảo tàng Lịch sử Tự nhiên Viên (Áo). Cung cấp các bản photogrammetry hộp sọ Protoceratops và tiêu bản hóa thạch kỷ Phấn Trắng sa mạc Gobi.</p>
+            <p id="ui-lic-card2-p">Bảo tàng Lịch sử Tự nhiên Viên (Áo). Cung cấp các bản photogrammetry hộp sọ Protoceratops và tiêu bản hóa thạch kỷ Phấn Trắng sa mạc Gobi.</p>
           </div>
 
           <div class="license-card">
             <span class="license-badge">Open Access Education</span>
             <h3>Natural History Museum London</h3>
-            <p>Bảo tàng Lịch sử Tự nhiên Luân Đôn. Cung cấp bản quét 3D tổ trứng hóa thạch Maiasaura khai quật năm 2020 phục vụ giáo dục cộng đồng.</p>
+            <p id="ui-lic-card3-p">Bảo tàng Lịch sử Tự nhiên Luân Đôn. Cung cấp bản quét 3D tổ trứng hóa thạch Maiasaura khai quật năm 2020 phục vụ giáo dục cộng đồng.</p>
           </div>
 
           <div class="license-card">
             <span class="license-badge">CC-BY 4.0 Creative Commons</span>
             <h3>Sketchfab Cultural Heritage</h3>
-            <p>Các nghệ sĩ và viện khảo cổ học quốc tế chia sẻ mẫu 3D rigged & textured mô phỏng động học sinh học với quyền ghi công tác giả mở.</p>
+            <p id="ui-lic-card4-p">Các nghệ sĩ và viện khảo cổ học quốc tế chia sẻ mẫu 3D rigged & textured mô phỏng động học sinh học với quyền ghi công tác giả mở.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+          <h3 style="font-size: 0.95rem; color: var(--accent-forest); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <span>⚖️</span> <span id="ui-license-sec2-title">Chính Sách Sở Hữu Trí Tuệ & Bảo Vệ Người Dùng</span>
+          </h3>
+          <div class="license-grid">
+            <div class="license-card">
+              <span class="license-badge" style="background: rgba(225, 29, 72, 0.1); color: #be123c;">Platform Copyright</span>
+              <h3 id="ui-lic-card5-h">Tác Quyền N&M Studio Education</h3>
+              <p id="ui-lic-card5-p">Toàn bộ mã nguồn WebGL, giải thuật 3D, hệ thống thuyết minh song ngữ và bộ tranh phục dựng 2K thuộc quyền sở hữu trí tuệ của N&M Studio. Mọi hành vi sao chép, trích xuất dữ liệu trái phép đều bị nghiêm cấm.</p>
+            </div>
+            <div class="license-card">
+              <span class="license-badge" style="background: rgba(16, 185, 129, 0.1); color: #059669;">User Privacy & Safety</span>
+              <h3 id="ui-lic-card6-h">Bảo Vệ Người Dùng (Zero-Tracking)</h3>
+              <p id="ui-lic-card6-p">Nền tảng không sử dụng cookie theo dõi của bên thứ ba, không thu thập dữ liệu cá nhân. Toàn bộ tính toán 3D diễn ra an toàn cục bộ trên GPU thiết bị của bạn.</p>
+            </div>
+            <div class="license-card">
+              <span class="license-badge" style="background: rgba(245, 158, 11, 0.1); color: #d97706;">Anti-Tamper & Trust</span>
+              <h3 id="ui-lic-card7-h">Bảo Vệ Thông Tin Tài Trợ</h3>
+              <p id="ui-lic-card7-p">Số tài khoản Techcombank và Ví MoMo được khóa bất biến ở cấp độ mã nguồn, ngăn chặn các phần mềm độc hại hoặc tiện ích can thiệp đổi số tài khoản giả mạo.</p>
+            </div>
+            <div class="license-card">
+              <span class="license-badge" style="background: rgba(59, 130, 246, 0.1); color: #2563eb;">DMCA & Takedown</span>
+              <h3 id="ui-lic-card8-h">Cơ Chế Tiếp Nhận & Khiếu Nại</h3>
+              <p id="ui-lic-card8-p">Chúng tôi tôn trọng tối đa bản quyền. Mọi yêu cầu ghi công hoặc gỡ bỏ xin gửi về: <strong>nghiavu2011@gmail.com</strong> hoặc Zalo <strong>+84 985.578.385</strong> (Xử lý trong 24-48h).</p>
+            </div>
           </div>
         </div>
 
@@ -5006,7 +5310,23 @@
         colorHeader: "🎨 Cân Bằng Ánh Sáng & Màu Sắc Model 3D",
         colorExposure: "Độ phơi sáng (Exposure)",
         colorKeylight: "Đèn chiếu chính (Key Light)",
-        colorAmbient: "Ánh sáng môi trường (Ambient)"
+        colorAmbient: "Ánh sáng môi trường (Ambient)",
+
+        licModalTitle: "🏛️ Hồ Sơ Pháp Lý, Bản Quyền & Thẩm Định Bảo Tàng Mở",
+        licModalSub: "Toàn bộ các tiêu bản 3D sử dụng trong Bảo Tàng Tri Thức 3D được tuyển chọn nghiêm ngặt từ các viện bảo tàng và chương trình số hóa di sản văn hóa mở hàng đầu thế giới với giấy phép kiểm chứng minh bạch:",
+        licSec2Title: "Chính Sách Sở Hữu Trí Tuệ & Bảo Vệ Người Dùng",
+        licCard1P: "Bản quét 3D giải phẫu tiêu bản Triceratops và các mẫu vật cổ sinh vật học thuộc phạm vi công cộng (Public Domain), toàn quyền sử dụng phi thương mại và nghiên cứu khoa học.",
+        licCard2P: "Bảo tàng Lịch sử Tự nhiên Viên (Áo). Cung cấp các bản photogrammetry hộp sọ Protoceratops và tiêu bản hóa thạch kỷ Phấn Trắng sa mạc Gobi.",
+        licCard3P: "Bảo tàng Lịch sử Tự nhiên Luân Đôn. Cung cấp bản quét 3D tổ trứng hóa thạch Maiasaura khai quật năm 2020 phục vụ giáo dục cộng đồng.",
+        licCard4P: "Các nghệ sĩ và viện khảo cổ học quốc tế chia sẻ mẫu 3D rigged & textured mô phỏng động học sinh học với quyền ghi công tác giả mở.",
+        licCard5H: "Tác Quyền N&M Studio Education",
+        licCard5P: "Toàn bộ mã nguồn WebGL, giải thuật 3D, hệ thống thuyết minh song ngữ và bộ tranh phục dựng 2K thuộc quyền sở hữu trí tuệ của N&M Studio. Mọi hành vi sao chép, trích xuất dữ liệu trái phép đều bị nghiêm cấm.",
+        licCard6H: "Bảo Vệ Người Dùng (Zero-Tracking)",
+        licCard6P: "Nền tảng không sử dụng cookie theo dõi của bên thứ ba, không thu thập dữ liệu cá nhân. Toàn bộ tính toán 3D diễn ra an toàn cục bộ trên GPU thiết bị của bạn.",
+        licCard7H: "Bảo Vệ Thông Tin Tài Trợ",
+        licCard7P: "Số tài khoản Techcombank và Ví MoMo được khóa bất biến ở cấp độ mã nguồn, ngăn chặn các phần mềm độc hại hoặc tiện ích can thiệp đổi số tài khoản giả mạo.",
+        licCard8H: "Cơ Chế Tiếp Nhận & Khiếu Nại",
+        licCard8P: "Chúng tôi tôn trọng tối đa bản quyền. Mọi yêu cầu ghi công hoặc gỡ bỏ xin gửi về: <strong>nghiavu2011@gmail.com</strong> hoặc Zalo <strong>+84 985.578.385</strong> (Xử lý trong 24-48h)."
       },
       en: {
         brandTitleSub: "3D DINOSAUR MUSEUM • 17 SPECIMENS",
@@ -5113,7 +5433,23 @@
         colorHeader: "🎨 3D Model Lighting & Color Balance",
         colorExposure: "Exposure",
         colorKeylight: "Key Light",
-        colorAmbient: "Ambient Light"
+        colorAmbient: "Ambient Light",
+
+        licModalTitle: "🏛️ Legal Dossier, Copyright & Open Science Attribution",
+        licModalSub: "All 3D dinosaur specimens in Prehistoric Earth are curated strictly from leading global cultural heritage museums under verified open science licenses:",
+        licSec2Title: "Intellectual Property Policy & User Protection",
+        licCard1P: "3D anatomical scans of Triceratops and museum fossil holotypes under Public Domain (CC0 1.0 Universal) for non-commercial education and scientific research.",
+        licCard2P: "Natural History Museum Vienna (Austria). High-resolution photogrammetry of Protoceratops skulls and Cretaceous Gobi Desert fossil specimens.",
+        licCard3P: "Natural History Museum London. 3D surface scans of Maiasaura fossil nests excavated in 2020 dedicated to public science education.",
+        licCard4P: "International paleontologists and artists sharing rigged and bio-mechanically animated 3D specimens under open attribution.",
+        licCard5H: "Platform Copyright — N&M Studio Education",
+        licCard5P: "All WebGL architecture, 3D shader algorithms, bilingual narration systems, and 2K diorama artworks are proprietary intellectual property of N&M Studio. Unauthorized scraping is restricted.",
+        licCard6H: "User Privacy & Safety (Zero-Tracking)",
+        licCard6P: "The platform uses zero third-party tracking cookies and collects zero personal data. All WebGL computations run securely and locally on your device GPU.",
+        licCard7H: "Financial Integrity & Anti-Tamper",
+        licCard7P: "Donation accounts (Techcombank & MoMo) are code-frozen to prevent malicious extensions or scripts from substituting fraudulent payment info.",
+        licCard8H: "DMCA & Takedown Notice Protocol",
+        licCard8P: "We strictly respect intellectual property rights. For attribution inquiries or takedown requests, contact: <strong>nghiavu2011@gmail.com</strong> or Zalo <strong>+84 985.578.385</strong> (Processed within 24-48h)."
       }
     };
 
@@ -5357,6 +5693,26 @@
       if (supTitle) supTitle.textContent = t.supportTitle;
       const supDesc = document.querySelector('#left-support-panel p') || document.querySelector('.support-card-head p');
       if (supDesc) supDesc.textContent = t.supportDesc;
+
+      // License & Legal Modal
+      const licTitle = document.getElementById('ui-license-modal-title');
+      if (licTitle) licTitle.textContent = t.licModalTitle;
+      const licSub = document.getElementById('ui-license-modal-sub');
+      if (licSub) licSub.textContent = t.licModalSub;
+      const licSec2 = document.getElementById('ui-license-sec2-title');
+      if (licSec2) licSec2.textContent = t.licSec2Title;
+      const c1 = document.getElementById('ui-lic-card1-p'); if (c1) c1.textContent = t.licCard1P;
+      const c2 = document.getElementById('ui-lic-card2-p'); if (c2) c2.textContent = t.licCard2P;
+      const c3 = document.getElementById('ui-lic-card3-p'); if (c3) c3.textContent = t.licCard3P;
+      const c4 = document.getElementById('ui-lic-card4-p'); if (c4) c4.textContent = t.licCard4P;
+      const c5h = document.getElementById('ui-lic-card5-h'); if (c5h) c5h.textContent = t.licCard5H;
+      const c5p = document.getElementById('ui-lic-card5-p'); if (c5p) c5p.textContent = t.licCard5P;
+      const c6h = document.getElementById('ui-lic-card6-h'); if (c6h) c6h.textContent = t.licCard6H;
+      const c6p = document.getElementById('ui-lic-card6-p'); if (c6p) c6p.textContent = t.licCard6P;
+      const c7h = document.getElementById('ui-lic-card7-h'); if (c7h) c7h.textContent = t.licCard7H;
+      const c7p = document.getElementById('ui-lic-card7-p'); if (c7p) c7p.textContent = t.licCard7P;
+      const c8h = document.getElementById('ui-lic-card8-h'); if (c8h) c8h.textContent = t.licCard8H;
+      const c8p = document.getElementById('ui-lic-card8-p'); if (c8p) c8p.innerHTML = t.licCard8P;
 
       // Re-render
       renderDinoRail();
@@ -7282,6 +7638,7 @@
        V8 UNIFIED SVG CHEVRON LOGIC: HEADER, SIDEBAR & RAIL
        ========================================================================== */
     const appHeader = document.getElementById('app-header');
+    const appWorkspace = document.getElementById('app-workspace');
     const btnToggleHeader = document.getElementById('btn-toggle-header');
     const headerToggleSvg = document.getElementById('header-toggle-svg');
     let isHeaderCollapsed = false;
@@ -7356,6 +7713,20 @@
         updateRailSvg(isRailCollapsed);
         setTimeout(onWindowResize, 380);
       };
+    }
+
+    // Tự động thu gọn thanh thông tin & thẻ ủng hộ trên điện thoại và máy tính bảng nhỏ để tầm nhìn 3D khoáng đạt
+    if (window.innerWidth <= 768) {
+      if (leftSupportPanel) leftSupportPanel.classList.add('collapsed');
+      if (btnReopenSupport) btnReopenSupport.classList.remove('hidden');
+      if (infoSidebar) {
+        isSidebarCollapsed = true;
+        infoSidebar.classList.add('collapsed');
+        btnToggleSidebar?.classList.add('collapsed');
+        document.body.classList.add('sidebar-collapsed');
+        if (appWorkspace) appWorkspace.classList.add('sidebar-collapsed');
+        updateSidebarSvg(true);
+      }
     }
 
     /* ==========================================================================
