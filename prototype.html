@@ -64,6 +64,47 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* ANTI-DRAG & ASSET PROTECTION */
+    img, video, canvas {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      user-drag: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    /* SECURITY NOTIFICATION TOAST */
+    .security-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: rgba(15, 23, 42, 0.94);
+      color: #f8fafc;
+      padding: 10px 22px;
+      border-radius: 999px;
+      border: 1px solid rgba(251, 191, 36, 0.45);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 100005;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .security-toast.active {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
     /* TOP HEADER */
     .app-header {
       height: 56px;
@@ -2894,7 +2935,7 @@
           <button class="pill-btn" id="btn-open-bg-modal" style="cursor: pointer;" title="Thư viện 23 bối cảnh tiền sử 2K hoặc tải ảnh từ máy tính/điện thoại">
             🖼️ <span id="ui-btn-custom-bg">Đổi ảnh nền</span>
           </button>
-          <input type="file" id="input-bg-upload" class="upload-input-hidden" accept="image/*">
+          <input type="file" id="input-bg-upload" class="upload-input-hidden" accept="image/png, image/jpeg, image/webp">
         </div>
       </div>
 
@@ -6574,23 +6615,54 @@
       });
     }
 
-    // Tải ảnh nền tùy ý từ máy tính / điện thoại
+    // Tải ảnh nền tùy ý từ máy tính / điện thoại (Có cơ chế kiểm soát bảo mật & kích thước)
     const inputBgUpload = document.getElementById('input-bg-upload');
     if (inputBgUpload) {
       inputBgUpload.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
+        if (!file) return;
+
+        // 1. Kiểm soát kích thước: Tối đa 15MB
+        if (file.size > 15 * 1024 * 1024) {
+          showSecurityToast(currentLang === 'vi' 
+            ? '⚠️ Kích thước ảnh vượt quá 15MB. Vui lòng chọn ảnh nhẹ hơn để bảo vệ hiệu năng máy.' 
+            : '⚠️ Image exceeds 15MB limit. Please choose an optimized image file.');
+          inputBgUpload.value = '';
+          return;
+        }
+
+        // 2. Kiểm soát định dạng MIME an toàn (Chặn SVG chứa script, file thực thi)
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!file.type || !allowedTypes.includes(file.type.toLowerCase())) {
+          showSecurityToast(currentLang === 'vi' 
+            ? '🛡️ Định dạng không hợp lệ! Chỉ chấp nhận PNG, JPG, WebP để đảm bảo an toàn hệ thống.' 
+            : '🛡️ Invalid format! Only PNG, JPG, and WebP are allowed for security.');
+          inputBgUpload.value = '';
+          return;
+        }
+
+        // 3. Kiểm định giải mã hình ảnh thực tế (Phòng chống tệp nhị phân giả mạo / độc hại)
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          const verifyImg = new Image();
+          verifyImg.onload = () => {
             currentSelectedBgFile = 'custom';
-            stageBgLayer.style.backgroundImage = `url('${event.target.result}')`;
+            stageBgLayer.style.backgroundImage = `url('${dataUrl}')`;
             if (modalBgPicker) {
               modalBgPicker.classList.remove('open', 'active');
               modalBgPicker.setAttribute('aria-hidden', 'true');
             }
           };
-          reader.readAsDataURL(file);
-        }
+          verifyImg.onerror = () => {
+            showSecurityToast(currentLang === 'vi' 
+              ? '⚠️ Tệp ảnh bị lỗi cấu trúc hoặc không thể hiển thị an toàn.' 
+              : '⚠️ Corrupted or unrenderable image file.');
+            inputBgUpload.value = '';
+          };
+          verifyImg.src = dataUrl;
+        };
+        reader.readAsDataURL(file);
       });
     }
 
@@ -7169,14 +7241,26 @@
       modalCoffee?.classList.add('open');
     });
 
-    // Copy to clipboard with visual feedback
+    // Cố định thông tin tài khoản tác giả chính thức (Chống tấn công DOM Injection / thay đổi STK)
+    const OFFICIAL_PAYMENT_ACCOUNTS = Object.freeze({
+      TCB: '19077215974018',
+      MOMO: '0985578385'
+    });
+
+    // Copy to clipboard with anti-tamper verification & visual feedback
     document.querySelectorAll('.btn-copy-acc').forEach(btn => {
       btn.addEventListener('click', (e) => {
-        const copyText = btn.getAttribute('data-copy');
+        let copyText = btn.getAttribute('data-copy');
+        // Đối soát danh sách tài khoản hợp lệ của tác giả
+        if (copyText !== OFFICIAL_PAYMENT_ACCOUNTS.TCB && copyText !== OFFICIAL_PAYMENT_ACCOUNTS.MOMO) {
+          console.warn('Tampered account detected. Restoring verified author account.');
+          copyText = (copyText && copyText.includes('0985')) ? OFFICIAL_PAYMENT_ACCOUNTS.MOMO : OFFICIAL_PAYMENT_ACCOUNTS.TCB;
+        }
         if (copyText) {
           navigator.clipboard.writeText(copyText).then(() => {
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<span>✓</span> <span>Đã chép!</span>';
+            const copiedText = currentLang === 'vi' ? 'Đã chép!' : 'Copied!';
+            btn.innerHTML = `<span>✓</span> <span>${copiedText}</span>`;
             btn.style.background = '#10b981';
             btn.style.color = '#ffffff';
             setTimeout(() => {
@@ -7273,6 +7357,95 @@
         setTimeout(onWindowResize, 380);
       };
     }
+
+    /* ==========================================================================
+       12. BẢO VỆ AN TOÀN, BẢN QUYỀN SỐ & CHỐNG SAO CHÉP (SECURITY & ANTI-THEFT)
+       - Chống Clickjacking / nhúng iframe trái phép
+       - Chặn tải trộm hình ảnh & mô hình 3D qua chuột phải (Context Menu)
+       - Chặn thao tác kéo thả tệp ra máy tính (Drag & Drop scraping)
+       - Chặn phím tắt trích xuất mã nguồn / lưu trang (Ctrl+S, Ctrl+U)
+       - Hiển thị thông điệp bản quyền số trong DevTools Console
+       ========================================================================== */
+
+    // 1. Chống nhúng iframe clickjacking
+    if (window.top !== window.self) {
+      try {
+        window.top.location = window.self.location;
+      } catch (err) {
+        console.warn('Iframe embedding blocked for security.');
+      }
+    }
+
+    // 2. Thông báo bảo mật thanh lịch (Security Toast)
+    let securityToastTimer = null;
+    function showSecurityToast(msg) {
+      const toast = document.getElementById('security-toast');
+      const toastMsg = document.getElementById('security-toast-msg');
+      if (!toast || !toastMsg) return;
+      toastMsg.textContent = msg || (currentLang === 'vi' 
+        ? 'Bản quyền số © N&M Studio. Toàn bộ tài nguyên 3D & dữ liệu được bảo hộ.' 
+        : 'Digital Copyright © N&M Studio. All 3D assets & media protected.');
+      toast.classList.add('active');
+      clearTimeout(securityToastTimer);
+      securityToastTimer = setTimeout(() => {
+        toast.classList.remove('active');
+      }, 2600);
+    }
+    window.showSecurityToast = showSecurityToast;
+
+    // 3. Chặn chuột phải trên các phần tử đa phương tiện & mô hình 3D
+    document.addEventListener('contextmenu', (e) => {
+      const target = e.target;
+      const isProtected = target.closest('#webgl-canvas-wrap') ||
+                          target.closest('#modal-lightbox') ||
+                          target.closest('#stage-bg-layer') ||
+                          target.closest('.art-thumb-card') ||
+                          target.closest('.bg-card') ||
+                          target.tagName === 'IMG' ||
+                          target.tagName === 'CANVAS' ||
+                          target.tagName === 'VIDEO';
+
+      if (isProtected) {
+        e.preventDefault();
+        showSecurityToast(currentLang === 'vi' 
+          ? '🛡️ Bản quyền số © N&M Studio. Không sao chép tài nguyên 3D & hình ảnh khi chưa có sự cho phép.' 
+          : '🛡️ Digital Copyright © N&M Studio. Unauthorized 3D asset extraction is restricted.');
+      }
+    });
+
+    // 4. Chặn kéo thả hình ảnh / canvas trực tiếp ra ngoài màn hình
+    document.addEventListener('dragstart', (e) => {
+      if (e.target.tagName === 'IMG' || e.target.tagName === 'CANVAS' || e.target.tagName === 'VIDEO') {
+        e.preventDefault();
+      }
+    });
+
+    // 5. Chặn các tổ hợp phím tải trang / trích xuất
+    document.addEventListener('keydown', (e) => {
+      // Ctrl+S / Cmd+S (Save Page Dump)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+        e.preventDefault();
+        showSecurityToast(currentLang === 'vi' 
+          ? '🛡️ Bảo tàng số 3D trực tuyến • Toàn bộ tài nguyên được bảo hộ bản quyền số.' 
+          : '🛡️ 3D Online Museum • Protected under digital intellectual property laws.');
+        return false;
+      }
+      // Ctrl+U / Cmd+U (View Source)
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'u' || e.key === 'U')) {
+        e.preventDefault();
+        showSecurityToast(currentLang === 'vi' 
+          ? '🛡️ Kiến trúc WebGL & mã nguồn thuộc bản quyền sở hữu trí tuệ của N&M Studio.' 
+          : '🛡️ Source code & WebGL architecture protected by N&M Studio copyright.');
+        return false;
+      }
+    });
+
+    // 6. Hiển thị biểu ngữ cảnh báo bản quyền & an toàn hệ thống trong Developer Console
+    console.log(
+      "%c🛡️ N&M STUDIO • PREHISTORIC EARTH 3D MUSEUM\\n%cToàn bộ mô hình 3D, hình ảnh phục dựng và tài liệu cổ sinh học được bảo vệ theo Luật Sở hữu Trí tuệ. Mọi hành vi sao chép, trích xuất dữ liệu, can thiệp mã nguồn nhằm mục đích trục lợi hoặc xâm phạm hệ thống đều bị nghiêm cấm.\\nAll 3D assets, reconstructed art, and paleo dossiers are protected by copyright.",
+      "color: #fbbf24; font-size: 15px; font-weight: bold; background: #0f172a; padding: 8px 14px; border-radius: 6px; border: 1px solid #38bdf8;",
+      "color: #94a3b8; font-size: 12px; line-height: 1.6;"
+    );
 
   </script>
 
@@ -7382,9 +7555,19 @@
       <button class="modal-close-btn" id="close-lightbox" title="Đóng cửa sổ ảnh (Esc)" style="position: absolute; top: -16px; right: -16px; z-index: 100000; width: 38px; height: 38px; border-radius: 50%; background: #ffffff; color: #1e293b; font-size: 24px; font-weight: 700; border: 2px solid rgba(0,0,0,0.15); box-shadow: 0 4px 16px rgba(0,0,0,0.5); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;">&times;</button>
       <div style="position: relative; overflow: hidden; border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.25); background: #0b0f19;">
         <img id="lightbox-full-img" src="" alt="Tranh tư liệu 2K toàn màn hình" title="Bấm đúp để thu phóng 1.65x chi tiết" style="max-width: 92vw; max-height: 84vh; display: block; object-fit: contain; cursor: zoom-in; transition: transform 0.25s ease;">
+        <div class="lightbox-watermark-overlay" style="position: absolute; bottom: 12px; right: 16px; pointer-events: none; background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 5px 12px; font-size: 0.72rem; color: #f8fafc; font-weight: 600; letter-spacing: 0.4px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 10;">
+          <span>🛡️</span>
+          <span>© N&M STUDIO • PREHISTORIC EARTH</span>
+        </div>
       </div>
       <div id="lightbox-caption" style="margin-top: 10px; color: #ffffff; font-size: 0.92rem; font-weight: 600; text-align: center; text-shadow: 0 2px 8px rgba(0,0,0,0.8); max-width: 85vw; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); padding: 6px 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.15);"></div>
     </div>
+  </div>
+
+  <!-- TOAST CẢNH BÁO BẢO VỆ BẢN QUYỀN SỐ & AN TOÀN HỆ THỐNG -->
+  <div class="security-toast" id="security-toast" role="alert" aria-live="assertive">
+    <span>🛡️</span>
+    <span id="security-toast-msg">Bản quyền số © N&M Studio. Nội dung & hình ảnh được bảo hộ.</span>
   </div>
 
 </body>
