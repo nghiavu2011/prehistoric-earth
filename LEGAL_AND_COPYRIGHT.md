@@ -70,7 +70,7 @@ Hệ thống sử dụng các mẫu quét 3D được cấp phép minh bạch t�
 
 ### 5. Chính Sách Chống Tấn Công, Sao Chép & Gian Lận Tài Chính
 * **Bảo vệ Thông tin Ủng hộ / Tài trợ:**
-  * Số tài khoản Techcombank (`19077215974018`) và Ví MoMo (`0985578385`) được khóa bất biến ở cấp độ mã nguồn (`Object.freeze`).
+  * Số tài khoản Techcombank (`19077215974018`) và Ví MoMo (`0985578385`) - Chủ tài khoản: **Vũ Trọng Nghĩa** được khóa bất biến ở cấp độ mã nguồn (`Object.freeze`).
   * Hệ thống tự động kiểm tra toàn vẹn và chống việc phần mềm độc hại (Malware / Browser Extension độc hại) thay đổi số tài khoản trên giao diện nhằm trục lợi tiền ủng hộ của người dùng.
 * **Bảo Mật Máy Chủ & HTTP Security Headers:**
   * Đạt chuẩn an toàn quốc tế: CSP (Content Security Policy), HSTS (Strict-Transport-Security), X-Frame-Options (SAMEORIGIN - Chống clickjacking), X-Content-Type-Options (nosniff).

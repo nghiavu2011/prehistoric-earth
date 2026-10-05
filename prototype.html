@@ -3191,6 +3191,7 @@
               <span>📋</span> <span>Chép</span>
             </button>
           </div>
+          <div class="bank-acc-holder" style="font-size: 0.72rem; font-weight: 700; color: #334155; margin-top: 3px; letter-spacing: 0.02em;">Chủ TK: VŨ TRỌNG NGHĨA</div>
           <div class="bank-sub-hint">Mọi App Ngân Hàng quét được</div>
         </div>
 
@@ -3210,6 +3211,7 @@
               <span>📋</span> <span>Chép</span>
             </button>
           </div>
+          <div class="bank-acc-holder" style="font-size: 0.72rem; font-weight: 700; color: #334155; margin-top: 3px; letter-spacing: 0.02em;">Chủ TK: VŨ TRỌNG NGHĨA</div>
           <div class="bank-sub-hint">Quét nhanh qua App MoMo</div>
         </div>
 
@@ -5651,6 +5653,9 @@
         supportDesc: "Quét mã trực tiếp để tiếp tục duy trì máy chủ & phát triển mô hình 3D:",
         btnToggleWatercolor: "Nền màu nước",
         copyBtn: "Chép",
+        bankAccHolder: "Chủ TK: VŨ TRỌNG NGHĨA",
+        copyStkBtn: "Sao chép STK",
+        copyMomoBtn: "Sao chép số MoMo",
         bankHintTcb: "Mọi App Ngân Hàng quét được",
         bankHintMomo: "Quét nhanh qua App MoMo",
         btnCoffeeDetail: "Mời tách cà phê chi tiết",
@@ -5914,6 +5919,13 @@
       }
       const btnCoffeeDetail = document.querySelector('#btn-open-coffee-detail span:last-child');
       if (btnCoffeeDetail) btnCoffeeDetail.textContent = t.btnCoffeeDetail;
+      if (t.bankAccHolder) {
+        document.querySelectorAll('.bank-acc-holder').forEach(el => el.textContent = t.bankAccHolder);
+      }
+      const copyStkSpan = document.querySelector('.ui-copy-stk-text');
+      if (copyStkSpan && t.copyStkBtn) copyStkSpan.textContent = t.copyStkBtn;
+      const copyMomoSpan = document.querySelector('.ui-copy-momo-text');
+      if (copyMomoSpan && t.copyMomoBtn) copyMomoSpan.textContent = t.copyMomoBtn;
       const reopenSupportSpan = document.querySelector('#btn-reopen-support span:last-child');
       if (reopenSupportSpan) reopenSupportSpan.textContent = t.supportTitle;
 
@@ -8119,7 +8131,8 @@
     // Cố định thông tin tài khoản tác giả chính thức (Chống tấn công DOM Injection / thay đổi STK)
     const OFFICIAL_PAYMENT_ACCOUNTS = Object.freeze({
       TCB: '19077215974018',
-      MOMO: '0985578385'
+      MOMO: '0985578385',
+      HOLDER: 'VŨ TRỌNG NGHĨA'
     });
 
     // Copy to clipboard with anti-tamper verification & visual feedback
@@ -8361,20 +8374,26 @@
           <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; box-shadow: var(--shadow-sm);">
             <div style="font-size: 0.82rem; font-weight: 700; color: #e11d48; text-transform: uppercase; letter-spacing: 0.05em;">Techcombank</div>
             <img src="./assets/branding/techcom.jpg" alt="Mã QR Techcombank" style="width: 100%; max-width: 180px; border-radius: var(--radius-sm); border: 1px solid rgba(0,0,0,0.1);">
-            <div style="font-size: 0.78rem; line-height: 1.45; color: var(--text-main);">
-              <strong>STK:</strong> <code>19036573860010</code><br>
-              <strong>Chủ TK:</strong> NGUYEN DUY CHIEN
+            <div style="font-size: 0.82rem; line-height: 1.5; color: var(--text-main);">
+              <strong>STK:</strong> <code style="font-size: 0.92rem; font-weight: 800; color: #e11d48;">19077215974018</code><br>
+              <div class="bank-acc-holder" style="font-weight: 700; color: #1e293b; margin-top: 2px;">Chủ TK: VŨ TRỌNG NGHĨA</div>
             </div>
+            <button class="btn-copy-acc" data-copy="19077215974018" style="padding: 5px 14px; font-size: 0.76rem; border-radius: 6px; border: 1px solid #e11d48; background: rgba(225, 29, 72, 0.08); color: #e11d48; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <span>📋</span> <span class="ui-copy-stk-text">Sao chép STK</span>
+            </button>
           </div>
 
           <!-- MoMo -->
           <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; box-shadow: var(--shadow-sm);">
             <div style="font-size: 0.82rem; font-weight: 700; color: #a21caf; text-transform: uppercase; letter-spacing: 0.05em;">Ví Điện Tử MoMo</div>
             <img src="./assets/branding/momo.jpg" alt="Mã QR MoMo" style="width: 100%; max-width: 180px; border-radius: var(--radius-sm); border: 1px solid rgba(0,0,0,0.1);">
-            <div style="font-size: 0.78rem; line-height: 1.45; color: var(--text-main);">
-              <strong>Ví MoMo:</strong> <code>0985578385</code><br>
-              <strong>Chủ TK:</strong> Nguyễn Duy Chiến
+            <div style="font-size: 0.82rem; line-height: 1.5; color: var(--text-main);">
+              <strong>Ví MoMo:</strong> <code style="font-size: 0.92rem; font-weight: 800; color: #a21caf;">0985 578 385</code><br>
+              <div class="bank-acc-holder" style="font-weight: 700; color: #1e293b; margin-top: 2px;">Chủ TK: VŨ TRỌNG NGHĨA</div>
             </div>
+            <button class="btn-copy-acc" data-copy="0985578385" style="padding: 5px 14px; font-size: 0.76rem; border-radius: 6px; border: 1px solid #a21caf; background: rgba(162, 28, 175, 0.08); color: #a21caf; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <span>📋</span> <span class="ui-copy-momo-text">Sao chép số MoMo</span>
+            </button>
           </div>
         </div>
 
