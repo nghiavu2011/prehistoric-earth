@@ -1112,7 +1112,272 @@
       font-weight: 600;
     }
 
-        /* Epic BGM Button Active Pulse */
+        /* TABLET SMART SPLIT-VIEW (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      body:not(.sidebar-collapsed) .info-sidebar {
+        width: 360px !important;
+        max-width: 38vw !important;
+        top: 72px !important;
+        bottom: 84px !important;
+        transform: none !important;
+        opacity: 1 !important;
+      }
+      body:not(.sidebar-collapsed) .stage-top-bar {
+        right: 380px !important;
+      }
+      .stage-dino-rail {
+        max-width: calc(100vw - 400px) !important;
+      }
+    }
+
+    /* MOBILE 2-STAGE BOTTOM SHEET (<= 768px) */
+    @media (max-width: 768px) {
+      .info-sidebar {
+        position: fixed !important;
+        top: auto !important;
+        left: 8px !important;
+        right: 8px !important;
+        width: calc(100vw - 16px) !important;
+        max-width: calc(100vw - 16px) !important;
+        bottom: 66px !important;
+        height: 38vh !important;
+        max-height: 38vh !important;
+        border-radius: 20px 20px 14px 14px !important;
+        padding: 8px 14px 16px 14px !important;
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35) !important;
+        z-index: 45 !important;
+        transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .info-sidebar.expanded {
+        height: 82vh !important;
+        max-height: 82vh !important;
+      }
+      .info-sidebar.collapsed {
+        transform: translateY(calc(100% + 40px)) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      .bottom-sheet-handle {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 0 8px 0;
+        cursor: grab;
+        touch-action: none;
+      }
+      .bottom-sheet-handle .drag-bar {
+        width: 44px;
+        height: 5px;
+        background: rgba(0, 0, 0, 0.22);
+        border-radius: 999px;
+        transition: background 0.2s ease;
+      }
+      .bottom-sheet-handle:hover .drag-bar {
+        background: #d97706;
+      }
+    }
+    @media (min-width: 769px) {
+      .bottom-sheet-handle {
+        display: none !important;
+      }
+    }
+
+    /* NÚT TIẾNG GẦM SINH HỌC 📢 */
+    .btn-roar-fx {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.25));
+      border: 1px solid rgba(217, 119, 6, 0.4);
+      color: #b45309;
+      border-radius: var(--radius-full);
+      padding: 4px 10px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s ease;
+    }
+    .btn-roar-fx:hover {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      color: #ffffff;
+      transform: scale(1.05);
+      box-shadow: 0 2px 10px rgba(217, 119, 6, 0.35);
+    }
+    .btn-roar-fx.roaring {
+      background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+      color: #ffffff !important;
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.7) !important;
+      animation: roar-pulse 0.4s infinite ease-in-out;
+    }
+    @keyframes roar-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    /* EXPLORER QUEST PROGRESS BADGE TRÊN RAIL */
+    .explorer-quest-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 6px;
+      flex-shrink: 0;
+    }
+    .explorer-badge {
+      background: rgba(15, 23, 42, 0.88);
+      border: 1px solid rgba(217, 119, 6, 0.4);
+      color: #f59e0b;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+    .explorer-badge:hover {
+      background: #b45309;
+      color: #ffffff;
+    }
+    .dino-tab.explored::after {
+      content: '✓';
+      display: inline-block;
+      margin-left: 4px;
+      color: #10b981;
+      font-weight: 900;
+      font-size: 0.72rem;
+    }
+
+    /* CLASSROOM PRESENTATION MODE */
+    body.classroom-mode #app-header,
+    body.classroom-mode .info-sidebar,
+    body.classroom-mode .sidebar-toggle-btn,
+    body.classroom-mode .stage-top-bar,
+    body.classroom-mode .left-support-card,
+    body.classroom-mode .mini-support-chip,
+    body.classroom-mode .header-toggle-tab,
+    body.classroom-mode .stage-dino-rail {
+      display: none !important;
+    }
+    .classroom-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    body.classroom-mode .classroom-overlay {
+      display: block;
+    }
+    .classroom-exit-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      pointer-events: auto;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .classroom-exit-btn:hover {
+      background: #dc2626;
+      border-color: #ef4444;
+      transform: scale(1.05);
+    }
+    .classroom-nav-prev, .classroom-nav-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+    .classroom-nav-prev:hover, .classroom-nav-next:hover {
+      background: rgba(217, 119, 6, 0.85);
+      transform: translateY(-50%) scale(1.15);
+    }
+    .classroom-nav-prev { left: 24px; }
+    .classroom-nav-next { right: 24px; }
+
+    .classroom-teleprompter {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(92vw, 980px);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(217, 119, 6, 0.4);
+      border-radius: 16px;
+      padding: 18px 24px;
+      color: #ffffff;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+    }
+    .teleprompter-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .teleprompter-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #f59e0b;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .teleprompter-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin: 0;
+      color: #ffffff;
+    }
+    .teleprompter-tag {
+      font-size: 0.72rem;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .teleprompter-body {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      margin: 0;
+    }
+
+    /* Epic BGM Button Active Pulse */
     .bgm-btn.active {
       background: linear-gradient(135deg, #059669, #047857) !important;
       color: #ffffff !important;
@@ -3130,6 +3395,18 @@
         <span id="ui-btn-bgm">Nhạc Nền</span>
       </button>
 
+      <!-- Chế độ Lớp Học / Chiếu TV -->
+      <button class="pill-btn" id="btn-toggle-classroom" title="Bật/Tắt Chế độ Lớp học & Chiếu TV phòng khách (Phím C)">
+        <span>🎓</span>
+        <span id="ui-btn-classroom">Lớp Học</span>
+      </button>
+
+      <!-- Chụp Ảnh Kỷ Niệm 1-Click -->
+      <button class="pill-btn" id="btn-take-snapshot" title="Chụp ảnh tiêu bản WebGL kèm tem bảo tàng cổ sinh 1080p (Phím S)">
+        <span>📷</span>
+        <span id="ui-btn-snapshot">Chụp Ảnh</span>
+      </button>
+
       <!-- Toàn màn hình -->
       <button class="pill-btn" id="btn-fullscreen" title="Bật/Tắt Toàn Màn Hình">
         <span>⛶</span>
@@ -3528,6 +3805,10 @@
 
     <!-- SIDEBAR THÔNG TIN KHOA HỌC (V9 BỐ CỤC SIÊU GỌN - HẠN CHẾ CUỘN TUYỆT ĐỐI) -->
     <aside class="info-sidebar" id="info-sidebar">
+      <!-- BARS / HANDLE VUỐT BOTTOM SHEET TRÊN MOBILE -->
+      <div class="bottom-sheet-handle" id="sheet-drag-handle" title="Kéo lên / xuống hoặc bấm để mở rộng">
+        <span class="drag-bar"></span>
+      </div>
       
       <!-- HEADER THU GỌN -->
       <div class="sidebar-header-compact">
@@ -3535,7 +3816,14 @@
           <span class="info-badge" id="exhibit-tag" style="margin: 0;">Khủng long Ceratopsia</span>
           <span id="badge-has-video" class="badge-video-pill" style="display: none;" title="Xem thước phim phục dựng 1080p">🎬 Video 1080p</span>
         </div>
-        <h1 id="exhibit-name" class="compact-title">Triceratops</h1>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px;">
+          <h1 id="exhibit-name" class="compact-title" style="margin: 0;">Triceratops</h1>
+          <!-- NÚT TIẾNG GẦM SINH HỌC 📢 -->
+          <button class="btn-roar-fx" id="btn-play-roar" title="Nghe tiếng gầm sinh học rền vang (Phím R)">
+            <span>📢</span>
+            <span id="ui-btn-roar">Tiếng Gầm</span>
+          </button>
+        </div>
         <p class="subtitle compact-subtitle" id="exhibit-subtitle">Người khổng lồ ba sừng của cuối Kỷ Phấn Trắng</p>
       </div>
 
@@ -3765,6 +4053,72 @@
 
     </aside>
   </main>
+
+  <!-- ==========================================================================
+       CHẾ ĐỘ LỚP HỌC / TRÌNH CHIẾU TV (CLASSROOM PRESENTER MODE)
+       ========================================================================== -->
+  <div class="classroom-overlay" id="classroom-overlay">
+    <button class="classroom-exit-btn" id="btn-exit-classroom" title="Thoát chế độ lớp học (Phím ESC hoặc C)">
+      <span>✕</span>
+      <span id="ui-classroom-exit-text">Thoát Lớp Học (ESC)</span>
+    </button>
+
+    <div class="classroom-nav-prev" id="btn-classroom-prev" title="Tiêu bản trước (←)">❮</div>
+    <div class="classroom-nav-next" id="btn-classroom-next" title="Tiêu bản sau (→)">❯</div>
+
+    <!-- Phụ đề chạy chữ lớn dưới màn hình TV -->
+    <div class="classroom-teleprompter" id="classroom-teleprompter">
+      <div class="teleprompter-header">
+        <span class="teleprompter-badge" id="teleprompter-period">KỶ PHẤN TRẮNG</span>
+        <h2 class="teleprompter-title" id="teleprompter-title">TYRANNOSAURUS REX</h2>
+        <span class="teleprompter-tag" id="teleprompter-highlight-tag">⚡ DẤU ẤN TIỀN SỬ</span>
+      </div>
+      <p class="teleprompter-body" id="teleprompter-text">
+        Đang nạp thuyết minh cổ sinh vật học...
+      </p>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: CHỨNG NHẬN NHÀ KHẢO CỔ NHÍ (EXPLORER DIPLOMA 17/17)
+       ========================================================================== -->
+  <div class="app-modal-backdrop" id="modal-diploma">
+    <div class="modal-container diploma-container" style="max-width: 650px; background: #fffbf0; border: 3px double #d97706; border-radius: 16px; padding: 26px 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); position: relative;">
+      <button class="modal-close-btn" id="close-diploma-modal" style="position: absolute; top: 12px; right: 12px;">&times;</button>
+      
+      <div style="font-size: 2.2rem; margin-bottom: 4px;">🏆 📜 🦖</div>
+      <div style="font-size: 0.78rem; font-weight: 800; color: #b45309; letter-spacing: 0.15em; text-transform: uppercase;">VIỆN NGHIÊN CỨU CỔ SINH VẬT HỌC N&M STUDIO</div>
+      <h2 style="font-family: var(--font-display); font-size: 1.55rem; color: #78350f; margin: 8px 0;" id="ui-diploma-h2">CHỨNG NHẬN NHÀ KHẢO CỔ NHÍ XUẤT SẮC</h2>
+      <p style="font-size: 0.85rem; color: #451a03; line-height: 1.5; margin-bottom: 14px;" id="ui-diploma-p">
+        Trao tặng cho Nhà thám hiểm dũng cảm đã hoàn thành xuất sắc chuyến du hành thời gian và khám phá trọn vẹn <strong>17/17 Tiêu Bản Đại Trung Sinh</strong> tại Bảo Tàng Khủng Long 3D:
+      </p>
+
+      <div style="margin: 16px 0;">
+        <input type="text" id="input-diploma-name" placeholder="Nhập tên của bạn hoặc của bé..." value="Nhà Cổ Sinh Vật Học Nhí" style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: #b45309; text-align: center; border: none; border-bottom: 2px dashed #d97706; background: transparent; padding: 6px 12px; width: 85%; max-width: 380px; outline: none;">
+      </div>
+
+      <div style="display: flex; justify-content: space-around; font-size: 0.78rem; color: #78350f; margin: 18px 0 14px; border-top: 1px dashed rgba(217, 119, 6, 0.4); padding-top: 12px;">
+        <div>
+          <span>Ngày hoàn thành:</span><br>
+          <strong id="diploma-date">05/10/2026</strong>
+        </div>
+        <div>
+          <span>Tiến độ khám phá:</span><br>
+          <strong style="color: #059669;">17/17 Tiêu bản (100%)</strong>
+        </div>
+        <div>
+          <span>Giám tuyển khoa học:</span><br>
+          <strong>Vũ Trọng Nghĩa</strong>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+        <button id="btn-print-diploma" style="background: linear-gradient(135deg, #d97706, #b45309); color: #fff; font-weight: 700; font-size: 0.84rem; padding: 9px 22px; border-radius: 999px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(217, 119, 6, 0.35);">
+          <span>🖨️</span> <span id="ui-btn-print-diploma">In / Tải Chứng Nhận Về Máy</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ==========================================================================
        MODAL 1: QUẢ ĐỊA CẦU CỔ SINH & ĐỊA TẦNG HÓA THẠCH (PALEO-GLOBE MODAL)
@@ -5393,6 +5747,7 @@
     function loadExhibit(exhibit) {
       currentExhibit = exhibit;
       window.currentExhibit = exhibit;
+      trackDinosaurExploration(exhibit.id);
       updateUIContent();
 
       document.getElementById('stage-bg-layer').style.backgroundImage = `url('${exhibit.background}')`;
@@ -5690,6 +6045,14 @@
         colorAmbient: "Ánh sáng môi trường (Ambient)",
 
         btnBgmText: "Nhạc Nền",
+        btnClassroomText: "Lớp Học",
+        btnSnapshotText: "Chụp Ảnh",
+        btnRoarText: "Tiếng Gầm",
+        classroomExitText: "Thoát Lớp Học (ESC)",
+        diplomaH2: "CHỨNG NHẬN NHÀ KHẢO CỔ NHÍ XUẤT SẮC",
+        diplomaP: "Trao tặng cho Nhà thám hiểm dũng cảm đã hoàn thành xuất sắc chuyến du hành thời gian và khám phá trọn vẹn <strong>17/17 Tiêu Bản Đại Trung Sinh</strong> tại Bảo Tàng Khủng Long 3D:",
+        diplomaPrint: "In / Tải Chứng Nhận Về Máy",
+
         btnBgmTitle: "Bật/Tắt Nhạc Nền Epic Tiền Sử (Heroic Age - Kevin MacLeod CC-BY 4.0)",
         licCardBgmP: "Bản quyền âm nhạc Epic: \"Heroic Age\" sáng tác bởi Kevin MacLeod (incompetech.com), cấp phép theo Creative Commons Attribution 4.0 (CC-BY 4.0).",
         highlightBadge: "⚡ DẤU ẤN TIỀN SỬ",
@@ -5817,6 +6180,14 @@
         colorAmbient: "Ambient Light",
 
         btnBgmText: "Epic BGM",
+        btnClassroomText: "Classroom",
+        btnSnapshotText: "Snapshot",
+        btnRoarText: "Roar FX",
+        classroomExitText: "Exit Classroom (ESC)",
+        diplomaH2: "JUNIOR PALEONTOLOGIST DIPLOMA",
+        diplomaP: "Awarded to the brave explorer who successfully completed the journey through time and discovered all <strong>17/17 Mesozoic Specimens</strong> in Prehistoric Earth 3D:",
+        diplomaPrint: "Print / Save Diploma",
+
         btnBgmTitle: "Toggle Prehistoric Epic BGM (Heroic Age - Kevin MacLeod CC-BY 4.0)",
         licCardBgmP: "Epic soundtrack: \"Heroic Age\" composed by Kevin MacLeod (incompetech.com), licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).",
         highlightBadge: "⚡ PALEO HIGHLIGHT",
@@ -6113,6 +6484,22 @@
       if (btnToggleBgmEl && t.btnBgmTitle) btnToggleBgmEl.title = t.btnBgmTitle;
       const licCardBgm = document.getElementById('ui-lic-card-bgm');
       if (licCardBgm && t.licCardBgmP) licCardBgm.textContent = t.licCardBgmP;
+
+      const uiBtnClassroom = document.getElementById('ui-btn-classroom');
+      if (uiBtnClassroom && t.btnClassroomText) uiBtnClassroom.textContent = t.btnClassroomText;
+      const uiBtnSnapshot = document.getElementById('ui-btn-snapshot');
+      if (uiBtnSnapshot && t.btnSnapshotText) uiBtnSnapshot.textContent = t.btnSnapshotText;
+      const uiBtnRoar = document.getElementById('ui-btn-roar');
+      if (uiBtnRoar && t.btnRoarText) uiBtnRoar.textContent = t.btnRoarText;
+      const uiClassExit = document.getElementById('ui-classroom-exit-text');
+      if (uiClassExit && t.classroomExitText) uiClassExit.textContent = t.classroomExitText;
+      const uiDipH2 = document.getElementById('ui-diploma-h2');
+      if (uiDipH2 && t.diplomaH2) uiDipH2.textContent = t.diplomaH2;
+      const uiDipP = document.getElementById('ui-diploma-p');
+      if (uiDipP && t.diplomaP) uiDipP.innerHTML = t.diplomaP;
+      const uiDipPrint = document.getElementById('ui-btn-print-diploma');
+      if (uiDipPrint && t.diplomaPrint) uiDipPrint.textContent = t.diplomaPrint;
+
 
       // Re-render
       renderDinoRail();
@@ -6451,6 +6838,511 @@
       });
     }
 
+    // =========================================================================
+    // TRỤ CỘT 2: ÂM THANH TIẾNG GẦM SINH HỌC (PROCEDURAL ROAR FX QUA WEB AUDIO API)
+    // =========================================================================
+    let roarAudioCtx = null;
+    function getRoarAudioContext() {
+      if (!roarAudioCtx) {
+        roarAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (roarAudioCtx.state === 'suspended') {
+        roarAudioCtx.resume();
+      }
+      return roarAudioCtx;
+    }
+
+    function playProceduralRoar() {
+      try {
+        const ctx = getRoarAudioContext();
+        const now = ctx.currentTime;
+        const ex = currentExhibit || EXHIBITS[0];
+        const dinoId = ex.id || 't_rex';
+
+        // Tự động hạ nhạc nền Epic khi gầm
+        if (isBgmPlaying) fadeBgmVolume(0.03, 200);
+
+        // Hiệu ứng visual nút gầm
+        const btnRoar = document.getElementById('btn-play-roar');
+        if (btnRoar) {
+          btnRoar.classList.add('roaring');
+          setTimeout(() => btnRoar.classList.remove('roaring'), 2000);
+        }
+
+        // Rung nhẹ mô hình 3D tạo cảm giác chấn động âm học
+        if (mainDinoGroup) {
+          const origY = mainDinoGroup.position.y;
+          let frame = 0;
+          const shakeInterval = setInterval(() => {
+            frame++;
+            if (frame > 25) {
+              mainDinoGroup.position.y = origY;
+              clearInterval(shakeInterval);
+            } else {
+              const delta = Math.sin(frame * 0.8) * 0.04 * (1 - frame / 25);
+              mainDinoGroup.position.y = origY + delta;
+            }
+          }, 35);
+        }
+
+        if (dinoId === 'pterosaur') {
+          // Tiếng rít bổng xé gió của Dực Long Pterosaur
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(1250, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 1.1);
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.28, now + 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.15);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 1.2);
+        } else if (dinoId === 'mamenchisaurus') {
+          // Cổ dài 12m: Âm trầm cộng hưởng khoang cổ (Tube Resonator 40Hz)
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const filter = ctx.createBiquadFilter();
+          const gain = ctx.createGain();
+
+          osc1.type = 'triangle';
+          osc1.frequency.setValueAtTime(46, now);
+          osc1.frequency.linearRampToValueAtTime(36, now + 2.2);
+
+          osc2.type = 'sine';
+          osc2.frequency.setValueAtTime(92, now);
+          osc2.frequency.linearRampToValueAtTime(72, now + 2.2);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(170, now);
+
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.38, now + 0.4);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 2.3);
+
+          osc1.connect(filter);
+          osc2.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 2.35);
+          osc2.stop(now + 2.35);
+        } else {
+          // Khủng long ăn thịt Theropod & Hộ pháp (T-Rex, Giga, Spino...): Infrasound Sub-Bass + Brown Noise
+          const bufferSize = ctx.sampleRate * 2.0;
+          const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const output = noiseBuffer.getChannelData(0);
+          let lastOut = 0.0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.04 * white)) / 1.04;
+            lastOut = output[i];
+            output[i] *= 3.5;
+          }
+          const noise = ctx.createBufferSource();
+          noise.buffer = noiseBuffer;
+
+          const noiseFilter = ctx.createBiquadFilter();
+          noiseFilter.type = 'lowpass';
+          noiseFilter.frequency.setValueAtTime(260, now);
+          noiseFilter.frequency.exponentialRampToValueAtTime(55, now + 1.8);
+          noiseFilter.Q.setValueAtTime(4.0, now);
+
+          const noiseGain = ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.01, now);
+          noiseGain.gain.linearRampToValueAtTime(0.32, now + 0.15);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.9);
+
+          noise.connect(noiseFilter);
+          noiseFilter.connect(noiseGain);
+          noiseGain.connect(ctx.destination);
+          noise.start(now);
+
+          // Tonal oscillator with throat flutter LFO
+          const osc = ctx.createOscillator();
+          const oscGain = ctx.createGain();
+          osc.type = 'sawtooth';
+          const baseFreq = (dinoId === 't_rex' || dinoId === 'giganotosaurus' || dinoId === 'spinosaurus') ? 48 : 62;
+          osc.frequency.setValueAtTime(baseFreq, now);
+          osc.frequency.linearRampToValueAtTime(baseFreq * 0.65, now + 1.7);
+
+          const lfo = ctx.createOscillator();
+          const lfoGain = ctx.createGain();
+          lfo.frequency.setValueAtTime(14, now);
+          lfoGain.gain.setValueAtTime(18, now);
+          lfo.connect(osc.frequency);
+          lfo.start(now);
+          lfo.stop(now + 1.8);
+
+          const oscFilter = ctx.createBiquadFilter();
+          oscFilter.type = 'lowpass';
+          oscFilter.frequency.setValueAtTime(220, now);
+
+          oscGain.gain.setValueAtTime(0.01, now);
+          oscGain.gain.linearRampToValueAtTime(0.42, now + 0.12);
+          oscGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+          osc.connect(oscFilter);
+          oscFilter.connect(oscGain);
+          oscGain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 1.85);
+        }
+
+        // Hồi phục nhạc nền sau 2 giây
+        setTimeout(() => {
+          if (isBgmPlaying && !isPlayingAudio) fadeBgmVolume(normalBgmVolume, 600);
+        }, 2100);
+
+        showSeasonToast(currentLang === 'vi' ? `📢 Tiếng gầm sinh học: ${ex.nameVi}` : `📢 Biological Roar: ${ex.nameEn}`);
+      } catch (err) {
+        console.warn('Web Audio Roar error:', err);
+      }
+    }
+
+    const btnPlayRoar = document.getElementById('btn-play-roar');
+    if (btnPlayRoar) {
+      btnPlayRoar.addEventListener('click', playProceduralRoar);
+    }
+
+    // =========================================================================
+    // TRỤ CỘT 3: CHỤP ẢNH KỶ NIỆM 1-CLICK (CANVAS SNAPSHOT WITH WATERMARK)
+    // =========================================================================
+    function takeMuseumSnapshot() {
+      if (!renderer || !currentExhibit) return;
+      try {
+        renderer.render(scene, camera);
+        const webglDataUrl = renderer.domElement.toDataURL('image/png');
+
+        const img = new Image();
+        img.onload = () => {
+          const snapCanvas = document.createElement('canvas');
+          snapCanvas.width = img.width;
+          snapCanvas.height = img.height;
+          const ctx = snapCanvas.getContext('2d');
+
+          // Vẽ nền 3D
+          ctx.drawImage(img, 0, 0);
+
+          // Vẽ tem bảo tàng góc dưới trái
+          const isMobile = snapCanvas.width < 800;
+          const pad = isMobile ? 14 : 26;
+          const boxW = isMobile ? 320 : 440;
+          const boxH = isMobile ? 70 : 86;
+          const boxX = pad;
+          const boxY = snapCanvas.height - boxH - pad;
+
+          ctx.save();
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.86)';
+          ctx.strokeStyle = 'rgba(217, 119, 6, 0.5)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(boxX, boxY, boxW, boxH, 12);
+          else ctx.rect(boxX, boxY, boxW, boxH);
+          ctx.fill();
+          ctx.stroke();
+
+          // Thanh vạch vàng
+          ctx.fillStyle = '#d97706';
+          ctx.fillRect(boxX, boxY + 6, 4, boxH - 12);
+
+          // Dòng 1: Tên loài & Niên đại
+          ctx.font = `bold ${isMobile ? 13 : 16}px system-ui, -apple-system, sans-serif`;
+          ctx.fillStyle = '#ffffff';
+          const exName = currentLang === 'vi' ? currentExhibit.nameVi : currentExhibit.nameEn;
+          const exPeriod = currentLang === 'vi' ? currentExhibit.periodVi : currentExhibit.periodEn;
+          ctx.fillText(`${exName} • ${exPeriod}`, boxX + 16, boxY + (isMobile ? 24 : 30));
+
+          // Dòng 2: Tỉ lệ người 1:1
+          ctx.font = `${isMobile ? 10 : 12}px monospace`;
+          ctx.fillStyle = '#94a3b8';
+          ctx.fillText('TỈ LỆ ĐỐI CHỨNG NGƯỜI 1:1 • BẢO TÀNG KHỦNG LONG 3D', boxX + 16, boxY + (isMobile ? 44 : 54));
+
+          // Dòng 3: Bản quyền N&M Studio
+          ctx.font = `italic ${isMobile ? 9 : 11}px system-ui, sans-serif`;
+          ctx.fillStyle = '#f59e0b';
+          ctx.fillText('© N&M Studio Education • prehistoric-earth.vercel.app', boxX + 16, boxY + (isMobile ? 59 : 72));
+          ctx.restore();
+
+          // Tải ảnh hoặc chia sẻ Web Share API
+          const finalUrl = snapCanvas.toDataURL('image/png');
+          const dlLink = document.createElement('a');
+          dlLink.download = `BaoTangKhungLong3D_${currentExhibit.id}_${Date.now()}.png`;
+          dlLink.href = finalUrl;
+          dlLink.click();
+
+          showSeasonToast(currentLang === 'vi' ? '📸 Đã chụp và lưu ảnh kỷ niệm 1080p!' : '📸 1080p museum snapshot saved!');
+        };
+        img.src = webglDataUrl;
+      } catch (err) {
+        console.error('Snapshot error:', err);
+      }
+    }
+
+    const btnTakeSnapshot = document.getElementById('btn-take-snapshot');
+    if (btnTakeSnapshot) {
+      btnTakeSnapshot.addEventListener('click', takeMuseumSnapshot);
+    }
+
+    // =========================================================================
+    // TRỤ CỘT 4: CHẾ ĐỘ LỚP HỌC & TRÌNH CHIẾU TV (CLASSROOM PRESENTER MODE)
+    // =========================================================================
+    let isClassroomMode = false;
+    function toggleClassroomMode() {
+      isClassroomMode = !isClassroomMode;
+      document.body.classList.toggle('classroom-mode', isClassroomMode);
+      const btnClassroom = document.getElementById('btn-toggle-classroom');
+      if (btnClassroom) btnClassroom.classList.toggle('active', isClassroomMode);
+
+      if (isClassroomMode) {
+        updateClassroomTeleprompter();
+        showSeasonToast(currentLang === 'vi' ? '🎓 Đã bật Chế độ Lớp học & Chiếu TV' : '🎓 Classroom Presenter Mode active');
+        if (!isPlayingAudio) playExhibitAudio();
+      } else {
+        showSeasonToast(currentLang === 'vi' ? 'Đã thoát Chế độ Lớp học' : 'Exited Classroom Mode');
+      }
+      onWindowResize();
+    }
+
+    function updateClassroomTeleprompter() {
+      if (!isClassroomMode) return;
+      const ex = currentExhibit;
+      const isVi = currentLang === 'vi';
+      const pBadge = document.getElementById('teleprompter-period');
+      const pTitle = document.getElementById('teleprompter-title');
+      const pTag = document.getElementById('teleprompter-highlight-tag');
+      const pText = document.getElementById('teleprompter-text');
+
+      if (pBadge) pBadge.textContent = isVi ? ex.periodVi.toUpperCase() : ex.periodEn.toUpperCase();
+      if (pTitle) pTitle.textContent = (isVi ? ex.nameVi : ex.nameEn).toUpperCase();
+      if (pTag) {
+        const hl = ex[currentLang]?.highlight;
+        pTag.textContent = hl ? `⚡ ${hl.title}` : (isVi ? '⚡ ĐẶC TRƯNG CỔ SINH' : '⚡ PALEO SPECIMEN');
+      }
+      if (pText) {
+        const data = ex[currentLang];
+        pText.textContent = `${data.intro} ${data.obs}`;
+      }
+    }
+
+    const btnToggleClassroom = document.getElementById('btn-toggle-classroom');
+    if (btnToggleClassroom) btnToggleClassroom.addEventListener('click', toggleClassroomMode);
+
+    const btnExitClassroom = document.getElementById('btn-exit-classroom');
+    if (btnExitClassroom) btnExitClassroom.addEventListener('click', toggleClassroomMode);
+
+    const btnClassPrev = document.getElementById('btn-classroom-prev');
+    if (btnClassPrev) {
+      btnClassPrev.addEventListener('click', () => {
+        let prevIdx = currentExhibitIndex - 1;
+        if (prevIdx < 0) prevIdx = EXHIBITS.length - 1;
+        currentExhibitIndex = prevIdx;
+        loadExhibit(EXHIBITS[prevIdx]);
+        renderDinoRail();
+        updateClassroomTeleprompter();
+      });
+    }
+
+    const btnClassNext = document.getElementById('btn-classroom-next');
+    if (btnClassNext) {
+      btnClassNext.addEventListener('click', () => {
+        let nextIdx = (currentExhibitIndex + 1) % EXHIBITS.length;
+        currentExhibitIndex = nextIdx;
+        loadExhibit(EXHIBITS[nextIdx]);
+        renderDinoRail();
+        updateClassroomTeleprompter();
+      });
+    }
+
+    // =========================================================================
+    // TRỤ CỘT 5: GAMIFICATION "NHÀ KHẢO CỔ NHÍ" (EXPLORER QUEST 17/17)
+    // =========================================================================
+    const STORAGE_KEY_EXPLORED = 'prehistoric_explored_dinos_v1';
+    let exploredDinos = new Set();
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_EXPLORED);
+      if (saved) exploredDinos = new Set(JSON.parse(saved));
+    } catch (e) {}
+
+    let exploreTimer = null;
+    function trackDinosaurExploration(dinoId) {
+      if (exploreTimer) clearTimeout(exploreTimer);
+      exploreTimer = setTimeout(() => {
+        if (!exploredDinos.has(dinoId)) {
+          exploredDinos.add(dinoId);
+          try {
+            localStorage.setItem(STORAGE_KEY_EXPLORED, JSON.stringify([...exploredDinos]));
+          } catch (e) {}
+          updateExplorerBadgeUI();
+          renderDinoRail();
+
+          if (exploredDinos.size === EXHIBITS.length) {
+            celebrateDiplomaAward();
+          }
+        }
+      }, 3500);
+    }
+
+    function updateExplorerBadgeUI() {
+      const countEl = document.getElementById('explorer-count');
+      if (countEl) countEl.textContent = exploredDinos.size;
+    }
+
+    function celebrateDiplomaAward() {
+      triggerConfettiParticles();
+      const modal = document.getElementById('modal-diploma');
+      if (modal) {
+        modal.classList.add('open');
+        const dateEl = document.getElementById('diploma-date');
+        if (dateEl) {
+          const now = new Date();
+          dateEl.textContent = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+        }
+      }
+    }
+
+    // Native Confetti Emitter (Zero external libraries)
+    function triggerConfettiParticles() {
+      const c = document.createElement('canvas');
+      c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:999999;';
+      document.body.appendChild(c);
+      const ctx = c.getContext('2d');
+      c.width = window.innerWidth;
+      c.height = window.innerHeight;
+
+      const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6', '#d97706'];
+      const particles = Array.from({ length: 90 }, () => ({
+        x: Math.random() * c.width,
+        y: Math.random() * c.height * 0.4 - c.height * 0.2,
+        w: Math.random() * 8 + 4,
+        h: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 4,
+        vy: Math.random() * 4 + 3,
+        rot: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 8
+      }));
+
+      let start = null;
+      function step(t) {
+        if (!start) start = t;
+        const elapsed = t - start;
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vRot;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rot * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+
+        if (elapsed < 3800) {
+          requestAnimationFrame(step);
+        } else {
+          c.remove();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    const closeDiplomaBtn = document.getElementById('close-diploma-modal');
+    if (closeDiplomaBtn) {
+      closeDiplomaBtn.addEventListener('click', () => {
+        document.getElementById('modal-diploma')?.classList.remove('open');
+      });
+    }
+
+    const btnPrintDiploma = document.getElementById('btn-print-diploma');
+    if (btnPrintDiploma) {
+      btnPrintDiploma.addEventListener('click', () => {
+        window.print();
+      });
+    }
+
+    // =========================================================================
+    // MOBILE BOTTOM-SHEET TOUCH GESTURES (PEEK 38vh <-> EXPANDED 82vh)
+    // =========================================================================
+    const sheetHandle = document.getElementById('sheet-drag-handle');
+    const sheetSidebar = document.getElementById('info-sidebar');
+    let isSheetExpanded = false;
+
+    if (sheetHandle && sheetSidebar) {
+      sheetHandle.addEventListener('click', () => {
+        isSheetExpanded = !isSheetExpanded;
+        sheetSidebar.classList.toggle('expanded', isSheetExpanded);
+      });
+
+      let touchStartY = 0;
+      sheetHandle.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      sheetHandle.addEventListener('touchend', (e) => {
+        const touchEndY = e.changedTouches[0].clientY;
+        const diff = touchStartY - touchEndY;
+        if (diff > 35) {
+          // Vuốt lên -> Mở rộng 82vh
+          isSheetExpanded = true;
+          sheetSidebar.classList.add('expanded');
+        } else if (diff < -35) {
+          // Vuốt xuống -> Thu nhỏ 38vh
+          isSheetExpanded = false;
+          sheetSidebar.classList.remove('expanded');
+        }
+      }, { passive: true });
+    }
+
+    // =========================================================================
+    // DESKTOP KEYBOARD SHORTCUTS (SPACE, B, H, R, S, C, F, ARROWS, ESC)
+    // =========================================================================
+    window.addEventListener('keydown', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (isPlayingAudio) stopExhibitAudio();
+        else playExhibitAudio();
+      } else if (e.key === 'b' || e.key === 'B') {
+        toggleBgm();
+      } else if (e.key === 'h' || e.key === 'H') {
+        const btnH = document.getElementById('btn-toggle-human');
+        if (btnH) btnH.click();
+      } else if (e.key === 'r' || e.key === 'R') {
+        playProceduralRoar();
+      } else if (e.key === 's' || e.key === 'S') {
+        takeMuseumSnapshot();
+      } else if (e.key === 'c' || e.key === 'C') {
+        toggleClassroomMode();
+      } else if (e.key === 'f' || e.key === 'F') {
+        const btnFs = document.getElementById('btn-fullscreen');
+        if (btnFs) btnFs.click();
+      } else if (e.key === 'ArrowLeft') {
+        let prevIdx = currentExhibitIndex - 1;
+        if (prevIdx < 0) prevIdx = EXHIBITS.length - 1;
+        currentExhibitIndex = prevIdx;
+        loadExhibit(EXHIBITS[prevIdx]);
+        renderDinoRail();
+        updateClassroomTeleprompter();
+      } else if (e.key === 'ArrowRight') {
+        let nextIdx = (currentExhibitIndex + 1) % EXHIBITS.length;
+        currentExhibitIndex = nextIdx;
+        loadExhibit(EXHIBITS[nextIdx]);
+        renderDinoRail();
+        updateClassroomTeleprompter();
+      } else if (e.key === 'Escape') {
+        if (isClassroomMode) toggleClassroomMode();
+        document.querySelectorAll('.app-modal-backdrop.open').forEach(m => m.classList.remove('open'));
+      }
+    });
+
     /* ==========================================================================
        7. CHUYỂN 4 MÙA TIỀN SỬ MƯỢT MÀ TINH TẾ (GIỮ NGUYÊN KHUNG CẢNH REF)
        ========================================================================== */
@@ -6783,12 +7675,35 @@
     };
 
     function renderDinoRail() {
-      dinoRail.innerHTML = EXHIBITS.map((ex, idx) => `
-        <button class="dino-tab ${idx === currentExhibitIndex ? 'active' : ''}" data-index="${idx}">
-          <span>${DINO_ICONS[ex.id] || '🦕'}</span>
-          <span>${currentLang === 'vi' ? ex.nameVi : ex.nameEn}</span>
-        </button>
-      `).join('');
+      const isVi = currentLang === 'vi';
+      const badgeHtml = `
+        <div class="explorer-quest-wrap">
+          <button class="explorer-badge" id="btn-show-diploma" title="${isVi ? 'Hành trình khám phá 17/17 tiêu bản' : '17/17 Discovery Quest'}">
+            <span>🎒</span>
+            <span>${isVi ? 'Đã xem' : 'Explored'}: <strong id="explorer-count">${exploredDinos.size}</strong>/17</span>
+          </button>
+        </div>
+      `;
+
+      const tabsHtml = EXHIBITS.map((ex, idx) => {
+        const isExp = exploredDinos.has(ex.id);
+        return `
+          <button class="dino-tab ${idx === currentExhibitIndex ? 'active' : ''} ${isExp ? 'explored' : ''}" data-index="${idx}">
+            <span>${DINO_ICONS[ex.id] || '🦕'}</span>
+            <span>${isVi ? ex.nameVi : ex.nameEn}</span>
+          </button>
+        `;
+      }).join('');
+
+      dinoRail.innerHTML = badgeHtml + tabsHtml;
+
+      const btnShowDip = document.getElementById('btn-show-diploma');
+      if (btnShowDip) {
+        btnShowDip.addEventListener('click', () => {
+          if (exploredDinos.size === EXHIBITS.length) celebrateDiplomaAward();
+          else showSeasonToast(isVi ? `🎒 Bạn đã khám phá ${exploredDinos.size}/17 tiêu bản! Khám phá đủ 17 loài để nhận Chứng Nhận!` : `🎒 You explored ${exploredDinos.size}/17 specimens! Explore all 17 to unlock your Diploma!`);
+        });
+      }
 
       dinoRail.querySelectorAll('.dino-tab').forEach(tab => {
         tab.addEventListener('click', () => {
