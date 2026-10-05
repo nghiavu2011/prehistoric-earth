@@ -44,6 +44,10 @@ Hệ thống sử dụng các mẫu quét 3D được cấp phép minh bạch t�
   * *Giấy phép:* `Open Access Education / Research Use`.
 * **Sketchfab Cultural Heritage & Scientific Community:**
   * *Tiêu bản:* Các mô hình 3D phục dựng động học sinh học (Liopleurodon, Mamenchisaurus, Ankylosaurus...) do các nhà tạo hình cổ sinh học quốc tế phát hành theo giấy phép mở `CC-BY 4.0`.
+* **Âm Nhạc Nền Tiền Sử Epic (Background Music):**
+  * *Tác phẩm:* *"Heroic Age"* sáng tác và phối khí bởi Kevin MacLeod (incompetech.com).
+  * *Giấy phép:* `Creative Commons Attribution 4.0 International (CC-BY 4.0)` (http://creativecommons.org/licenses/by/4.0/).
+  * *Quy chuẩn sử dụng:* Phát lại vòng lặp phục vụ trải nghiệm tham quan bảo tàng, tích hợp tính năng tự động hạ âm lượng (auto-ducking) khi có thuyết minh giọng đọc cổ sinh vật học.
 
 ---
 

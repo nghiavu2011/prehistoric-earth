@@ -1112,7 +1112,71 @@
       font-weight: 600;
     }
 
-    .coffee-btn {
+        /* Epic BGM Button Active Pulse */
+    .bgm-btn.active {
+      background: linear-gradient(135deg, #059669, #047857) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(16, 185, 129, 0.4) !important;
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.45) !important;
+      animation: pulse-bgm 2.2s infinite ease-in-out;
+    }
+    @keyframes pulse-bgm {
+      0%, 100% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.35); }
+      50% { box-shadow: 0 0 18px rgba(16, 185, 129, 0.7); }
+    }
+
+    /* Tab 1: Paleo Highlight Dossier Card */
+    .paleo-highlight-card {
+      margin: 12px 0 10px 0;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, rgba(254, 243, 199, 0.55) 0%, rgba(255, 255, 255, 0.85) 100%);
+      border: 1px solid rgba(217, 119, 6, 0.3);
+      border-left: 4px solid #d97706;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      transition: all 0.25s ease;
+    }
+    .paleo-highlight-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .paleo-highlight-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #b45309;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .paleo-highlight-tag {
+      font-size: 0.62rem;
+      font-family: var(--font-mono, monospace);
+      font-weight: 700;
+      color: #78350f;
+      background: rgba(245, 158, 11, 0.16);
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+    .paleo-highlight-title {
+      font-size: 0.84rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 4px 0;
+      line-height: 1.3;
+    }
+    .paleo-highlight-desc {
+      font-size: 0.76rem;
+      line-height: 1.48;
+      color: #334155;
+      margin: 0;
+    }
+
+.coffee-btn {
       background: linear-gradient(135deg, #d97706, #b45309) !important;
       color: #ffffff !important;
       font-weight: 700 !important;
@@ -3060,6 +3124,12 @@
         <span>Bản Quyền</span>
       </button>
 
+      <!-- Nhạc Nền Epic Tiền Sử (CC-BY 4.0 Kevin MacLeod) -->
+      <button class="pill-btn bgm-btn" id="btn-toggle-bgm" title="Bật/Tắt Nhạc Nền Epic Tiền Sử (Heroic Age - Kevin MacLeod CC-BY 4.0)">
+        <span id="ui-icon-bgm">🎵</span>
+        <span id="ui-btn-bgm">Nhạc Nền</span>
+      </button>
+
       <!-- Toàn màn hình -->
       <button class="pill-btn" id="btn-fullscreen" title="Bật/Tắt Toàn Màn Hình">
         <span>⛶</span>
@@ -3261,26 +3331,26 @@
         <div class="tuner-row">
           <div class="tuner-label">
             <span>Khoảng cách đến chân Khủng long</span>
-            <span id="lbl-human-dist-val" style="color: var(--accent-forest);">10.0 mét</span>
+            <span id="lbl-human-dist-val" style="color: var(--accent-forest);">3.5 mét</span>
           </div>
-          <input type="range" class="tuner-slider" id="slider-human-dist" min="2.0" max="15.0" step="0.5" value="10.0">
+          <input type="range" class="tuner-slider" id="slider-human-dist" min="2.0" max="15.0" step="0.5" value="3.5">
           <div class="preset-chip-row">
             <button class="preset-chip" data-hdist="2.5">2.5m</button>
+            <button class="preset-chip active" data-hdist="3.5">3.5m</button>
             <button class="preset-chip" data-hdist="5.0">5.0m</button>
             <button class="preset-chip" data-hdist="7.5">7.5m</button>
-            <button class="preset-chip active" data-hdist="10.0">10m</button>
-            <button class="preset-chip" data-hdist="12.5">12.5m</button>
+            <button class="preset-chip" data-hdist="10.0">10m</button>
           </div>
         </div>
 
         <div class="tuner-row">
           <div class="tuner-label">
             <span>Vị trí đứng tương quan</span>
-            <span id="lbl-human-pos-val" style="color: var(--accent-terracotta);">Bên phải</span>
+            <span id="lbl-human-pos-val" style="color: var(--accent-terracotta);">Bên trái</span>
           </div>
           <div class="preset-chip-row">
-            <button class="preset-chip active" data-hpos="right">👉 Bên phải</button>
-            <button class="preset-chip" data-hpos="left">👈 Bên trái</button>
+            <button class="preset-chip" data-hpos="right">👉 Bên phải</button>
+            <button class="preset-chip active" data-hpos="left">👈 Bên trái</button>
             <button class="preset-chip" data-hpos="front">⬆️ Phía trước</button>
             <button class="preset-chip" data-hpos="behind">⬇️ Đằng sau</button>
           </div>
@@ -3486,6 +3556,16 @@
         <p class="info-intro-p" id="exhibit-intro">
           Triceratops sống ở khu vực phía tây Bắc Mỹ khoảng 68–66 triệu năm trước. Hộp sọ khổng lồ dài tới 2.5m, ba chiếc sừng nhọn và phần diềm cổ rộng khiến nó trở thành loài khủng long biểu tượng nhất.
         </p>
+
+        <!-- ĐẶC ĐIỂM TIÊU BIỂU & GIẢI PHẪU TIỀN SỬ (PALEONTOLOGICAL HIGHLIGHT) -->
+        <div class="paleo-highlight-card" id="exhibit-highlight-card">
+          <div class="paleo-highlight-header">
+            <span class="paleo-highlight-badge">⚡ DẤU ẤN TIỀN SỬ</span>
+            <span class="paleo-highlight-tag" id="exhibit-highlight-tag">GIẢI PHẪU // PHÒNG THỦ</span>
+          </div>
+          <h4 class="paleo-highlight-title" id="exhibit-highlight-title">Hộp sọ bọc giáp & Sức mạnh phòng thủ</h4>
+          <p class="paleo-highlight-desc" id="exhibit-highlight-desc">Diềm cổ xương nguyên khối cùng cặp sừng trán dài 1m tạo lá chắn bất khả xâm phạm. Vết sẹo thủng đã lành trên hóa thạch Hell Creek chứng minh Triceratops từng trực tiếp giao chiến sống còn với T-Rex.</p>
+        </div>
 
         <!-- Gợi ý quan sát đối chứng người Joe 1.75m -->
         <div class="observation-box">
@@ -3793,6 +3873,12 @@
             <h3>Sketchfab Cultural Heritage</h3>
             <p id="ui-lic-card4-p">Các nghệ sĩ và viện khảo cổ học quốc tế chia sẻ mẫu 3D rigged & textured mô phỏng động học sinh học với quyền ghi công tác giả mở.</p>
           </div>
+
+          <div class="license-card">
+            <span class="license-badge">CC-BY 4.0 International</span>
+            <h3>Kevin MacLeod (Incompetech)</h3>
+            <p id="ui-lic-card-bgm">Bản quyền âm nhạc Epic: "Heroic Age" sáng tác bởi Kevin MacLeod (incompetech.com), cấp phép theo Creative Commons Attribution 4.0 (CC-BY 4.0).</p>
+          </div>
         </div>
 
         <div style="margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
@@ -3870,8 +3956,13 @@
         vi: {
           tag: "Khủng long Ceratopsia",
           subtitle: "Người khổng lồ ba sừng của cuối Kỷ Phấn Trắng",
-          intro: "Triceratops sở hữu hộp sọ khổng lồ dài tới 2.5m, ba chiếc sừng nhọn và phần diềm cổ rộng khiến nó trở thành biểu tượng phòng thủ dũng mãnh nhất chống lại kẻ săn mồi T-Rex.",
-          obs: "Người Joe cao 1.75m đứng cạnh đối chứng tỷ lệ. Riêng phần hộp sọ đã dài hơn cả chiều cao người trưởng thành!",
+          intro: "Triceratops sống ở khu vực phía tây Bắc Mỹ khoảng 68–66 triệu năm trước. Hộp sọ khổng lồ dài tới 2.5m, ba chiếc sừng nhọn và phần diềm cổ rộng khiến nó trở thành một trong những loài khủng long ăn thực vật hùng mạnh và mang tính biểu tượng nhất của cuối Kỷ Phấn Trắng.",
+          obs: "Người Joe cao 1.75m đứng ở mạn trái cách 3.5m. Hãy quan sát: riêng phần hộp sọ và diềm cổ bọc giáp của Triceratops đã dài hơn toàn bộ chiều cao của một người trưởng thành!",
+          highlight: {
+                    "tag": "GIẢI PHẪU // PHÒNG THỦ",
+                    "title": "Hộp sọ bọc giáp & Sức mạnh phòng thủ",
+                    "desc": "Diềm cổ xương nguyên khối cùng cặp sừng trán dài 1m tạo lá chắn bất khả xâm phạm. Vết sẹo thủng đã lành trên hóa thạch Hell Creek chứng minh Triceratops từng trực tiếp giao chiến sống còn với T-Rex."
+          },
           diet: "Thực vật",
           dietSub: "Dương xỉ, lá kim, mè gai",
           length: "8.5 mét",
@@ -3884,8 +3975,13 @@
         en: {
           tag: "Ceratopsian dinosaur",
           subtitle: "The three-horned giant of the Late Cretaceous",
-          intro: "Triceratops sported a massive 2.5m skull, three formidable horns, and a solid bony neck frill, representing the pinnacle of herbivore defense.",
-          obs: "Compare proportions with human Joe (1.75m). The skull alone exceeds human height!",
+          intro: "Triceratops inhabited western North America approximately 68–66 million years ago. Its colossal 2.5-meter skull, three formidable sharp horns, and broad bony neck frill make it one of the most iconic and powerfully armored herbivores of the Late Cretaceous.",
+          obs: "Compare proportions with human Joe (1.75m) standing on the left flank at 3.5m. The skull and massive neck frill alone exceed the total height of an adult human!",
+          highlight: {
+                    "tag": "ANATOMY // DEFENSIVE COMBAT",
+                    "title": "Armored Skull & Defensive Battering",
+                    "desc": "A solid bone frill and dual 1-meter brow horns formed an impenetrable shield against apex predators. Hell Creek fossils show healed puncture wounds proving direct clashes with T-Rex."
+          },
           diet: "Herbivore",
           dietSub: "Ferns, cycads, conifers",
           length: "8.5 metres",
@@ -3922,8 +4018,13 @@
         vi: {
           tag: "Khảo cổ học Hóa thạch",
           subtitle: "Khung xương giải phẫu hoàn chỉnh trong bảo tàng",
-          intro: "Bản quét 3D bộ xương hóa thạch Triceratops prorsus tái hiện chi tiết từng đốt sống, xương sườn và cấu trúc hộp sọ rỗng đồ sộ theo tiêu chuẩn bảo tàng quốc tế.",
-          obs: "Người Joe đứng cạnh nhìn thấy toàn bộ cấu trúc xương sọ diềm cổ 2.5m và bộ khung nâng đỡ thể trọng 10 tấn.",
+          intro: "Bản quét 3D bộ xương hóa thạch Triceratops prorsus tái hiện chi tiết từng khớp xương, đốt sống cổ và hàm răng xếp tầng. Đây là tư liệu vô giá giúp các nhà cổ sinh học phân tích cơ sinh học vận động và sức tải cơ thể lên tới 10 tấn.",
+          obs: "Đối chứng với Người Joe 1.75m để thấy hệ thống cột sống và 4 chi trụ cột vững chắc như cột đình La Mã nâng đỡ toàn bộ khối xương sọ nặng nề.",
+          highlight: {
+                    "tag": "KHẢO CỔ // BẢN QUÉT 3D",
+                    "title": "Cấu trúc cột sống & Bản quét 3D Bảo tàng",
+                    "desc": "Các đốt sống cổ hợp nhất (syncervical) nâng đỡ hộp sọ nặng hơn 1 tấn. Mẫu vật số hóa từ bộ xương khớp nối hoàn chỉnh giúp khảo sát góc vát răng tự mài sắc khi nghiền thực vật xơ cứng."
+          },
           diet: "Tiêu bản hóa thạch",
           dietSub: "Bảo tàng Lịch sử Tự nhiên",
           length: "8.5 mét",
@@ -3936,8 +4037,13 @@
         en: {
           tag: "Fossil Anatomy",
           subtitle: "Complete museum-mounted fossil skeleton",
-          intro: "High-resolution anatomical 3D scan of an articulated Triceratops prorsus fossil mount in international museum posture.",
-          obs: "Examine the 1:1 bone architecture alongside human Joe.",
+          intro: "This 3D scan of an articulated Triceratops prorsus fossil skeleton reveals every cranial suture, fused cervical joint, and stacked dental battery. It provides invaluable physical insight into multi-tonne skeletal biomechanics.",
+          obs: "Compare with human Joe (1.75m) to inspect the colossal column-like limbs that supported its massive 10-tonne living weight and heavy armored skull.",
+          highlight: {
+                    "tag": "PALEO-SCAN // SKELETAL SYSTEM",
+                    "title": "Syncervical Vertebrae & 3D Articulated Scan",
+                    "desc": "Fused cervical vertebrae (syncervical) supported the immense 1-tonne skull. This laser scan reveals the self-sharpening dental battery engineered to slice through tough fibrous cycads."
+          },
           diet: "Fossil Specimen",
           dietSub: "Natural History Museum",
           length: "8.5 metres",
@@ -3975,8 +4081,13 @@
         vi: {
           tag: "Khủng long Theropoda",
           subtitle: "Vua săn mồi đỉnh cao của Kỷ Phấn Trắng",
-          intro: "Tyrannosaurus rex dài hơn 12 mét, cao gần 4 mét tại hông với lực cắn khủng khiếp lên tới 35.000 Newton, đủ sức nghiền nát xương của mọi con mồi.",
-          obs: "Người Joe đứng cạnh chỉ cao ngang đầu gối của T-Rex! Chiếc đầu bạo chúa khổng lồ có thể nuốt trọn một người lớn.",
+          intro: "Tyrannosaurus rex dài hơn 12 mét, cao gần 4 mét tại hông với hộp sọ dài 1.5m chứa những chiếc răng chuối sắc nhọn dài tới 30cm. Nó là kẻ săn mồi đỉnh cao thống trị tuyệt đối các hệ sinh thái cuối kỷ Phấn Trắng ở Bắc Mỹ.",
+          obs: "Quan sát Người Joe 1.75m đứng cạnh chân T-Rex: đầu gối của T-Rex ngang tầm ngực người, và hàm răng của nó hoàn toàn có thể nuốt trọn một người trưởng thành trong một lần ngoạm!",
+          highlight: {
+                    "tag": "KẺ SĂN MỒI ĐẦU BẢNG // LỰC CẮN",
+                    "title": "Lực cắn 35,000 N & Thị giác hai mắt lập thể",
+                    "desc": "Cấu trúc hộp sọ hợp nhất chịu được lực ép nghiền vụn xương lên tới 35,000 Newton. Hốc mắt hướng thẳng về phía trước mang lại trường nhìn lập thể (binocular vision) rộng 55 độ, vượt trội cả chim ưng hiện đại."
+          },
           diet: "Ăn thịt",
           dietSub: "Triceratops, Edmontosaurus",
           length: "12.3 mét",
@@ -3989,8 +4100,13 @@
         en: {
           tag: "Theropod dinosaur",
           subtitle: "Apex predator of the Late Cretaceous",
-          intro: "Tyrannosaurus rex was over 12 meters long with bone-crushing jaws capable of exerting immense bite force.",
-          obs: "The human reaches only knee-level to the giant predator.",
+          intro: "Tyrannosaurus rex stretched over 12 metres in length and stood nearly 4 metres high at the hips, armed with a 1.5m skull housing serrated, bone-crushing teeth up to 30cm long. It was the undisputed apex predator of Late Cretaceous North America.",
+          obs: "Observe human Joe (1.75m) beside T-Rex's massive foot: the dinosaur's knee reaches chest level, and its gaping jaws could easily swallow an adult human in a single bite!",
+          highlight: {
+                    "tag": "APEX PREDATOR // BIOMECHANICS",
+                    "title": "35,000 N Bone-Crushing Bite & Binocular Vision",
+                    "desc": "Fused nasal and skull bones absorbed up to 35,000 Newtons of bone-crushing force. Forward-facing orbits gave T-Rex a 55-degree binocular field of view, outmatching modern eagles in depth perception."
+          },
           diet: "Carnivore",
           dietSub: "Ceratopsids, hadrosaurs",
           length: "12.3 metres",
@@ -4027,8 +4143,13 @@
         vi: {
           tag: "Bằng Chứng Hóa Thạch (NHM London)",
           subtitle: "Tổ khủng long ấp trứng hóa thạch nguyên bản",
-          intro: "Bản quét 3D từ Bảo tàng Lịch sử Tự nhiên Luân Đôn tái hiện tổ ấp hình miệng núi lửa bằng bùn của Maiasaura ('Người mẹ thằn lằn tốt lành'), chứa các quả trứng hóa thạch xếp vòng tròn.",
-          obs: "Đây là bằng chứng hóa thạch chấn động thế giới chứng minh khủng long biết xây tổ, ủ ấm trứng và chăm sóc con non chu đáo như loài chim ngày nay!",
+          intro: "Bản quét 3D từ Bảo tàng Lịch sử Tự nhiên Luân Đôn tái hiện tổ trứng hóa thạch của loài Maiasaura peeblesorum (Thằn lằn mẹ hiền). Mẫu vật mang tính cách mạng này đã thay đổi hoàn toàn quan niệm cổ sinh vật học về tập tính sinh sản của khủng long.",
+          obs: "Người Joe cao 1.75m đối chứng miệng hố tổ trứng rộng hơn 2m. Đường kính tổ đủ chỗ cho khoảng 30 đến 40 quả trứng được sắp xếp xoắn ốc tỉ mỉ!",
+          highlight: {
+                    "tag": "TẬP TÍNH XÃ HỘI // BẰNG CHỨNG HÓA THẠCH",
+                    "title": "Hành vi ấp trứng & Bản năng chăm sóc bầy non",
+                    "desc": "Phát hiện đột phá tại 'Egg Mountain' (Montana) chứng minh khủng long không bỏ rơi trứng: Mẹ Maiasaura lót thảm thực vật tạo nhiệt ủ trứng và mớm ăn cho khủng long sơ sinh cho đến khi cứng cáp."
+          },
           diet: "Tiêu bản tổ trứng",
           dietSub: "Bảo tàng NHM London",
           length: "Đường kính 2.5m",
@@ -4041,8 +4162,13 @@
         en: {
           tag: "Fossil Evidence (NHM London)",
           subtitle: "Original fossilized dinosaur nesting site",
-          intro: "3D photogrammetry scan from the Natural History Museum London showing a Maiasaura mud nest crater with concentric clutches of fossil eggs.",
-          obs: "Groundbreaking paleontological proof of parental care and nesting behavior in dinosaurs, identical to modern birds.",
+          intro: "This high-resolution 3D scan from the Natural History Museum London captures an authentic fossilized clutch of Maiasaura peeblesorum ('good mother lizard'). This landmark discovery revolutionized paleontological understanding of dinosaur reproduction and parenting.",
+          obs: "Human Joe (1.75m) stands beside the 2-metre wide nest crater, which housed 30 to 40 large eggs meticulously arranged in concentric spiral layers.",
+          highlight: {
+                    "tag": "SOCIAL BEHAVIOR // EGGSHELL EVIDENCE",
+                    "title": "Nesting Colonies & Parental Care Proof",
+                    "desc": "The landmark 'Egg Mountain' discovery in Montana revealed dinosaurs did not abandon eggs: Maiasaura mothers built communal vegetation mounds for incubation and nourished hatchlings until maturity."
+          },
           diet: "Fossil Nest Specimen",
           dietSub: "NHM London Collection",
           length: "Diameter 2.5m",
@@ -4079,8 +4205,13 @@
         vi: {
           tag: "Khủng long Carcharodontosauridae",
           subtitle: "Bạo chúa khổng lồ Nam Mỹ vượt trội T-Rex",
-          intro: "Giganotosaurus carolinii là một trong những loài khủng long ăn thịt trên cạn lớn nhất từng tồn tại, dài hơn 13 mét, nặng tới 9 tấn và sở hữu hàm răng hình lưỡi dao chuyên xẻ thịt các loài thằn lằn hộ pháp khổng lồ.",
-          obs: "Chiều dài hơn 13m của Giganotosaurus thậm chí vượt qua cả T-Rex! Hãy điều chỉnh người sang bên phải hoặc phía trước để cảm nhận độ choáng ngợp.",
+          intro: "Giganotosaurus carolinii là một trong những loài khủng long ăn thịt trên cạn đồ sộ nhất từng bước đi trên Trái Đất. Phát hiện tại vùng Patagonia (Argentina), loài thằn lằn khổng lồ này thậm chí còn dài hơn cả T-Rex ở Bắc Mỹ.",
+          obs: "Đối chứng với Người Joe 1.75m: Chiều dài cơ thể hơn 13 mét của Giganotosaurus tương đương một toa tàu hỏa, và bước chân của nó có thể bao phủ hơn 4 mét khi chạy nước rút!",
+          highlight: {
+                    "tag": "SIÊU SĂN MỒI // GONDWANA LEVIATHAN",
+                    "title": "Sát thủ Nam Bán Cầu & Sọ dài 1.8 mét",
+                    "desc": "Dài hơn 13 mét và nặng 8 tấn, Giganotosaurus săn các loài thằn lằn hộ pháp Argentinosaurus. Răng dẹt sắc như lưỡi dao cạo giúp xé toạc mảng thịt lớn gây mất máu con mồi nhanh chóng."
+          },
           diet: "Ăn thịt",
           dietSub: "Argentinosaurus non, sauropod",
           length: "13.2 mét",
@@ -4093,8 +4224,13 @@
         en: {
           tag: "Carcharodontosaurid",
           subtitle: "Giant Southern Tyrant of Patagonia",
-          intro: "Giganotosaurus was one of the largest terrestrial carnivores ever known, exceeding T-Rex in body length and hunting giant sauropods in packs.",
-          obs: "Measuring 13.2m in length, notice its immense serrated blade-like dentition.",
+          intro: "Giganotosaurus carolinii ranks among the largest terrestrial carnivores ever to walk the Earth. Discovered in the Patagonian badlands of Argentina, this colossal predator surpassed even North America's Tyrannosaurus rex in overall length.",
+          obs: "Compare with human Joe (1.75m): At 13+ metres long, Giganotosaurus equals a full-size passenger railway carriage, with a sprinting stride spanning over 4 metres!",
+          highlight: {
+                    "tag": "SUPER PREDATOR // GONDWANA LEVIATHAN",
+                    "title": "1.8-Metre Skull & South American Titan Hunter",
+                    "desc": "Exceeding 13 meters and 8 tonnes, Giganotosaurus tackled colossal sauropods like Argentinosaurus. Its compressed blade-like teeth caused rapid hemorrhaging with devastating shearing bites."
+          },
           diet: "Carnivore",
           dietSub: "Titanosaurs",
           length: "13.2 metres",
@@ -4131,8 +4267,13 @@
         vi: {
           tag: "Khủng long Sauropoda",
           subtitle: "Người khổng lồ sở hữu chiếc cổ dài nhất thế giới",
-          intro: "Mamenchisaurus sinocanadorum sở hữu chiếc cổ kỳ quan dài tới 14 mét (chiếm hơn nửa chiều dài cơ thể 26m) gồm 19 đốt sống rỗng được gia cố bằng các gân xương chịu lực siêu nhẹ.",
-          obs: "Với chiều dài 26m, Mamenchisaurus gấp 15 lần chiều cao người! Chiếc cổ vươn cao như một cần cẩu xây dựng đồ sộ.",
+          intro: "Mamenchisaurus sinocanadorum sở hữu chiếc cổ kỳ quan dài tới 12 mét — chiếc cổ dài nhất trong thế giới động vật từng được ghi nhận. Loài thằn lằn chân thằn lằn khổng lồ này sinh sống tại châu Á vào kỷ Jura Muộn khoảng 160 triệu năm trước.",
+          obs: "Quan sát Người Joe 1.75m: Đầu của Mamenchisaurus vươn cao tới tầng 4 của một tòa nhà! Riêng một đốt sống cổ của nó đã dài bằng nửa thân người trưởng thành.",
+          highlight: {
+                    "tag": "KỶ LỤC CỔ SINH // KHÍ HỌC XƯƠNG",
+                    "title": "Chiếc cổ 12 mét & Đốt sống rỗng tổ ong",
+                    "desc": "Cổ chiếm một nửa tổng chiều dài cơ thể với 19 đốt sống cổ kéo dài. Cấu trúc xương rỗng chứa túi khí (pneumatization) giúp giảm 40% trọng lượng cổ mà vẫn đảm bảo độ bền cơ học phi thường."
+          },
           diet: "Thực vật",
           dietSub: "Tán cây lá kim cao tầng, dương xỉ",
           length: "26.0 mét",
@@ -4145,8 +4286,13 @@
         en: {
           tag: "Sauropod dinosaur",
           subtitle: "The longest-necked creature in Earth's history",
-          intro: "Mamenchisaurus possessed an astonishing 14-meter-long neck consisting of 19 hollow vertebrae, allowing it to graze high canopies.",
-          obs: "At 26 meters total length, it dwarfs the human observer by a factor of fifteen!",
+          intro: "Mamenchisaurus sinocanadorum possessed an extraordinary 12-metre neck — the longest neck known in the animal kingdom. This titan sauropod roamed ancient Late Jurassic floodplains across East Asia roughly 160 million years ago.",
+          obs: "Notice human Joe (1.75m) at its base: Mamenchisaurus easily reached the fourth floor of a modern building! A single neck vertebra was half the length of an adult human.",
+          highlight: {
+                    "tag": "EXTREME ANATOMY // PNEUMATIC SYSTEM",
+                    "title": "12-Metre Neck & Honeycomb Bone Pneumatization",
+                    "desc": "The neck spanned half its total body length across 19 elongated cervical vertebrae. Internal honeycomb air sacs reduced skeletal weight by 40% while preserving exceptional bending stiffness."
+          },
           diet: "Herbivore",
           dietSub: "High conifer canopies",
           length: "26.0 metres",
@@ -4183,8 +4329,13 @@
         vi: {
           tag: "Khủng long Spinosauridae",
           subtitle: "Thợ săn vuốt liềm có hộp sọ cá sấu",
-          intro: "Baryonyx walkeri sở hữu hàm răng hẹp dài hình nón tương tự cá sấu nước ngọt và chiếc móng vuốt ngón cái cong sắc lẹm dài tới 31cm dùng để quặp giữ những con cá vảy dày khổng lồ.",
-          obs: "Người Joe đứng cạnh đối chứng: Chiếc móng vuốt ngón tay của Baryonyx dài gần bằng cả cẳng tay người lớn!",
+          intro: "Baryonyx walkeri sở hữu hàm răng hẹp dài hình nón tương tự cá sấu hiện đại và móng vuốt ngón tay cái cong như lưỡi liềm dài hơn 31cm. Loài khủng long chân thú này chuyên săn các loài cá tiền sử khổng lồ ven sông hồ kỷ Phấn Trắng Sớm.",
+          obs: "Người Joe 1.75m đứng cạnh: Chiếc vuốt ngón cái 31cm của Baryonyx dài gần bằng toàn bộ cẳng tay của người, sẵn sàng phóng ra như chiếc móc câu sắt!",
+          highlight: {
+                    "tag": "TIÊU HÓA ĐẶC HÓA // CHUYÊN GIA SĂN CÁ",
+                    "title": "Móng vuốt lưỡi liềm 31cm & Hàm cá sấu chuyên biệt",
+                    "desc": "Vuốt ngón cái cong 31cm hoạt động như lưỡi móc ngậm cá dưới dòng nước chảy xiết. Hóa thạch dạ dày tại Wealden lưu giữ vảy cá Lepidotes bị axit tiêu hóa cùng xương iguanodont non."
+          },
           diet: "Cá & Động vật nhỏ",
           dietSub: "Cá vảy Lepidotes, Iguanodon non",
           length: "8.5 mét",
@@ -4197,8 +4348,13 @@
         en: {
           tag: "Spinosaurid dinosaur",
           subtitle: "Heavy-clawed crocodilian fisher",
-          intro: "Baryonyx featured a long crocodile-like snout filled with serrated conical teeth and a massive 31cm sickle-like thumb claw.",
-          obs: "Its lethal thumb claw alone is nearly as long as a human forearm.",
+          intro: "Baryonyx walkeri featured long, slender crocodile-like jaws with finely serrated conical teeth and a massive 31cm curved thumb claw. This Early Cretaceous theropod was an extraordinary specialized riverbank fish hunter.",
+          obs: "Stand human Joe (1.75m) alongside: Baryonyx's 31cm sickle claw is nearly as long as a human forearm, engineered as an iron gaff for river hunting!",
+          highlight: {
+                    "tag": "SPECIALIZED FEEDING // PISCIVORE",
+                    "title": "31cm Sickle Thumb Claw & Crocodilian Jaws",
+                    "desc": "A curved 31cm thumb claw acted as a deadly gaff for snatching heavy prehistoric fish. Fossilized gut contents in the Wealden Formation preserved acid-etched Lepidotes scales and juvenile bones."
+          },
           diet: "Piscivore / Carnivore",
           dietSub: "Giant Lepidotes fish",
           length: "8.5 metres",
@@ -4235,8 +4391,13 @@
         vi: {
           tag: "Bò sát biển Pliosauroidea",
           subtitle: "Thần săn mồi đại dương cổ đại Kỷ Jura",
-          intro: "Liopleurodon ferox sở hữu bốn vây bơi thủy động học có khả năng tăng tốc chớp nhoáng, chiếc đầu dài tới 2m với hàm răng cắm chéo sắc nhọn tạo ra lực cắn có thể bẻ gãy mọi bộ xương.",
-          obs: "Thân hình 10m của Liopleurodon dưới nước đồ sộ gấp gần sáu lần chiều cao người đứng trên cạn!",
+          intro: "Liopleurodon ferox sở hữu bốn vây bơi thủy động học có khả năng tăng tốc bùng nổ dưới đại dương kỷ Jura. Là loài bò sát biển thuộc bộ Pliosauroidea, nó là nỗi kinh hoàng cho mọi sinh vật bơi lội trong vùng biển ấm châu Âu cổ đại.",
+          obs: "So sánh với Người Joe 1.75m: Chiếc đầu hình nêm dài 2m của Liopleurodon cùng 4 mái chèo khổng lồ biến nó thành một tàu ngầm săn mồi sinh học hoàn hảo.",
+          highlight: {
+                    "tag": "THỦY QUÁI JURA // KHÍ ĐỘNG DƯỚI NƯỚC",
+                    "title": "Bốn vây bơi thủy động học & Thính giác dưới nước",
+                    "desc": "Bốn mái chèo vây khổng lồ tạo lực đẩy tandem nhịp nhàng, cho phép tăng tốc tức thời từ dưới bóng tối biển sâu. Răng nanh dài 20cm có khía cạnh xoắn xuyên thủng mai cúc đá (Ammonite) và bò sát biển."
+          },
           diet: "Thịt biển",
           dietSub: "Cá măng, thằn lằn cổ dài Plesiosaur",
           length: "10.0 mét",
@@ -4249,8 +4410,13 @@
         en: {
           tag: "Pliosaur reptile",
           subtitle: "Apex marine ambush hunter of the Jurassic",
-          intro: "Liopleurodon was a short-necked pliosaur capable of explosive underwater acceleration propelled by four massive flippers.",
-          obs: "Its 2-meter skull is larger than the entire height of an adult human.",
+          intro: "Liopleurodon ferox possessed four hydrodynamic flippers capable of explosive underwater acceleration across Jurassic epicontinental seas. Belonging to the short-necked pliosaurs, it was the supreme marine ambush predator.",
+          obs: "Observe human Joe (1.75m): Liopleurodon's 2-metre wedge-shaped skull and sweeping flipper wings turned it into a living biological attack submarine.",
+          highlight: {
+                    "tag": "JURASSIC LEVIATHAN // HYDRODYNAMICS",
+                    "title": "Four Tandem Flippers & Deep-Sea Ambush",
+                    "desc": "Four massive hydrofoil flippers provided tandem underwater propulsion for explosive ambush acceleration. Robust 20cm teeth crushed ammonite shells and marine reptiles with devastating pressure."
+          },
           diet: "Carnivore",
           dietSub: "Ichthyosaurs, plesiosaurs",
           length: "10.0 metres",
@@ -4287,8 +4453,13 @@
         vi: {
           tag: "Khủng long Allosauroidea",
           subtitle: "Sư tử săn mồi bầy đàn Kỷ Jura",
-          intro: "Allosaurus là kẻ săn mồi thống trị kỷ Jura với chiều dài 9.5 mét, sở hữu hộp sọ linh hoạt với khớp hàm mở rộng như một chiếc rìu chiến bổ xuống.",
-          obs: "Người cao 1.75m chỉ đứng ngang tầm đùi của Allosaurus! Khi đứng thẳng, đầu Allosaurus cao hơn 3.2 mét.",
+          intro: "Allosaurus là kẻ săn mồi thống trị kỷ Jura với chiều dài 9.5m, chi trước ba móng vuốt sắc nhọn và hộp sọ nhẹ có thể mở rộng như lưỡi rìu chiến. Nó thường săn lùng các loài khủng long chân thằn lằn và Stegosaurus theo bầy.",
+          obs: "Người Joe 1.75m đứng cạnh: Allosaurus cao gấp đôi người trưởng thành, cặp mắt có gờ xương bảo vệ màu đỏ cam tạo nên thần thái của kẻ săn mồi dũng mãnh.",
+          highlight: {
+                    "tag": "CHIẾN THUẬT SĂN MỒI // KHỚP SỌ ĐỘNG",
+                    "title": "Đòn rìu bổ hộp sọ & Kẻ thống trị Kỷ Jura",
+                    "desc": "Khớp hàm mở rộng tới 79 độ kết hợp cơ cổ cực khỏe cho phép Allosaurus giáng hàm trên xuống như chiếc rìu chiến bổ vào con mồi. Vết thương lành trên đuôi Stegosaurus chứng minh các cuộc đụng độ khốc liệt."
+          },
           diet: "Ăn thịt",
           dietSub: "Stegosaurus, sauropod non",
           length: "9.5 mét",
@@ -4301,8 +4472,13 @@
         en: {
           tag: "Allosauroid dinosaur",
           subtitle: "The apex predator of the Jurassic",
-          intro: "Allosaurus was the dominant terrestrial carnivore of the Jurassic period, reaching nearly 10 meters in length.",
-          obs: "Observed alongside human Joe: note its muscular build adapted for cooperative hunting.",
+          intro: "Allosaurus was the dominant apex predator of the Late Jurassic Morrison Formation, stretching 9.5 metres with three-clawed forelimbs and a kinetically flexible skull designed for slashing strikes against giant prey.",
+          obs: "Human Joe (1.75m) stands at half its hip height; its prominent reddish lacrimal crests above the eyes gave it an intimidating, piercing gaze.",
+          highlight: {
+                    "tag": "HUNTING STRATEGY // CRANIAL KINESIS",
+                    "title": "Hatchet-Strike Jaw Mechanics & Jurassic King",
+                    "desc": "A gape angle of up to 79 degrees paired with powerful neck muscles allowed Allosaurus to drive its upper jaw down like a battle axe. Healed punctures on Stegosaurus tails confirm violent clashes."
+          },
           diet: "Carnivore",
           dietSub: "Sauropods, stegosaurs",
           length: "9.5 metres",
@@ -4339,8 +4515,13 @@
         vi: {
           tag: "Khủng long Thyreophora",
           subtitle: "Hiệp sĩ phiến sừng của Kỷ Jura",
-          intro: "Stegosaurus sở hữu hai hàng phiến sừng xương hình thoi dựng đứng dọc sống lưng vươn cao tới 3.8m và bốn gai nhọn chết người (thagomizer) ở chóp đuôi.",
-          obs: "Đỉnh phiến sừng cao hơn 3.8m, gấp hơn hai lần chiều cao người Joe.",
+          intro: "Stegosaurus sở hữu hai hàng phiến sừng xương hình thoi dựng dọc sống lưng và cụm 4 gai đuôi nhọn hoắt. Dù có thân hình hộ pháp dài 9m và nặng gần 5 tấn, bộ não của nó chỉ nhỏ cỡ quả óc chó.",
+          obs: "Đối chứng với Người Joe 1.75m: Phiến lưng cao nhất của Stegosaurus cao tới 1m, che chắn toàn bộ phần thân trên khỏi các cú vồ từ trên không hoặc kẻ săn mồi lớn.",
+          highlight: {
+                    "tag": "VŨ KHÍ PHÒNG THỦ // BỘ ĐIỀU NHIỆT",
+                    "title": "Phiến lưng điều hòa nhiệt & Gai đuôi Thagomizer",
+                    "desc": "17 phiến sừng lưng chằng chịt rãnh mạch máu giúp hấp thu nhiệt mặt trời lúc bình minh và tản nhiệt buổi trưa. Bốn gai đuôi nhọn dài 90cm (Thagomizer) có thể quất cong với lực làm gãy xương kẻ săn mồi."
+          },
           diet: "Thực vật",
           dietSub: "Dương xỉ tầng thấp, rêu",
           length: "9.0 mét",
@@ -4353,8 +4534,13 @@
         en: {
           tag: "Thyreophoran dinosaur",
           subtitle: "Plated giant of the Late Jurassic",
-          intro: "Stegosaurus reached 9 meters in length, armed with prominent dorsal plates and a deadly four-spiked tail club.",
-          obs: "The tallest back plates stood nearly 4 meters high, more than double human height.",
+          intro: "Stegosaurus featured two alternating rows of diamond-shaped bony plates standing vertically along its back and four formidable tail spikes. Despite its 9-metre, 5-tonne bulk, its brain was barely the size of a walnut.",
+          obs: "Compare with human Joe (1.75m): The tallest back plates stand nearly 1m high, effectively protecting its dorsal spine from leaping Jurassic predators.",
+          highlight: {
+                    "tag": "DEFENSIVE WEAPONRY // THERMOREGULATION",
+                    "title": "Vascular Frills & The Lethal Thagomizer",
+                    "desc": "17 alternating plates packed with blood vessels absorbed morning sun rays and dispersed heat at noon. Four 90cm tail spikes ('Thagomizer') could swing laterally with bone-shattering force."
+          },
           diet: "Herbivore",
           dietSub: "Low ferns, mosses",
           length: "9.0 metres",
@@ -4391,8 +4577,13 @@
         vi: {
           tag: "Khủng long Bán thủy sinh",
           subtitle: "Thủy quái khổng lồ dài nhất thời tiền sử",
-          intro: "Spinosaurus aegyptianus là loài khủng long ăn thịt dài nhất từng tồn tại (14.5m), sở hữu cánh buồm xương cao gần 2m trên lưng và cấu tạo đuôi bơi dẹp chuyên săn cá lớn.",
-          obs: "Chiều dài 14.5m của Spinosaurus gấp hơn 8 lần chiều cao người đứng cạnh!",
+          intro: "Spinosaurus aegyptianus là loài khủng long ăn thịt dài nhất từng được phát hiện, đạt tới 15 mét. Nó nổi tiếng với cánh buồm xương khổng lồ cao tới 1.65m trên lưng, mõm dài như cá sấu và chiếc đuôi dẹp như mái chèo thích nghi bơi lội.",
+          obs: "Người Joe 1.75m đứng cạnh: Toàn bộ thân hình thuôn dài 15 mét của Spinosaurus dài gấp đôi một chiếc xe buýt đô thị và vượt xa chiều dài của T-Rex!",
+          highlight: {
+                    "tag": "TIÊN PHONG THỦY SINH // ĐỘNG HỌC ĐUÔI VÂY",
+                    "title": "Cánh buồm 2 mét & Lối sống bán thủy sinh",
+                    "desc": "Gai đốt sống dài tới 1.65m tạo cánh buồm da kỳ vĩ. Phát hiện đốt sống đuôi dạng vây bơi dẹt năm 2020 chứng minh Spinosaurus là khủng long đầu tiên bơi lội và săn mồi chủ động trong các dòng sông tiền sử."
+          },
           diet: "Cá & Thủy sinh",
           dietSub: "Cá đao Mawsonia, cá phổi",
           length: "14.5 mét",
@@ -4405,8 +4596,13 @@
         en: {
           tag: "Spinosaurid dinosaur",
           subtitle: "The semiaquatic river monster",
-          intro: "Measuring over 14 meters in length, Spinosaurus is the longest known carnivorous dinosaur, sporting a 1.8m dorsal sail.",
-          obs: "Its 14.5-meter body length is over 8 times the height of the human observer.",
+          intro: "Spinosaurus aegyptianus represents the longest carnivorous dinosaur known to science, reaching 15 metres. It is renowned for its towering 1.65m dorsal sail, elongated crocodilian snout, and paddle-like swimming tail.",
+          obs: "Human Joe (1.75m) stands dwarfed beside this 15-metre river giant, which stretched longer than a standard city transit bus and exceeded T-Rex in body length!",
+          highlight: {
+                    "tag": "AQUATIC ADAPTATION // PROPULSION SYSTEM",
+                    "title": "2-Metre Sail & Paddle-Tailed Semi-Aquatic Swimmer",
+                    "desc": "Vertebral spines reaching 1.65m formed a spectacular dorsal sail. 2020 fossil evidence of a broad, paddle-like tail proved Spinosaurus was the first true swimming dinosaur of prehistoric river systems."
+          },
           diet: "Piscivore",
           dietSub: "Giant coelacanths, sawfish",
           length: "14.5 metres",
@@ -4443,8 +4639,13 @@
         vi: {
           tag: "Bò sát bay Tiền sử",
           subtitle: "Chúa tể bầu trời thời khủng long",
-          intro: "Pterosaur là loài động vật có xương sống đầu tiên phát triển khả năng bay lượn thực thụ nhờ màng cánh da nối ngón tay thứ tư kéo dài và bộ xương rỗng siêu nhẹ.",
-          obs: "Quan sát ở cao độ ngang tầm mắt trên trời: Sải cánh 6.5m của dực long rộng gấp gần bốn lần chiều cao người!",
+          intro: "Pterosaur là loài động vật có xương sống đầu tiên phát triển khả năng bay lượn chủ động trên bầu trời. Với đôi cánh da căng rộng và cấu trúc xương rỗng siêu nhẹ chứa túi khí, chúng làm chủ bầu trời suốt hơn 150 triệu năm.",
+          obs: "Người Joe 1.75m đối chứng: Sải cánh của Pterosaur dang rộng lướt trên không trung tạo bóng râm che phủ toàn bộ khu vực người quan sát đứng bên dưới.",
+          highlight: {
+                    "tag": "CHINH PHỤC BẦU TRỜI // KHÍ ĐỘNG HỌC",
+                    "title": "Màng cánh ngón thứ tư & Xương xốp siêu nhẹ",
+                    "desc": "Màng da cánh (patagium) căng trên ngón tay thứ tư kéo dài phi thường. Xương rỗng có thành mỏng như vỏ trứng kết hợp túi khí giúp chúng đạt sải cánh khổng lồ mà trọng lượng vẫn cực kỳ nhẹ."
+          },
           diet: "Cá & Động vật nhỏ",
           dietSub: "Săn mồi ven biển",
           length: "Sải cánh 6.5m",
@@ -4457,8 +4658,13 @@
         en: {
           tag: "Pterosaur",
           subtitle: "Lord of the Prehistoric Skies",
-          intro: "Pterosaurs were the first vertebrates to conquer the skies, soaring on membranous wings supported by an elongated fourth finger.",
-          obs: "Its 6.5-meter wingspan is nearly four times human height!",
+          intro: "Pterosaurs were the earliest vertebrates to evolve powered flapping flight. With expansive membranous wings and an ultra-lightweight skeletal network infused with air sacs, they commanded the prehistoric skies for over 150 million years.",
+          obs: "Human Joe (1.75m) looks up: The gliding wingspan casts a sprawling shadow covering the entire observation footprint below.",
+          highlight: {
+                    "tag": "AERIAL REVOLUTION // WING BIOMECHANICS",
+                    "title": "Fourth-Digit Wing Membrane & Ultralight Skeleton",
+                    "desc": "The flight membrane (patagium) was anchored along an extraordinarily elongated fourth finger. Paper-thin hollow bones and internal air cavities enabled massive wingspans with featherweight mass."
+          },
           diet: "Piscivore",
           dietSub: "Coastal fish, crustaceans",
           length: "Wingspan 6.5m",
@@ -4495,8 +4701,13 @@
         vi: {
           tag: "Khủng long Giáp Long",
           subtitle: "Cỗ xe tăng bọc thép Kỷ Phấn Trắng",
-          intro: "Ankylosaurus magniventris là loài khủng long bọc giáp lớn nhất với những tấm xương gai dày đặc phủ kín lưng và chiếc chùy xương nặng nề có thể đập vỡ xương kẻ thù.",
-          obs: "Người Joe đứng cạnh nhìn thấy rõ thân hình bè rộng đồ sộ (rộng tới 2.5m) của cỗ xe tăng sống tiền sử.",
+          intro: "Ankylosaurus magniventris là loài khủng long bọc giáp lớn nhất từng tồn tại, được mệnh danh là 'xe tăng sống' của kỷ Phấn Trắng Muộn. Lưng bọc kín các tấm giáp xương osteoderm dày và đuôi có chùy đặc có thể đập vỡ xương kẻ thù.",
+          obs: "Người Joe 1.75m đứng cạnh: Ankylosaurus tuy không cao (chỉ khoảng 1.7m) nhưng thân mình bè rộng tới gần 2 mét và chiếc chùy đuôi to bằng cả khối đá tảng!",
+          highlight: {
+                    "tag": "XE BỌC THÉP TIỀN SỬ // VŨ KHÍ TÁC CHIẾN",
+                    "title": "Giáp xương Osteoderm & Chuỳ đuôi đập vỡ xương",
+                    "desc": "Lưng và mí mắt bọc kín các tấm xương osteoderm gắn liền vào da. Chuỳ đuôi nặng hơn 30kg cấu tạo từ các khối xương hợp nhất có thể vung với tốc độ làm vỡ vụn xương chân của T-Rex khi tấn công."
+          },
           diet: "Thực vật",
           dietSub: "Cây bụi tầng thấp, quả rụng",
           length: "8.0 mét",
@@ -4509,8 +4720,13 @@
         en: {
           tag: "Ankylosaurid dinosaur",
           subtitle: "Living tank of the Cretaceous",
-          intro: "Ankylosaurus was heavily armored with thick osteoderms and possessed a heavy bone club at the tip of its tail.",
-          obs: "Observe its extraordinary wide-barrel body width of 2.5 meters.",
+          intro: "Ankylosaurus magniventris was the largest armored dinosaur to ever live, celebrated as the living battle tank of the Late Cretaceous. Protected by fused bony osteoderms and a massive heavy tail club, it was virtually unassailable.",
+          obs: "Notice human Joe (1.75m) beside its low-slung, heavily fortified profile: It stood 1.7m at its crest, but stretched nearly 2m across with a bowling-ball-sized tail club!",
+          highlight: {
+                    "tag": "LIVING TANK // IMPACT WEAPONRY",
+                    "title": "Osteoderm Armor Plating & 30kg Tail Club",
+                    "desc": "Thick bony osteoderms shielded its entire dorsum and even eyelids. A fused 30kg tail club swung with enough kinetic energy to shatter the tibia bones of attacking Tyrannosaurs."
+          },
           diet: "Herbivore",
           dietSub: "Low shrubs, fallen fruits",
           length: "8.0 metres",
@@ -4547,8 +4763,13 @@
         vi: {
           tag: "Khủng long Ăn thịt Nam Cực",
           subtitle: "Dị long mào băng của Kỷ Jura Sớm",
-          intro: "Cryolophosaurus ellioti là loài khủng long ăn thịt đầu tiên được khai quật tại châu Nam Cực, sở hữu chiếc mào xương hình quạt độc đáo vắt ngang trán.",
-          obs: "Chiếc mào hình lược độc nhất vô nhị dùng để phô diễn thị giác thu hút bạn tình.",
+          intro: "Cryolophosaurus ellioti là loài khủng long ăn thịt đầu tiên được khai quật tại Nam Cực. Với chiếc mào xương độc đáo uốn cong vắt ngang đỉnh đầu, nó được các nhà cổ sinh học ưu ái gọi bằng biệt danh 'Elvisaurus'.",
+          obs: "Quan sát Người Joe 1.75m: Chiếc mào vương miện trên đầu Cryolophosaurus vươn cao ở độ cao gần 3 mét, giúp nó khẳng định uy quyền tối thượng giữa vùng rừng ôn đới Nam Cực cổ xưa.",
+          highlight: {
+                    "tag": "ĐỊA CỔ SINH // THỜI KỲ BĂNG GIÁ",
+                    "title": "Mào sừng vương miện & Bí mật lục địa Nam Cực",
+                    "desc": "Mào xương uốn lượn ngang đầu giống chiếc quạt Tây Ban Nha dùng để phô trương thu hút bạn tình. Sống tại vùng đất nay là dãy núi Transantarctic (Nam Cực), nơi từng là rừng ôn đới ấm áp thời Jura Sớm."
+          },
           diet: "Ăn thịt",
           dietSub: "Khủng long chân thằn lằn nguyên thủy",
           length: "6.5 mét",
@@ -4561,8 +4782,13 @@
         en: {
           tag: "Antarctic Theropod",
           subtitle: "The frozen crested lizard",
-          intro: "Cryolophosaurus was the first carnivorous dinosaur discovered in Antarctica, sporting a distinctive Spanish comb-like cranial crest.",
-          obs: "Examine the unique forward-facing crest used for visual display.",
+          intro: "Cryolophosaurus ellioti was the first predatory dinosaur unearthed on the frozen continent of Antarctica. Bearing a bizarre transverse crest curled across its skull, paleontologists affectionately nicknamed it 'Elvisaurus'.",
+          obs: "Observe human Joe (1.75m): The Spanish-comb ornamental crest rises nearly 3 metres high, broadcasting territorial dominance across Early Jurassic Antarctic forests.",
+          highlight: {
+                    "tag": "POLAR EXPEDITION // DISPLAY STRUCTURE",
+                    "title": "Transverse Crest & Prehistoric Antarctic Forests",
+                    "desc": "A distinctive Spanish-comb transverse crest served for species recognition and courtship display. Unearthed in Antarctica's Hanson Formation, which hosted temperate rainforests during the Early Jurassic."
+          },
           diet: "Carnivore",
           dietSub: "Prosauropods",
           length: "6.5 metres",
@@ -4599,8 +4825,13 @@
         vi: {
           tag: "Khủng long Dromaeosauridae",
           subtitle: "Thợ săn lông vũ tốc độ cao Sa mạc Gobi",
-          intro: "Velociraptor ngoài đời thực chỉ cao khoảng 0.5m, phủ đầy lông vũ và sở hữu móng vuốt hình liềm sắc bén dài 6.5cm ở ngón chân thứ hai để ghì chặt con mồi.",
-          obs: "Người Joe (1.75m) cao hơn gấp ba lần Velociraptor! Chiều cao thực tế của loài này chỉ ngang bắp chân người lớn.",
+          intro: "Velociraptor ngoài đời thực chỉ cao khoảng 0.5m và dài 2m, phủ đầy lông vũ rực rỡ tương tự loài chim săn mồi hiện đại. Khác xa hình ảnh bò sát trần trụi trong phim điện ảnh, chúng săn bắt theo nhóm nhỏ nhờ trí thông minh cao và vuốt liềm linh hoạt.",
+          obs: "Đối chứng với Người Joe 1.75m: Hông của Velociraptor chỉ cao ngang đầu gối người! Tuy nhiên, tốc độ bứt phá và móng vuốt chân sắc như dao mổ khiến nó là sát thủ đáng sợ.",
+          highlight: {
+                    "tag": "TIẾN HÓA LOÀI CHIM // SĂN MỒI NHANH NHẸN",
+                    "title": "Lông vũ chim săn & Vuốt lưỡi liềm găm con mồi",
+                    "desc": "Hóa thạch tại sa mạc Gobi bảo lưu vết cắm lông vũ (quill knobs) trên xương trụ. Vuốt chân hình lưỡi liềm dài 9cm dùng để găm chặt cổ họng con mồi trong tư thế giằng co như mẫu vật nổi tiếng 'Fighting Dinosaurs'."
+          },
           diet: "Ăn thịt",
           dietSub: "Protoceratops non, thằn lằn",
           length: "2.0 mét",
@@ -4613,8 +4844,13 @@
         en: {
           tag: "Dromaeosaurid dinosaur",
           subtitle: "Feathered swift hunter of the Gobi",
-          intro: "Unlike cinematic depictions, the real Velociraptor was turkey-sized, feathered, with a specialized killing sickle claw.",
-          obs: "The 1.75m human is over three times taller than a real Velociraptor!",
+          intro: "In reality, Velociraptor mongoliensis stood only 0.5m high at the hip and was covered in flight feathers resembling modern raptorial birds. Far from hairless lizards, they were agile, highly intelligent flock hunters of prehistoric sand dunes.",
+          obs: "Human Joe (1.75m) towers over Velociraptor, whose back barely reaches knee level; yet its razor-sharp sickle claws and tactical agility made it extraordinarily lethal.",
+          highlight: {
+                    "tag": "AVIAN ANCESTRY // HIGH-AGILITY PREDATOR",
+                    "title": "Quill Knobs, Plumage & 9cm Retractable Sickle Claws",
+                    "desc": "Fossils from the Gobi Desert preserve distinct quill knobs on the ulna, proving full plumage. The 9cm sickle claw pinned down thrashing prey, as immortalized in the famous 'Fighting Dinosaurs' fossil."
+          },
           diet: "Carnivore",
           dietSub: "Protoceratops, lizards",
           length: "2.0 metres",
@@ -4651,8 +4887,13 @@
         vi: {
           tag: "Khủng long Tyrannosauridae",
           subtitle: "Bạo chúa phương Bắc sải bước tốc độ",
-          intro: "Gorgosaurus là họ hàng tiền thân thon thả và nhanh nhẹn của T-Rex, chuyên săn đuổi các loài khủng long mỏ vịt và khủng long có sừng ven các đồng bằng duyên hải Bắc Mỹ.",
-          obs: "Người Joe đứng đối chứng nhìn thấy rõ cấu trúc chi sau thanh thoát, tối ưu hóa cho những cú bứt tốc săn mồi kinh hoàng.",
+          intro: "Gorgosaurus là họ hàng tiền thân thon thả và nhanh nhẹn của T-Rex, sống trước T-Rex khoảng vài triệu năm tại Bắc Mỹ. Với cơ thể thon dài và đôi chân săn mồi được tối ưu hóa cho tốc độ, nó là kẻ thống trị thảo nguyên kỷ Phấn Trắng.",
+          obs: "Người Joe 1.75m đứng cạnh: Chi sau dài ngoằng của Gorgosaurus cho phép nó bứt tốc đuổi kịp những đàn khủng long mỏ vịt nhanh nhất trên địa hình rừng ngập nước.",
+          highlight: {
+                    "tag": "KHÍ HỌC SĂN BẮT // ĐỘNG HỌC TỐC ĐỘ",
+                    "title": "Chân sau dài thon & Tốc độ săn đuổi 45 km/h",
+                    "desc": "Chi sau thon dài và bàn chân kiểu arctometatarsalian hấp thu xung lực khi bứt tốc, cho phép Gorgosaurus đạt vận tốc hơn 40 km/h để lùa bắt những đàn khủng long mỏ vịt nhanh nhẹn ở Alberta."
+          },
           diet: "Ăn thịt",
           dietSub: "Hadrosauridae, Centrosaurus",
           length: "8.5 mét",
@@ -4665,8 +4906,13 @@
         en: {
           tag: "Tyrannosaurid dinosaur",
           subtitle: "The fleet-footed northern tyrant",
-          intro: "Gorgosaurus was a sleeker, faster tyrannosaurid that dominated western Canada prior to the emergence of T-Rex.",
-          obs: "Notice its elongated limb proportions built for rapid pursuit.",
+          intro: "Gorgosaurus libratus was a sleek, cursorial forerunner of T-Rex that roamed western North America millions of years earlier. Engineered with lighter bones and elongated running legs, it was the cheetah of the tyrannosaurid dynasty.",
+          obs: "Compare with human Joe (1.75m): The long slender tibia and metatarsal bones enabled rapid pursuit sprints across the river deltas of ancient Alberta.",
+          highlight: {
+                    "tag": "SPRINT DYNAMICS // PURSUIT HUNTER",
+                    "title": "Arctometatarsalian Foot & 45 km/h Pursuit Sprint",
+                    "desc": "Slender hindlimbs and shock-absorbing arctometatarsalian foot bones allowed Gorgosaurus to sprint over 40 km/h, making it a lethal cursorial predator of fast Hadrosaurs across prehistoric Alberta."
+          },
           diet: "Carnivore",
           dietSub: "Duck-billed dinosaurs",
           length: "8.5 metres",
@@ -4703,8 +4949,13 @@
         vi: {
           tag: "Bò sát biển Mosasauroidea",
           subtitle: "Thương long chúa tể đại dương Kỷ Phấn Trắng",
-          intro: "Mosasaurus là loài thằn lằn biển khổng lồ thống trị các đại dương kỷ Phấn Trắng với chiều dài 14m, bốn vây chèo mạnh mẽ và chiếc đuôi vây hình cá mập xé nước.",
-          obs: "Thân hình 14m của Mosasaurus đồ sộ vượt bậc so với người Joe 1.75m đứng cạnh!",
+          intro: "Mosasaurus là loài thằn lằn biển khổng lồ thống trị các đại dương kỷ Phấn Trắng Muộn. Với cơ thể dài tới 17 mét, hàm răng kép sắc như dao và vây bơi mạnh mẽ, nó săn lùng mọi loài cá mập, thằn lằn cổ dài và chim biển tiền sử.",
+          obs: "Người Joe 1.75m đứng cạnh: Một con Mosasaurus dài gấp gần 10 lần chiều cao người trưởng thành! Cặp hàm mở rộng của nó có thể nuốt trọn một chiếc xuồng máy cỡ trung bình.",
+          highlight: {
+                    "tag": "CHÚA TỂ ĐẠI DƯƠNG // GIẢI PHẪU BIỂN SÂU",
+                    "title": "Khớp hàm dưới đôi & Vây đuôi cá mập",
+                    "desc": "Khớp nối intramandibular ở hàm dưới cho phép Mosasaurus nuốt chửng những con mồi lớn như rùa biển Archelon và thằn lằn cổ dài Plesiosaur. Vây đuôi hai thùy bất đối xứng đẩy cơ thể 17 mét lướt êm dưới đại dương."
+          },
           diet: "Thịt biển",
           dietSub: "Cá mập, rùa biển, thằn lằn đầu rắn",
           length: "14.0 mét",
@@ -4717,8 +4968,13 @@
         en: {
           tag: "Marine Squamate",
           subtitle: "The apex predator of the Cretaceous oceans",
-          intro: "Mosasaurus was a massive apex marine lizard reaching up to 14 meters, wielding a powerful shark-like tail fluke.",
-          obs: "Compare the 14-meter marine leviathan to the human observer.",
+          intro: "Mosasaurus hoffmannii was the undisputed leviathan of Late Cretaceous oceans. Reaching 17 metres in length with double-hinged jaws, pterygoid palate teeth, and a powerful shark-like tail fluke, it terrorized prehistoric marine ecosystems.",
+          obs: "Human Joe (1.75m) is dwarfed 10-fold by Mosasaurus's 17-metre serpentine torso; its cavernous jaws could swallow a mid-sized patrol boat whole!",
+          highlight: {
+                    "tag": "OCEANIC SOVEREIGN // DEEP-SEA BIOMECHANICS",
+                    "title": "Intramandibular Jaw Joint & Hydrodynamic Tail Fluke",
+                    "desc": "An intramandibular joint in the lower jaw enabled Mosasaurus to engulf massive prey like giant Archelon turtles. A crescent-shaped tail fluke propelled its 17-metre streamline frame through Late Cretaceous seas."
+          },
           diet: "Piscivore / Carnivore",
           dietSub: "Ammonites, sharks, plesiosaurs",
           length: "14.0 metres",
@@ -4757,9 +5013,9 @@
     const clock = new THREE.Clock();
     let isHumanVisible = false;
 
-    // THÔNG SỐ VỊ TRÍ & KHOẢNG CÁCH NGƯỜI JOE
-    let currentHumanDist = 10.0;
-    let currentHumanPosDir = "right";
+    // THÔNG SỐ VỊ TRÍ & KHOẢNG CÁCH NGƯỜI JOE (Mặc định mạn trái 3.5m đối chứng rõ ràng)
+    let currentHumanDist = 3.5;
+    let currentHumanPosDir = "left";
 
     // THÔNG SỐ BÓNG ĐỔ & MẶT TRỜI
     let currentSunAzimuth = 135;
@@ -4785,6 +5041,7 @@
       scene = new THREE.Scene();
       scene.add(mainDinoGroup);
       scene.add(humanGroup);
+      window.humanGroup = humanGroup;
 
       const aspect = container.clientWidth / container.clientHeight;
       camera = new THREE.PerspectiveCamera(36, aspect, 0.1, 150);
@@ -5427,6 +5684,10 @@
         colorKeylight: "Đèn chiếu chính (Key Light)",
         colorAmbient: "Ánh sáng môi trường (Ambient)",
 
+        btnBgmText: "Nhạc Nền",
+        btnBgmTitle: "Bật/Tắt Nhạc Nền Epic Tiền Sử (Heroic Age - Kevin MacLeod CC-BY 4.0)",
+        licCardBgmP: "Bản quyền âm nhạc Epic: \"Heroic Age\" sáng tác bởi Kevin MacLeod (incompetech.com), cấp phép theo Creative Commons Attribution 4.0 (CC-BY 4.0).",
+        highlightBadge: "⚡ DẤU ẤN TIỀN SỬ",
         licModalTitle: "🏛️ Hồ Sơ Pháp Lý, Bản Quyền & Thẩm Định Bảo Tàng Mở",
         licModalSub: "Toàn bộ các tiêu bản 3D sử dụng trong Bảo Tàng Tri Thức 3D được tuyển chọn nghiêm ngặt từ các viện bảo tàng và chương trình số hóa di sản văn hóa mở hàng đầu thế giới với giấy phép kiểm chứng minh bạch:",
         licSec2Title: "Chính Sách Sở Hữu Trí Tuệ & Bảo Vệ Người Dùng",
@@ -5550,6 +5811,10 @@
         colorKeylight: "Key Light",
         colorAmbient: "Ambient Light",
 
+        btnBgmText: "Epic BGM",
+        btnBgmTitle: "Toggle Prehistoric Epic BGM (Heroic Age - Kevin MacLeod CC-BY 4.0)",
+        licCardBgmP: "Epic soundtrack: \"Heroic Age\" composed by Kevin MacLeod (incompetech.com), licensed under Creative Commons Attribution 4.0 International (CC-BY 4.0).",
+        highlightBadge: "⚡ PALEO HIGHLIGHT",
         licModalTitle: "🏛️ Legal Dossier, Copyright & Open Science Attribution",
         licModalSub: "All 3D dinosaur specimens in Prehistoric Earth are curated strictly from leading global cultural heritage museums under verified open science licenses:",
         licSec2Title: "Intellectual Property Policy & User Protection",
@@ -5828,6 +6093,14 @@
       const c7p = document.getElementById('ui-lic-card7-p'); if (c7p) c7p.textContent = t.licCard7P;
       const c8h = document.getElementById('ui-lic-card8-h'); if (c8h) c8h.textContent = t.licCard8H;
       const c8p = document.getElementById('ui-lic-card8-p'); if (c8p) c8p.innerHTML = t.licCard8P;
+
+      // BGM button
+      const uiBtnBgm = document.getElementById('ui-btn-bgm');
+      const btnToggleBgmEl = document.getElementById('btn-toggle-bgm');
+      if (uiBtnBgm && t.btnBgmText) uiBtnBgm.textContent = t.btnBgmText;
+      if (btnToggleBgmEl && t.btnBgmTitle) btnToggleBgmEl.title = t.btnBgmTitle;
+      const licCardBgm = document.getElementById('ui-lic-card-bgm');
+      if (licCardBgm && t.licCardBgmP) licCardBgm.textContent = t.licCardBgmP;
 
       // Re-render
       renderDinoRail();
@@ -6142,12 +6415,20 @@
         isHumanVisible = !isHumanVisible;
         btnToggleHuman.classList.toggle('active', isHumanVisible);
         if (isHumanVisible) {
+          const humanBtnText = document.getElementById('ui-btn-human');
+          if (humanBtnText && !rawHumanScene) {
+            humanBtnText.textContent = currentLang === 'vi' ? 'Đang nạp...' : 'Loading...';
+          }
           ensureHumanJoeLoaded(() => {
+            if (humanBtnText) {
+              humanBtnText.textContent = currentLang === 'vi' ? 'So sánh Người (1.75m)' : 'Human Scale (1.75m)';
+            }
             humanGroup.visible = true;
             if (groundRulerLine) groundRulerLine.visible = true;
             const badge = document.getElementById('ruler-badge');
             if (badge) badge.style.display = 'flex';
             updateHumanRelativePlacement();
+            showSeasonToast(currentLang === 'vi' ? '🧍 Đã xuất hiện Người Joe (1.75m) đối chứng tỉ lệ 1:1!' : '🧍 Joe Human (1.75m) enabled for 1:1 scale comparison!');
           });
         } else {
           humanGroup.visible = false;
@@ -6267,6 +6548,64 @@
     /* ==========================================================================
        8. THUYẾT MINH ÂM THANH SONG NGỮ (VI: STUDIO MP3 NAM/NỮ | EN: WEB SPEECH API CHUẨN)
        ========================================================================== */
+    // =========================================================================
+    // EPIC BACKGROUND MUSIC CONTROLLER (Heroic Age - Kevin MacLeod CC-BY 4.0)
+    // =========================================================================
+    const bgmPlayer = new Audio('./assets/audio/bgm_prehistoric_epic.mp3');
+    bgmPlayer.loop = true;
+    bgmPlayer.preload = 'none';
+    let isBgmPlaying = false;
+    let normalBgmVolume = 0.28;
+    let duckedBgmVolume = 0.06;
+    let bgmFadeInterval = null;
+
+    function fadeBgmVolume(targetVolume, durationMs = 600) {
+      if (!isBgmPlaying) return;
+      if (bgmFadeInterval) clearInterval(bgmFadeInterval);
+      const startVol = bgmPlayer.volume;
+      const stepTime = 30;
+      const steps = Math.max(1, Math.round(durationMs / stepTime));
+      const delta = (targetVolume - startVol) / steps;
+      let currentStep = 0;
+      bgmFadeInterval = setInterval(() => {
+        currentStep++;
+        const nextVol = Math.max(0, Math.min(1, bgmPlayer.volume + delta));
+        bgmPlayer.volume = nextVol;
+        if (currentStep >= steps) {
+          bgmPlayer.volume = targetVolume;
+          clearInterval(bgmFadeInterval);
+          bgmFadeInterval = null;
+        }
+      }, stepTime);
+    }
+
+    function toggleBgm() {
+      const btnBgm = document.getElementById('btn-toggle-bgm');
+      const iconBgm = document.getElementById('ui-icon-bgm');
+      if (!isBgmPlaying) {
+        bgmPlayer.volume = isPlayingAudio ? duckedBgmVolume : normalBgmVolume;
+        bgmPlayer.play().then(() => {
+          isBgmPlaying = true;
+          if (btnBgm) btnBgm.classList.add('active');
+          if (iconBgm) iconBgm.textContent = '🔊';
+          showSeasonToast(currentLang === 'vi' ? '🎵 Đang phát: Heroic Age (Nhạc nền Epic Tiền Sử)' : '🎵 Now Playing: Heroic Age (Prehistoric Epic BGM)');
+        }).catch(err => {
+          console.warn('BGM play blocked by browser policy:', err);
+        });
+      } else {
+        bgmPlayer.pause();
+        isBgmPlaying = false;
+        if (btnBgm) btnBgm.classList.remove('active');
+        if (iconBgm) iconBgm.textContent = '🎵';
+        showSeasonToast(currentLang === 'vi' ? '🔇 Đã tạm dừng nhạc nền' : '🔇 Background music paused');
+      }
+    }
+
+    const btnToggleBgm = document.getElementById('btn-toggle-bgm');
+    if (btnToggleBgm) {
+      btnToggleBgm.addEventListener('click', toggleBgm);
+    }
+
     let selectedVoice = "male";
     let isPlayingAudio = false;
     let audioPlayer = new Audio();
@@ -6328,6 +6667,7 @@
       isPlayingAudio = true;
       if (iconPlay) iconPlay.style.display = 'none';
       if (iconStop) iconStop.style.display = 'block';
+      if (isBgmPlaying) fadeBgmVolume(duckedBgmVolume, 500);
 
       // -------------------------------------------------------------
       // 1. NHÁNH TIẾNG ANH (ENGLISH NARRATION: NATIVE SPEECH SYNTHESIS)
@@ -6336,7 +6676,8 @@
         if ('speechSynthesis' in window) {
           if (audioStatusLabel) audioStatusLabel.textContent = "Speaking…";
           const ex = currentExhibit;
-          const textToSpeak = `${ex.nameEn}. ${ex.en.subtitle}. ${ex.en.intro} ${ex.en.obs}`;
+          const hlText = (ex.en && ex.en.highlight) ? ` ${ex.en.highlight.title}. ${ex.en.highlight.desc}` : '';
+          const textToSpeak = `${ex.nameEn}. ${ex.en.subtitle}. ${ex.en.intro}${hlText} ${ex.en.obs}`;
 
           const utter = new SpeechSynthesisUtterance(textToSpeak);
           utter.lang = 'en-US';
@@ -6397,6 +6738,7 @@
       if (audioStatusLabel) {
         audioStatusLabel.textContent = currentLang === 'vi' ? "Sẵn sàng" : "Ready";
       }
+      if (isBgmPlaying) fadeBgmVolume(normalBgmVolume, 800);
     }
 
     btnPlayAudio.addEventListener('click', () => {
@@ -6485,6 +6827,22 @@
 
       const obsEl = document.getElementById('exhibit-observation');
       if (obsEl) obsEl.textContent = data.obs;
+
+      // Paleontological Highlight Dossier
+      const hlCard = document.getElementById('exhibit-highlight-card');
+      const hlBadge = document.querySelector('.paleo-highlight-badge');
+      const hlTag = document.getElementById('exhibit-highlight-tag');
+      const hlTitle = document.getElementById('exhibit-highlight-title');
+      const hlDesc = document.getElementById('exhibit-highlight-desc');
+      if (data.highlight) {
+        if (hlCard) hlCard.style.display = 'block';
+        if (hlBadge) hlBadge.textContent = isVi ? '⚡ DẤU ẤN TIỀN SỬ' : '⚡ PALEO HIGHLIGHT';
+        if (hlTag) hlTag.textContent = data.highlight.tag || (isVi ? 'ĐẶC TRƯNG CỔ SINH' : 'PALEO HIGHLIGHT');
+        if (hlTitle) hlTitle.textContent = data.highlight.title;
+        if (hlDesc) hlDesc.textContent = data.highlight.desc;
+      } else if (hlCard) {
+        hlCard.style.display = 'none';
+      }
 
       // Tab 2: SCI-FI TELEMETRY HUD & FACT MATRIX
       const isSpecimenVi = isVi;
