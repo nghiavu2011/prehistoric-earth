@@ -10,12 +10,21 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-  <!-- Three.js & Loaders từ CDN Unpkg (ES Module) -->
+  <!-- Preconnect to high-speed CDNs & pre-resolve DNS -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+  <!-- Preload Initial Critical Exhibit (Triceratops 3D Model & Cretaceous Backdrop) -->
+  <link rel="preload" href="./assets/models/triceratops.glb" as="fetch" crossorigin>
+  <link rel="preload" href="./assets/backgrounds/cretaceous.jpg" as="image">
+
+  <!-- Three.js & Loaders từ CDN jsDelivr tốc độ cao (ES Module) -->
   <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
       }
     }
   </script>
@@ -3646,7 +3655,7 @@
             <span class="media-tag-pill">1080p HD</span>
           </div>
           <div class="video-wrapper">
-            <video id="exhibit-video-player" controls playsinline preload="metadata" class="exhibit-video-elem">
+            <video id="exhibit-video-player" controls playsinline preload="none" class="exhibit-video-elem">
               Trình duyệt của bạn không hỗ trợ phát thẻ video.
             </video>
             <div class="video-placeholder" id="video-placeholder" style="display: none;">
@@ -4772,6 +4781,7 @@
     let isTransitioningCam = false;
 
     function init3D() {
+      THREE.Cache.enabled = true;
       scene = new THREE.Scene();
       scene.add(mainDinoGroup);
       scene.add(humanGroup);
@@ -4781,7 +4791,7 @@
       camera.position.copy(CAMERA_PRESETS.FULL.pos);
 
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, window.innerWidth <= 768 ? 1.5 : 2));
       renderer.setSize(container.clientWidth, container.clientHeight);
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.25;
@@ -4867,7 +4877,6 @@
 
 
       initGroundRuler();
-      loadHumanJoeModel();
       window.addEventListener('resize', onWindowResize);
       requestAnimationFrame(renderLoop);
       window.mainDinoGroup = mainDinoGroup;
@@ -4922,10 +4931,23 @@
     }
 
     /* ==========================================================================
-       4. TẢI MÔ HÌNH NGƯỜI JOE & ĐỊNH VỊ ĐỘNG (KHOẢNG CÁCH + 4 VỊ TRÍ)
+       4. TẢI MÔ HÌNH NGƯỜI JOE & ĐỊNH VỊ ĐỘNG (KHOẢNG CÁCH + 4 VỊ TRÍ) - LAZY LOAD
        ========================================================================== */
-    function loadHumanJoeModel() {
+    let isHumanModelLoading = false;
+    let humanLoadCallbacks = [];
+
+    function ensureHumanJoeLoaded(callback) {
+      if (rawHumanScene) {
+        if (callback) callback();
+        return;
+      }
+      if (callback) humanLoadCallbacks.push(callback);
+      if (isHumanModelLoading) return;
+
+      isHumanModelLoading = true;
       const loader = new GLTFLoader();
+      loader.setMeshoptDecoder(MeshoptDecoder);
+
       loader.load('./assets/models/joe_human.glb', (gltf) => {
         rawHumanScene = gltf.scene;
 
@@ -4955,14 +4977,26 @@
 
         const updatedBox = new THREE.Box3().setFromObject(rawHumanScene);
         rawHumanScene.position.y = -updatedBox.min.y;
-
         rawHumanScene.rotation.y = -Math.PI / 2 + TARGET_FACING_ANGLE;
 
         humanGroup.add(rawHumanScene);
         humanGroup.visible = isHumanVisible;
 
         updateHumanRelativePlacement();
+        isHumanModelLoading = false;
+
+        const cbs = humanLoadCallbacks;
+        humanLoadCallbacks = [];
+        cbs.forEach(cb => { try { cb(); } catch (e) { console.error(e); } });
+      }, undefined, (err) => {
+        console.error('Error loading human model:', err);
+        isHumanModelLoading = false;
       });
+    }
+
+    function scheduleIdlePrefetch() {
+      // Giữ người Joe ở chế độ On-Demand 100%: Chỉ tải khi người dùng bấm nút "So sánh Người (1.75m)"
+      // Giúp tiết kiệm 13.2MB dữ liệu cho người dùng khi mới vào web
     }
 
     function updateHumanRelativePlacement() {
@@ -5026,8 +5060,76 @@
 
     /* ==========================================================================
        5. TẢI MÔ HÌNH KHỦNG LONG: ĐẶC KHỐI, SCALE 1:1, CỐT 0.00, CÙNG 1 HƯỚNG NHÌN
+       - Tích hợp lớp đệm Native CacheStorage: Tải 1 lần, nạp tức thì trong 20ms
        ========================================================================== */
-    // stageStatus & progressBar hoisted to top
+    const DINO_CACHE_NAME = 'prehistoric-models-v1';
+
+    async function fetchModelBufferWithProgress(url, onProgress) {
+      // 1. Kiểm tra bộ nhớ đệm CacheStorage cục bộ
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open(DINO_CACHE_NAME);
+          const cached = await cache.match(url);
+          if (cached) {
+            if (onProgress) onProgress(100);
+            return await cached.arrayBuffer();
+          }
+        } catch (e) {
+          console.warn('CacheStorage read error:', e);
+        }
+      }
+
+      // 2. Tải trực tiếp từ mạng có phân luồng đo tiến độ tải
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status} when fetching ${url}`);
+
+      const contentLength = res.headers.get('content-length');
+      const total = contentLength ? parseInt(contentLength, 10) : 0;
+
+      if (!res.body || !total) {
+        const buf = await res.arrayBuffer();
+        if ('caches' in window) {
+          try {
+            const cache = await caches.open(DINO_CACHE_NAME);
+            cache.put(url, new Response(buf.slice(0), { headers: res.headers })).catch(() => {});
+          } catch (e) {}
+        }
+        if (onProgress) onProgress(100);
+        return buf;
+      }
+
+      const reader = res.body.getReader();
+      const chunks = [];
+      let loaded = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        loaded += value.length;
+        if (onProgress && total > 0) {
+          onProgress(Math.min(99, Math.round((loaded / total) * 100)));
+        }
+      }
+
+      const allChunks = new Uint8Array(loaded);
+      let position = 0;
+      for (const chunk of chunks) {
+        allChunks.set(chunk, position);
+        position += chunk.length;
+      }
+
+      // Lưu trữ vĩnh viễn vào CacheStorage để các lần chuyển loài sau không tốn băng thông
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open(DINO_CACHE_NAME);
+          cache.put(url, new Response(allChunks.buffer.slice(0), { headers: res.headers })).catch(() => {});
+        } catch (e) {}
+      }
+
+      if (onProgress) onProgress(100);
+      return allChunks.buffer;
+    }
 
     function loadExhibit(exhibit) {
       currentExhibit = exhibit;
@@ -5060,145 +5162,158 @@
         targetFile = exhibit.skeletonFile;
       }
 
-      loader.load(
-        targetFile,
-        (gltf) => {
-          const model = gltf.scene;
+      function handleModelLoaded(gltf) {
+        const model = gltf.scene;
 
-          model.traverse((child) => {
-            if (child.isMesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-              if (child.material) {
-                // Áp dụng bóc tách X-Ray nếu slider > 0
-                if (currentPeelPercent > 0 || currentPeelMode === "xray") {
-                  const factor = currentPeelMode === "xray" ? 0.45 : (1.0 - (currentPeelPercent / 100) * 0.7);
-                  child.material.transparent = true;
-                  child.material.opacity = factor;
-                  child.material.wireframe = currentPeelPercent > 60;
-                } else {
-                  child.material.transparent = false;
-                  child.material.opacity = 1.0;
-                  child.material.wireframe = false;
-                }
-                child.material.depthWrite = true;
-                child.material.depthTest = true;
-                if (child.material.color) child.material.color.setHex(0xffffff);
-                if (child.material.emissive) child.material.emissive.setHex(0x000000);
-                child.material.roughness = Math.min(Math.max(child.material.roughness || 0.65, 0.4), 0.8);
-                child.material.metalness = Math.min(child.material.metalness || 0.05, 0.2);
-                child.material.needsUpdate = true;
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            if (child.material) {
+              // Áp dụng bóc tách X-Ray nếu slider > 0
+              if (currentPeelPercent > 0 || currentPeelMode === "xray") {
+                const factor = currentPeelMode === "xray" ? 0.45 : (1.0 - (currentPeelPercent / 100) * 0.7);
+                child.material.transparent = true;
+                child.material.opacity = factor;
+                child.material.wireframe = currentPeelPercent > 60;
+              } else {
+                child.material.transparent = false;
+                child.material.opacity = 1.0;
+                child.material.wireframe = false;
               }
-            }
-          });
-
-          model.position.set(0, 0, 0);
-          model.scale.setScalar(1);
-          model.rotation.set(0, exhibit.rotationOffsetY, 0);
-          model.updateMatrixWorld(true);
-
-          let box = new THREE.Box3().setFromObject(model);
-          let size = new THREE.Vector3();
-          box.getSize(size);
-          const rawLength = Math.max(size.x, size.z);
-          const targetMeters = exhibit.realLengthMeters;
-          const scaleFactor = targetMeters / rawLength;
-          model.scale.setScalar(scaleFactor);
-          model.updateMatrixWorld(true);
-
-          box = new THREE.Box3().setFromObject(model);
-          let center = new THREE.Vector3();
-          box.getCenter(center);
-
-          model.position.x = -center.x;
-          model.position.z = -center.z;
-
-          if (exhibit.isFlying) {
-            model.position.y = exhibit.flyHeight !== undefined ? exhibit.flyHeight : 1.85;
-            shadowReceiverPlane.visible = false;
-          } else {
-            model.position.y = -box.min.y + (exhibit.groundOffsetY || 0.0);
-            shadowReceiverPlane.visible = true;
-          }
-          model.updateMatrixWorld(true);
-
-          mainDinoGroup.add(model);
-
-          const finalBox = new THREE.Box3().setFromObject(model);
-          const finalSize = new THREE.Vector3();
-          finalBox.getSize(finalSize);
-          const finalCenter = new THREE.Vector3();
-          finalBox.getCenter(finalCenter);
-
-          // Cập nhật quy mô bóng tiếp xúc mềm mại dưới chân
-          if (softContactShadowMesh) {
-            const baseW = Math.max(finalSize.x * 1.35, 2.5);
-            const baseL = Math.max(finalSize.z * 1.35, 3.5);
-            softContactShadowMesh.userData = softContactShadowMesh.userData || {};
-            softContactShadowMesh.userData.baseW = baseW;
-            softContactShadowMesh.userData.baseL = baseL;
-            const factor = 1.0 + (currentShadowBlur - 1.0) * 0.04;
-            softContactShadowMesh.scale.set(baseW * factor, 1, baseL * factor);
-            softContactShadowMesh.position.set(0, 0.012, 0);
-            softContactShadowMesh.visible = !exhibit.isFlying;
-          }
-
-          // TỰ ĐỘNG CÂN CHỈNH CAMERA BAO TRỌN FULL BODY (HEAD-TO-TAIL FIT):
-          const maxDim = Math.max(finalSize.x, finalSize.y, finalSize.z);
-          const vFov = camera.fov * (Math.PI / 180);
-          let camDist = (maxDim / 2) / Math.tan(vFov / 2);
-          camDist = Math.max(camDist * 1.45, 6.0); // 45% lề an toàn để view toàn thân cực kỳ thoáng mắt
-
-          const targetY = exhibit.isFlying ? (exhibit.flyHeight !== undefined ? exhibit.flyHeight : 1.85) : finalCenter.y;
-          CAMERA_PRESETS.FULL.target.set(0, targetY, 0);
-
-          controls.target.copy(CAMERA_PRESETS.FULL.target);
-
-          // Đặt góc nhìn phối cảnh điện ảnh 3/4 kinh điển
-          const viewAngle = 0.52;
-          const camX = Math.sin(viewAngle) * camDist * 0.95;
-          const camY = targetY + finalSize.y * 0.22 + camDist * 0.15;
-          const camZ = Math.cos(viewAngle) * camDist * 0.95;
-
-          CAMERA_PRESETS.FULL.pos.set(camX, camY, camZ);
-          camera.position.set(camX, camY, camZ);
-          controls.minDistance = 1.5;
-          controls.maxDistance = Math.max(camDist * 3.5, 65.0);
-          controls.update();
-
-          if (gltf.animations && gltf.animations.length > 0) {
-            mixer = new THREE.AnimationMixer(model);
-            const action = mixer.clipAction(gltf.animations[0]);
-            action.play();
-          }
-
-          progressBar.style.width = '100%';
-          setTimeout(() => { stageStatus.classList.add('hidden'); }, 200);
-        },
-        (xhr) => {
-          if (xhr.lengthComputable && xhr.total > 0) {
-            const pct = Math.round((xhr.loaded / xhr.total) * 100);
-            progressBar.style.width = pct + '%';
-            const statusText = document.getElementById('status-text');
-            if (statusText) statusText.textContent = `Đang nạp ${exhibit.nameVi}... ${pct}%`;
-          }
-        },
-        (error) => {
-          console.error("Lỗi nạp mô hình:", error);
-          const statusText = document.getElementById('status-text');
-          if (statusText) {
-            statusText.innerHTML = `⚠️ Không thể tải mô hình 3D (${exhibit.nameVi}). <button id="btn-retry-model" style="margin-left:8px;padding:3px 10px;background:var(--accent-forest);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem;font-weight:600;">Thử lại</button>`;
-            const retryBtn = document.getElementById('btn-retry-model');
-            if (retryBtn) {
-              retryBtn.onclick = (e) => {
-                e.stopPropagation();
-                loadExhibit(exhibit);
-              };
+              child.material.depthWrite = true;
+              child.material.depthTest = true;
+              if (child.material.color) child.material.color.setHex(0xffffff);
+              if (child.material.emissive) child.material.emissive.setHex(0x000000);
+              child.material.roughness = Math.min(Math.max(child.material.roughness || 0.65, 0.4), 0.8);
+              child.material.metalness = Math.min(child.material.metalness || 0.05, 0.2);
+              child.material.needsUpdate = true;
             }
           }
-          progressBar.style.width = '0%';
+        });
+
+        model.position.set(0, 0, 0);
+        model.scale.setScalar(1);
+        model.rotation.set(0, exhibit.rotationOffsetY, 0);
+        model.updateMatrixWorld(true);
+
+        let box = new THREE.Box3().setFromObject(model);
+        let size = new THREE.Vector3();
+        box.getSize(size);
+        const rawLength = Math.max(size.x, size.z);
+        const targetMeters = exhibit.realLengthMeters;
+        const scaleFactor = targetMeters / rawLength;
+        model.scale.setScalar(scaleFactor);
+        model.updateMatrixWorld(true);
+
+        box = new THREE.Box3().setFromObject(model);
+        let center = new THREE.Vector3();
+        box.getCenter(center);
+
+        model.position.x = -center.x;
+        model.position.z = -center.z;
+
+        if (exhibit.isFlying) {
+          model.position.y = exhibit.flyHeight !== undefined ? exhibit.flyHeight : 1.85;
+          shadowReceiverPlane.visible = false;
+        } else {
+          model.position.y = -box.min.y + (exhibit.groundOffsetY || 0.0);
+          shadowReceiverPlane.visible = true;
         }
-      );
+        model.updateMatrixWorld(true);
+
+        mainDinoGroup.add(model);
+
+        const finalBox = new THREE.Box3().setFromObject(model);
+        const finalSize = new THREE.Vector3();
+        finalBox.getSize(finalSize);
+        const finalCenter = new THREE.Vector3();
+        finalBox.getCenter(finalCenter);
+
+        // Cập nhật quy mô bóng tiếp xúc mềm mại dưới chân
+        if (softContactShadowMesh) {
+          const baseW = Math.max(finalSize.x * 1.35, 2.5);
+          const baseL = Math.max(finalSize.z * 1.35, 3.5);
+          softContactShadowMesh.userData = softContactShadowMesh.userData || {};
+          softContactShadowMesh.userData.baseW = baseW;
+          softContactShadowMesh.userData.baseL = baseL;
+          const factor = 1.0 + (currentShadowBlur - 1.0) * 0.04;
+          softContactShadowMesh.scale.set(baseW * factor, 1, baseL * factor);
+          softContactShadowMesh.position.set(0, 0.012, 0);
+          softContactShadowMesh.visible = !exhibit.isFlying;
+        }
+
+        // TỰ ĐỘNG CÂN CHỈNH CAMERA BAO TRỌN FULL BODY (HEAD-TO-TAIL FIT):
+        const maxDim = Math.max(finalSize.x, finalSize.y, finalSize.z);
+        const vFov = camera.fov * (Math.PI / 180);
+        let camDist = (maxDim / 2) / Math.tan(vFov / 2);
+        camDist = Math.max(camDist * 1.45, 6.0); // 45% lề an toàn để view toàn thân cực kỳ thoáng mắt
+
+        const targetY = exhibit.isFlying ? (exhibit.flyHeight !== undefined ? exhibit.flyHeight : 1.85) : finalCenter.y;
+        CAMERA_PRESETS.FULL.target.set(0, targetY, 0);
+
+        controls.target.copy(CAMERA_PRESETS.FULL.target);
+
+        // Đặt góc nhìn phối cảnh điện ảnh 3/4 kinh điển
+        const viewAngle = 0.52;
+        const camX = Math.sin(viewAngle) * camDist * 0.95;
+        const camY = targetY + finalSize.y * 0.22 + camDist * 0.15;
+        const camZ = Math.cos(viewAngle) * camDist * 0.95;
+
+        CAMERA_PRESETS.FULL.pos.set(camX, camY, camZ);
+        camera.position.set(camX, camY, camZ);
+        controls.minDistance = 1.5;
+        controls.maxDistance = Math.max(camDist * 3.5, 65.0);
+        controls.update();
+
+        if (gltf.animations && gltf.animations.length > 0) {
+          mixer = new THREE.AnimationMixer(model);
+          const action = mixer.clipAction(gltf.animations[0]);
+          action.play();
+        }
+
+        progressBar.style.width = '100%';
+        setTimeout(() => { stageStatus.classList.add('hidden'); }, 200);
+
+        // Tải ngầm người Joe khi thiết bị rảnh rỗi (idle)
+        scheduleIdlePrefetch();
+      }
+
+      function handleModelError(error) {
+        console.error("Lỗi nạp mô hình:", error);
+        const statusText = document.getElementById('status-text');
+        if (statusText) {
+          statusText.innerHTML = `⚠️ Không thể tải mô hình 3D (${exhibit.nameVi}). <button id="btn-retry-model" style="margin-left:8px;padding:3px 10px;background:var(--accent-forest);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:0.75rem;font-weight:600;">Thử lại</button>`;
+          const retryBtn = document.getElementById('btn-retry-model');
+          if (retryBtn) {
+            retryBtn.onclick = (e) => {
+              e.stopPropagation();
+              loadExhibit(exhibit);
+            };
+          }
+        }
+        progressBar.style.width = '0%';
+      }
+
+      // Khởi động tiến trình tải qua lớp đệm CacheStorage
+      fetchModelBufferWithProgress(targetFile, (pct) => {
+        progressBar.style.width = pct + '%';
+        const statusText = document.getElementById('status-text');
+        if (statusText) statusText.textContent = `Đang nạp ${exhibit.nameVi}... ${pct}%`;
+      }).then(buffer => {
+        loader.parse(
+          buffer,
+          '',
+          (gltf) => { handleModelLoaded(gltf); },
+          (err) => {
+            console.warn("Parse buffer error, fallback to loader.load:", err);
+            loader.load(targetFile, handleModelLoaded, undefined, handleModelError);
+          }
+        );
+      }).catch(err => {
+        console.warn("Fetch buffer error, fallback to loader.load:", err);
+        loader.load(targetFile, handleModelLoaded, undefined, handleModelError);
+      });
     }
     
     /* ==========================================================================
@@ -6020,6 +6135,29 @@
       btnToggleWatercolor.classList.toggle('active', isWatercolor);
     });
 
+    // Toggle Mô hình Người Joe 1.75m (Lazy loading: Chỉ tải khi người dùng kích hoạt)
+    const btnToggleHuman = document.getElementById('btn-toggle-human');
+    if (btnToggleHuman) {
+      btnToggleHuman.addEventListener('click', () => {
+        isHumanVisible = !isHumanVisible;
+        btnToggleHuman.classList.toggle('active', isHumanVisible);
+        if (isHumanVisible) {
+          ensureHumanJoeLoaded(() => {
+            humanGroup.visible = true;
+            if (groundRulerLine) groundRulerLine.visible = true;
+            const badge = document.getElementById('ruler-badge');
+            if (badge) badge.style.display = 'flex';
+            updateHumanRelativePlacement();
+          });
+        } else {
+          humanGroup.visible = false;
+          if (groundRulerLine) groundRulerLine.visible = false;
+          const badge = document.getElementById('ruler-badge');
+          if (badge) badge.style.display = 'none';
+        }
+      });
+    }
+
     /* ==========================================================================
        7. CHUYỂN 4 MÙA TIỀN SỬ MƯỢT MÀ TINH TẾ (GIỮ NGUYÊN KHUNG CẢNH REF)
        ========================================================================== */
@@ -6493,7 +6631,7 @@
         hudMatrix.textContent = matrix;
       }
 
-      // Tab 3 Video & Images
+      // Tab 3 Video & Images (LAZY LOAD: Chỉ nạp khi mở Tab 3, tiết kiệm 13.7MB cho lần tải đầu)
       const videoPlayer = document.getElementById('exhibit-video-player');
       const videoPlaceholder = document.getElementById('video-placeholder');
       const mediaVideoTitle = document.getElementById('media-video-title');
@@ -6502,11 +6640,25 @@
         if (videoPlayer) {
           videoPlayer.style.display = 'block';
           const encodedVideoUrl = encodeURI(ex.videoFile);
-          if (videoPlayer.getAttribute('data-src') !== ex.videoFile) {
-            videoPlayer.pause();
-            videoPlayer.src = encodedVideoUrl;
-            videoPlayer.setAttribute('data-src', ex.videoFile);
-            videoPlayer.load();
+          videoPlayer.dataset.pendingSrc = encodedVideoUrl;
+          videoPlayer.dataset.rawSrc = ex.videoFile;
+
+          const mediaTab = document.getElementById('tab-media');
+          const isMediaTabActive = mediaTab && mediaTab.classList.contains('active');
+          if (isMediaTabActive) {
+            if (videoPlayer.getAttribute('data-src') !== ex.videoFile) {
+              videoPlayer.pause();
+              videoPlayer.src = encodedVideoUrl;
+              videoPlayer.setAttribute('data-src', ex.videoFile);
+              videoPlayer.load();
+            }
+          } else {
+            // Không nạp video ngầm khi tab đang ẩn để tránh nghẽn băng thông tải mô hình 3D
+            if (videoPlayer.getAttribute('data-src') !== ex.videoFile) {
+              videoPlayer.pause();
+              videoPlayer.removeAttribute('src');
+              videoPlayer.removeAttribute('data-src');
+            }
           }
         }
         if (videoPlaceholder) videoPlaceholder.style.display = 'none';
@@ -6519,6 +6671,8 @@
           videoPlayer.style.display = 'none';
           videoPlayer.removeAttribute('src');
           videoPlayer.removeAttribute('data-src');
+          delete videoPlayer.dataset.pendingSrc;
+          delete videoPlayer.dataset.rawSrc;
         }
         if (videoPlaceholder) videoPlaceholder.style.display = 'flex';
         if (mediaVideoTitle) {
@@ -6562,9 +6716,16 @@
         const targetPanel = document.getElementById(targetId);
         if (targetPanel) targetPanel.classList.add('active');
 
-        // Tạm dừng video nếu người dùng chuyển sang tab khác để tiết kiệm CPU/băng thông
-        if (targetId !== 'tab-media') {
-          const vp = document.getElementById('exhibit-video-player');
+        const vp = document.getElementById('exhibit-video-player');
+        if (targetId === 'tab-media') {
+          // Nạp video theo yêu cầu khi người dùng chủ động xem
+          if (vp && vp.dataset.pendingSrc && vp.getAttribute('data-src') !== vp.dataset.rawSrc) {
+            vp.src = vp.dataset.pendingSrc;
+            vp.setAttribute('data-src', vp.dataset.rawSrc);
+            vp.load();
+          }
+        } else {
+          // Tạm dừng video nếu người dùng chuyển sang tab khác để tiết kiệm CPU/băng thông
           if (vp && !vp.paused) vp.pause();
         }
       });
