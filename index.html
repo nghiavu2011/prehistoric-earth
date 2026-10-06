@@ -5467,18 +5467,18 @@
       {
         id: "carnotaurus",
         nameVi: "Carnotaurus",
-        videoFile: "",
+        videoFile: "./assets/video/Carnotaurus_sprinting_across_dus…_1080p_20261006205542_gwr_video_mvp.mp4",
         videoTitle: "Carnotaurus phóng nước rút săn mồi trên bình nguyên Patagonia (1080p HD)",
-        imageFile: "",
-        imageTitle: "Carnotaurus sastrei — Bò ăn thịt Kỷ Phấn Trắng Patagonia (2K)",
+        imageFile: "./assets/image/Anh KL/Hồ sơ Carnotaurus_ Kẻ săn mồi Patagonia.png",
+        imageTitle: "Hồ sơ khảo cổ Carnotaurus sastrei — Kẻ săn mồi Patagonia (2K)",
         nameEn: "Carnotaurus",
         periodVi: "Kỷ Phấn Trắng Muộn",
         periodEn: "Late Cretaceous",
-        timeScaleVi: "72–70 Ma (Maastrichtian)",
-        timeScaleEn: "72–70 Ma (Maastrichtian)",
+        timeScaleVi: "72–69.9 Ma (Maastrichtian)",
+        timeScaleEn: "72–69.9 Ma (Maastrichtian)",
         modelFile: "./assets/models/primal_carnage_carnotaurus.glb",
         background: "./assets/image/Anh Nen/Cretaceous_river_delta_swamp_forest_2K_20261002155846-clean.png",
-        realLengthMeters: 8.0,
+        realLengthMeters: 7.5,
         rotationOffsetY: TARGET_FACING_ANGLE,
         isFlying: false,
         formation: "Hệ tầng La Colonia (Chubut, Argentina)",
@@ -5501,9 +5501,9 @@
           },
           diet: "Ăn thịt (Carnivore)",
           dietSub: "Ornithopod, thằn lằn, Sauropod non",
-          length: "8.0 mét",
+          length: "7.5 mét",
           lengthSub: "Kẻ săn mồi tốc độ cao",
-          mass: "1.5–2.1 tấn",
+          mass: "1.5 tấn",
           massSub: "Thân hình khí động học",
           loc: "Hệ tầng La Colonia",
           locSub: "Patagonia, Argentina"
@@ -5520,9 +5520,9 @@
           },
           diet: "Carnivore",
           dietSub: "Small sauropods, ornithopods",
-          length: "8.0 metres",
+          length: "7.5 metres",
           lengthSub: "Fastest large theropod",
-          mass: "1.5–2.1 tonnes",
+          mass: "1.5 tonnes",
           massSub: "Hydrodynamic cursorial build",
           loc: "La Colonia Formation",
           locSub: "Patagonia, Argentina"
@@ -7069,8 +7069,10 @@
         const dinoId = ex.id || 't_rex';
         const isVi = currentLang === 'vi';
 
-        // Tự động hạ nhạc nền Epic khi gầm để tiếng gầm chiếm trọn không gian âm học
+        // Tự động hạ nhạc nền Epic & tạm dừng video đang chạy để tiếng gầm chiếm trọn không gian âm học
         if (isBgmPlaying) fadeBgmVolume(0.02, 180);
+        const activeVideo = document.getElementById('exhibit-video-player');
+        if (activeVideo && !activeVideo.paused) activeVideo.pause();
 
         // Hiệu ứng visual nút gầm
         const btnRoar = document.getElementById('btn-play-roar');
@@ -8518,6 +8520,20 @@
           const encodedVideoUrl = encodeURI(ex.videoFile);
           videoPlayer.dataset.pendingSrc = encodedVideoUrl;
           videoPlayer.dataset.rawSrc = ex.videoFile;
+
+          // Cân đối âm học: Tự động hạ BGM khi phát video & phục hồi khi tạm dừng / kết thúc
+          if (!videoPlayer._audioCoordinationAttached) {
+            videoPlayer._audioCoordinationAttached = true;
+            videoPlayer.addEventListener('play', () => {
+              if (isBgmPlaying) fadeBgmVolume(0.02, 280);
+            });
+            videoPlayer.addEventListener('pause', () => {
+              if (isBgmPlaying && !isPlayingAudio) fadeBgmVolume(normalBgmVolume, 500);
+            });
+            videoPlayer.addEventListener('ended', () => {
+              if (isBgmPlaying && !isPlayingAudio) fadeBgmVolume(normalBgmVolume, 500);
+            });
+          }
 
           const mediaTab = document.getElementById('tab-media');
           const isMediaTabActive = mediaTab && mediaTab.classList.contains('active');
