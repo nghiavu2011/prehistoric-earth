@@ -2645,6 +2645,92 @@
       font-style: italic;
     }
 
+    /* AI Studio Creative Prompts Card */
+    .prompt-media-block {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .prompt-box-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .prompt-item-group {
+      background: rgba(15, 23, 42, 0.03);
+      border: 1px solid rgba(0, 0, 0, 0.07);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      transition: all 0.2s ease;
+    }
+    .prompt-item-group:hover {
+      background: rgba(15, 23, 42, 0.05);
+      border-color: rgba(43, 76, 63, 0.3);
+    }
+    .prompt-type-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .prompt-type-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(234, 88, 12, 0.12);
+      color: #ea580c;
+      letter-spacing: 0.2px;
+    }
+    .prompt-type-badge.art-badge {
+      background: rgba(14, 165, 233, 0.12);
+      color: #0284c7;
+    }
+    .btn-copy-prompt {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.64rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .btn-copy-prompt:hover {
+      background: var(--accent-forest);
+      color: #ffffff;
+      border-color: var(--accent-forest);
+      transform: translateY(-1px);
+    }
+    .btn-copy-prompt.copied {
+      background: #10b981 !important;
+      color: #ffffff !important;
+      border-color: #10b981 !important;
+    }
+    .prompt-text-content {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.66rem;
+      line-height: 1.45;
+      color: #334155;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 4px;
+      padding: 7px 9px;
+      user-select: all;
+      max-height: 110px;
+      overflow-y: auto;
+      word-break: break-word;
+      border-left: 3px solid var(--accent-forest);
+    }
+
   
     /* ==========================================================================
        SCI-FI TELEMETRY HUD (TAB CHỈ SỐ KHOA HỌC)
@@ -4049,6 +4135,39 @@
           </div>
           <div id="exhibit-image-caption" class="media-caption">Bối cảnh môi trường sống cổ đại</div>
         </div>
+
+        <!-- Khung Prompt AI Sáng Tạo Video & Tranh 2K (Hollywood & National Geographic) -->
+        <div class="prompt-media-block" id="prompt-media-block">
+          <div class="media-block-title">
+            <span id="media-prompt-title">✨ Prompt AI Tạo Video & Tranh 2K</span>
+            <span class="media-tag-pill" style="background: rgba(234, 88, 12, 0.15); color: #ea580c; border: 1px solid rgba(234, 88, 12, 0.3);">AI Studio</span>
+          </div>
+          <div class="prompt-box-card">
+            <div class="prompt-item-group">
+              <div class="prompt-type-header">
+                <span class="prompt-type-badge" id="badge-prompt-video">🎥 Video Prompt (Google Flow / Veo 2 / Sora)</span>
+                <button class="btn-copy-prompt" id="btn-copy-video-prompt" title="Sao chép Prompt Video">
+                  <span class="copy-text">📋 Sao chép</span>
+                </button>
+              </div>
+              <div class="prompt-text-content" id="exhibit-video-prompt-text">
+                Đang nạp prompt video...
+              </div>
+            </div>
+
+            <div class="prompt-item-group">
+              <div class="prompt-type-header">
+                <span class="prompt-type-badge art-badge" id="badge-prompt-art">🎨 Tranh 2K Prompt (Midjourney / FLUX)</span>
+                <button class="btn-copy-prompt" id="btn-copy-art-prompt" title="Sao chép Prompt Tranh 2K">
+                  <span class="copy-text">📋 Sao chép</span>
+                </button>
+              </div>
+              <div class="prompt-text-content" id="exhibit-art-prompt-text">
+                Đang nạp prompt tranh...
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </aside>
@@ -4930,6 +5049,8 @@
         datingMethod: "95.0 Ma • Đồng vị Argon",
         discoverer: "1912 • Ernst Stromer",
         prompt: "Expansive mid-Cretaceous tropical delta river basin in North Africa, wide tranquil freshwater lagoons lined with ancient mangrove roots and giant seed ferns, low shoreline horizon, golden haze sunbeams glistening on calm tidal waters, realistic eye-level museum backdrop, empty foreground shore, 8k resolution, no animals in the image.",
+        videoPrompt: "Cinematic 8k documentary video: Mid-Cretaceous North African tropical delta river system, 95 million years ago. A colossal 15-meter Spinosaurus aegyptianus slowly wades through emerald river waters, its massive 1.65-meter dorsal sail catching golden equatorial rays. The predator snaps its long crocodilian jaws into the water, splashing misty droplets as it ambushes a giant Onchopristis sawfish. Slow-motion tracking shot from waterline upward to full predatory profile, paddle-like swimming tail undulating with fluid power, wet glistening scales, National Geographic documentary realism, photorealistic 60fps.",
+        artPrompt: "Masterpiece paleoart: Spinosaurus aegyptianus resting on the lush muddy bank of the Kem Kem delta, mid-Cretaceous Morocco. Hyper-detailed keratin crest and majestic dorsal sail, vibrant reptilian scales with natural countershading camouflage, sunbeams filtering through ancient giant ferns, atmospheric morning mist drifting over calm tidal waters, 8k ultra-resolution museum archival illustration.",
         vi: {
           tag: "Khủng long Bán thủy sinh",
           subtitle: "Thủy quái khổng lồ dài nhất thời tiền sử",
@@ -5302,6 +5423,8 @@
         datingMethod: "66.0 Ma • Sinh địa tầng Vi cổ sinh",
         discoverer: "1764 • Johann Leonard Hoffmann",
         prompt: "Underwater panoramic view of a shallow warm Cretaceous inland sea, golden sun caustic patterns dancing across white seabed sands, ancient coral pinnacles and towering kelp-like prehistoric seaweeds, clear turquoise-azure waters with sunbeams descending from surface, 16:9 horizontal perspective, peaceful marine backdrop, no sea monsters.",
+        videoPrompt: "Cinematic 8k IMAX underwater video: Late Cretaceous Western Interior Seaway, 66 million years ago. A titanic 14-meter Mosasaurus hoffmannii propels gracefully through crystalline turquoise waters. Its muscular hydrodynamic body and shark-like vertical tail fluke surge with effortless power. Caustic golden sunlight dances across its slate-grey scales and powerful flippers. In an explosive burst of oceanic speed, it opens its cavernous double-hinged intramandibular jaws revealing curved pterygoid palate teeth, ambushing an ammonite shoal. Volumetric water light shafts, floating marine plankton, BBC Blue Planet cinematography, photorealistic 60fps.",
+        artPrompt: "Museum-grade paleoart painting: Mosasaurus hoffmannii ruling the Cretaceous Maastrichtian epicontinental sea. Dramatic underwater perspective looking upward toward the shimmering sunlit surface, hyper-accurate squamate marine scales, hydrodynamic flippers, crescent tail fluke, surrounded by shoals of prehistoric fish and ammonites, photorealistic rendering, 8k ultra-high definition.",
         vi: {
           tag: "Bò sát biển Mosasauroidea",
           subtitle: "Thương long chúa tể đại dương Kỷ Phấn Trắng",
@@ -6048,6 +6171,11 @@
         btnClassroomText: "Lớp Học",
         btnSnapshotText: "Chụp Ảnh",
         btnRoarText: "Tiếng Gầm",
+        mediaPromptTitle: "✨ Prompt AI Sáng Tạo Video & Tranh 2K",
+        badgePromptVideo: "🎥 Video Prompt (Google Flow / Veo 2 / Sora)",
+        badgePromptArt: "🎨 Tranh 2K Prompt (Midjourney / FLUX)",
+        btnCopyPromptText: "📋 Sao chép",
+        promptCopiedText: "✓ Đã chép!",
         classroomExitText: "Thoát Lớp Học (ESC)",
         diplomaH2: "CHỨNG NHẬN NHÀ KHẢO CỔ NHÍ XUẤT SẮC",
         diplomaP: "Trao tặng cho Nhà thám hiểm dũng cảm đã hoàn thành xuất sắc chuyến du hành thời gian và khám phá trọn vẹn <strong>17/17 Tiêu Bản Đại Trung Sinh</strong> tại Bảo Tàng Khủng Long 3D:",
@@ -6183,6 +6311,11 @@
         btnClassroomText: "Classroom",
         btnSnapshotText: "Snapshot",
         btnRoarText: "Roar FX",
+        mediaPromptTitle: "✨ AI Creative Prompts for Video & Art",
+        badgePromptVideo: "🎥 Video Prompt (Google Flow / Veo 2 / Sora)",
+        badgePromptArt: "🎨 2K Paleoart Prompt (Midjourney / FLUX)",
+        btnCopyPromptText: "📋 Copy Prompt",
+        promptCopiedText: "✓ Copied!",
         classroomExitText: "Exit Classroom (ESC)",
         diplomaH2: "JUNIOR PALEONTOLOGIST DIPLOMA",
         diplomaP: "Awarded to the brave explorer who successfully completed the journey through time and discovered all <strong>17/17 Mesozoic Specimens</strong> in Prehistoric Earth 3D:",
@@ -6852,160 +6985,473 @@
       return roarAudioCtx;
     }
 
+    // HOLLYWOOD BLOCKBUSTER PROCEDURAL ROAR ENGINE (WEB AUDIO API NATIVE)
+    function makeRoarDistortionCurve(k = 36) {
+      const n = 44100;
+      const curve = new Float32Array(n);
+      const deg = Math.PI / 180;
+      for (let i = 0; i < n; i++) {
+        const x = (i * 2) / n - 1;
+        curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+      }
+      return curve;
+    }
+
     function playProceduralRoar() {
       try {
         const ctx = getRoarAudioContext();
         const now = ctx.currentTime;
         const ex = currentExhibit || EXHIBITS[0];
         const dinoId = ex.id || 't_rex';
+        const isVi = currentLang === 'vi';
 
-        // Tự động hạ nhạc nền Epic khi gầm
-        if (isBgmPlaying) fadeBgmVolume(0.03, 200);
+        // Tự động hạ nhạc nền Epic khi gầm để tiếng gầm chiếm trọn không gian âm học
+        if (isBgmPlaying) fadeBgmVolume(0.02, 180);
 
         // Hiệu ứng visual nút gầm
         const btnRoar = document.getElementById('btn-play-roar');
         if (btnRoar) {
           btnRoar.classList.add('roaring');
-          setTimeout(() => btnRoar.classList.remove('roaring'), 2000);
+          setTimeout(() => btnRoar.classList.remove('roaring'), 2400);
         }
 
-        // Rung nhẹ mô hình 3D tạo cảm giác chấn động âm học
+        // Rung chấn động học mô hình 3D (Shockwave tremor)
         if (mainDinoGroup) {
           const origY = mainDinoGroup.position.y;
           let frame = 0;
+          const isMarine = (dinoId === 'mosasaurus' || dinoId === 'liopleurodon');
+          const maxFrames = isMarine ? 32 : 28;
           const shakeInterval = setInterval(() => {
             frame++;
-            if (frame > 25) {
+            if (frame > maxFrames) {
               mainDinoGroup.position.y = origY;
               clearInterval(shakeInterval);
             } else {
-              const delta = Math.sin(frame * 0.8) * 0.04 * (1 - frame / 25);
+              const freq = isMarine ? 0.45 : 0.85;
+              const amp = isMarine ? 0.055 : 0.048;
+              const delta = Math.sin(frame * freq) * amp * (1 - frame / maxFrames);
               mainDinoGroup.position.y = origY + delta;
             }
           }, 35);
         }
 
-        if (dinoId === 'pterosaur') {
-          // Tiếng rít bổng xé gió của Dực Long Pterosaur
+        // 1. MASTER BUS VỚI HOLLYWOOD DYNAMICS COMPRESSOR & LIMITER
+        const masterComp = ctx.createDynamicsCompressor();
+        masterComp.threshold.setValueAtTime(-14, now);
+        masterComp.knee.setValueAtTime(16, now);
+        masterComp.ratio.setValueAtTime(9, now);
+        masterComp.attack.setValueAtTime(0.003, now);
+        masterComp.release.setValueAtTime(0.25, now);
+        masterComp.connect(ctx.destination);
+
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.88, now);
+        masterGain.connect(masterComp);
+
+        // 2. KHÔNG GIAN ÂM HỌC TIỀN SỬ (PREHISTORIC REVERB / SLAPBACK ECHO)
+        const isOcean = (dinoId === 'mosasaurus' || dinoId === 'liopleurodon');
+        const spatialDelay = ctx.createDelay();
+        spatialDelay.delayTime.setValueAtTime(isOcean ? 0.36 : 0.22, now);
+        const spatialFilter = ctx.createBiquadFilter();
+        spatialFilter.type = isOcean ? 'lowpass' : 'bandpass';
+        spatialFilter.frequency.setValueAtTime(isOcean ? 320 : 1100, now);
+        const spatialFeedback = ctx.createGain();
+        spatialFeedback.gain.setValueAtTime(isOcean ? 0.44 : 0.30, now);
+
+        spatialDelay.connect(spatialFilter);
+        spatialFilter.connect(spatialFeedback);
+        spatialFeedback.connect(spatialDelay);
+        spatialFilter.connect(masterGain);
+
+        let toastMsg = "";
+
+        if (dinoId === 'mosasaurus' || dinoId === 'liopleurodon') {
+          // =========================================================================
+          // MOSASAURUS & LIOPLEURODON: THỦY QUÁI ĐẠI DƯƠNG (HYDRO-ACOUSTIC SHOCKWAVE)
+          // =========================================================================
+          toastMsg = isVi ? `🌊 Tiếng gầm thủy quái: ${ex.nameVi} (Sóng hạ âm đại dương)` : `🌊 Hydro-Acoustic Infrasound Roar: ${ex.nameEn}`;
+
+          // Tầng 1: Hạ âm chấn động khối nước (Infrasound 38Hz -> 20Hz)
+          const subOsc = ctx.createOscillator();
+          const subGain = ctx.createGain();
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(38, now);
+          subOsc.frequency.exponentialRampToValueAtTime(20, now + 2.4);
+          subGain.gain.setValueAtTime(0.01, now);
+          subGain.gain.linearRampToValueAtTime(0.85, now + 0.3);
+          subGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+          subOsc.connect(subGain);
+          subGain.connect(masterGain);
+          subGain.connect(spatialDelay);
+          subOsc.start(now);
+          subOsc.stop(now + 2.55);
+
+          // Tầng 2: Gầm gừ sâu thẳm biển sâu có bão hòa phi tuyến
+          const growlOsc = ctx.createOscillator();
+          const growlShaper = ctx.createWaveShaper();
+          growlShaper.curve = makeRoarDistortionCurve(32);
+          const growlFilter = ctx.createBiquadFilter();
+          growlFilter.type = 'lowpass';
+          growlFilter.frequency.setValueAtTime(260, now);
+          const growlGain = ctx.createGain();
+          growlOsc.type = 'sawtooth';
+          growlOsc.frequency.setValueAtTime(84, now);
+          growlOsc.frequency.linearRampToValueAtTime(36, now + 2.2);
+          growlGain.gain.setValueAtTime(0.01, now);
+          growlGain.gain.linearRampToValueAtTime(0.65, now + 0.35);
+          growlGain.gain.exponentialRampToValueAtTime(0.001, now + 2.3);
+          growlOsc.connect(growlShaper);
+          growlShaper.connect(growlFilter);
+          growlFilter.connect(growlGain);
+          growlGain.connect(masterGain);
+          growlGain.connect(spatialDelay);
+          growlOsc.start(now);
+          growlOsc.stop(now + 2.35);
+
+          // Tầng 3: Chuỗi tiếng click định vị siêu âm & sập hàm dưới nước (Cavitation Clicks)
+          for (let i = 0; i < 6; i++) {
+            const clickTime = now + 0.18 + i * 0.12;
+            const clickOsc = ctx.createOscillator();
+            const clickGain = ctx.createGain();
+            const clickFilter = ctx.createBiquadFilter();
+            clickOsc.type = 'triangle';
+            clickOsc.frequency.setValueAtTime(1700 + i * 140, clickTime);
+            clickFilter.type = 'bandpass';
+            clickFilter.frequency.setValueAtTime(1900, clickTime);
+            clickFilter.Q.setValueAtTime(7.0, clickTime);
+            clickGain.gain.setValueAtTime(0.22, clickTime);
+            clickGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.045);
+            clickOsc.connect(clickFilter);
+            clickFilter.connect(clickGain);
+            clickGain.connect(masterGain);
+            clickOsc.start(clickTime);
+            clickOsc.stop(clickTime + 0.05);
+          }
+
+        } else if (dinoId === 'spinosaurus') {
+          // =========================================================================
+          // SPINOSAURUS: BÁN THỦY SINH KEM KEM (JURASSIC PARK 3 CROCODILIAN ROAR)
+          // =========================================================================
+          toastMsg = isVi ? `🐊 Tiếng gầm Spinosaurus (Cộng hưởng bán thủy sinh Kem Kem)` : `🐊 Spinosaurus Semiaquatic Predator Roar`;
+
+          // Giai đoạn 1 (0.0s - 0.4s): Tiếng hít thở & rít đe dọa của cá sấu sông
+          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
+          const nData = noiseBuffer.getChannelData(0);
+          for (let i = 0; i < nData.length; i++) nData[i] = (Math.random() * 2 - 1) * 0.35;
+          const hissSource = ctx.createBufferSource();
+          hissSource.buffer = noiseBuffer;
+          const hissFilter = ctx.createBiquadFilter();
+          hissFilter.type = 'bandpass';
+          hissFilter.frequency.setValueAtTime(1350, now);
+          const hissGain = ctx.createGain();
+          hissGain.gain.setValueAtTime(0.01, now);
+          hissGain.gain.linearRampToValueAtTime(0.3, now + 0.12);
+          hissGain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+          hissSource.connect(hissFilter);
+          hissFilter.connect(hissGain);
+          hissGain.connect(masterGain);
+          hissSource.start(now);
+
+          // Giai đoạn 2 (0.18s - 2.3s): Tiếng gầm bạo liệt xé toang vòm họng
+          const rStart = now + 0.16;
           const osc = ctx.createOscillator();
+          const shaper = ctx.createWaveShaper();
+          shaper.curve = makeRoarDistortionCurve(48); // Bão hòa dã man
+
+          // Bộ lọc Formant đôi mô phỏng buồng họng dài 1.5m của Spinosaurus
+          const f1 = ctx.createBiquadFilter();
+          f1.type = 'peaking';
+          f1.frequency.setValueAtTime(310, rStart);
+          f1.gain.setValueAtTime(10, rStart);
+
+          const f2 = ctx.createBiquadFilter();
+          f2.type = 'peaking';
+          f2.frequency.setValueAtTime(1280, rStart);
+          f2.gain.setValueAtTime(14, rStart);
+
+          // Rung giật màng hầu (LFO Flutter 18Hz)
+          const lfo = ctx.createOscillator();
+          const lfoGain = ctx.createGain();
+          lfo.frequency.setValueAtTime(18, rStart);
+          lfoGain.gain.setValueAtTime(24, rStart);
+          lfo.connect(osc.frequency);
+          lfo.start(rStart);
+          lfo.stop(rStart + 2.15);
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(82, rStart);
+          osc.frequency.linearRampToValueAtTime(36, rStart + 2.0);
+
+          const roarGain = ctx.createGain();
+          roarGain.gain.setValueAtTime(0.01, rStart);
+          roarGain.gain.linearRampToValueAtTime(0.78, rStart + 0.22);
+          roarGain.gain.exponentialRampToValueAtTime(0.001, rStart + 2.15);
+
+          osc.connect(shaper);
+          shaper.connect(f1);
+          f1.connect(f2);
+          f2.connect(roarGain);
+          roarGain.connect(masterGain);
+          roarGain.connect(spatialDelay);
+          osc.start(rStart);
+          osc.stop(rStart + 2.2);
+
+          // Tầng Sub-Bass bổ trợ độ nặng cơ thể 9 tấn
+          const spinoSub = ctx.createOscillator();
+          const spinoSubG = ctx.createGain();
+          spinoSub.type = 'sine';
+          spinoSub.frequency.setValueAtTime(48, rStart);
+          spinoSub.frequency.linearRampToValueAtTime(26, rStart + 1.8);
+          spinoSubG.gain.setValueAtTime(0.01, rStart);
+          spinoSubG.gain.linearRampToValueAtTime(0.55, rStart + 0.25);
+          spinoSubG.gain.exponentialRampToValueAtTime(0.001, rStart + 1.9);
+          spinoSub.connect(spinoSubG);
+          spinoSubG.connect(masterGain);
+          spinoSub.start(rStart);
+          spinoSub.stop(rStart + 1.95);
+
+        } else if (dinoId === 'pterosaur') {
+          // =========================================================================
+          // PTEROSAUR: DỰC LONG BAY BỔ NHÀO (AERIAL DIVE SCREECH)
+          // =========================================================================
+          toastMsg = isVi ? `🦅 Tiếng rít xé gió Dực Long: ${ex.nameVi}` : `🦅 Pterosaur Aerial Dive Screech: ${ex.nameEn}`;
+          const osc = ctx.createOscillator();
+          const shaper = ctx.createWaveShaper();
+          shaper.curve = makeRoarDistortionCurve(25);
           const gain = ctx.createGain();
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(1250, now);
-          osc.frequency.exponentialRampToValueAtTime(420, now + 1.1);
+          osc.frequency.setValueAtTime(1450, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 1.25);
           gain.gain.setValueAtTime(0.01, now);
-          gain.gain.linearRampToValueAtTime(0.28, now + 0.1);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.15);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
+          gain.gain.linearRampToValueAtTime(0.52, now + 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+          osc.connect(shaper);
+          shaper.connect(gain);
+          gain.connect(masterGain);
+          gain.connect(spatialDelay);
           osc.start(now);
-          osc.stop(now + 1.2);
+          osc.stop(now + 1.35);
+
         } else if (dinoId === 'mamenchisaurus') {
-          // Cổ dài 12m: Âm trầm cộng hưởng khoang cổ (Tube Resonator 40Hz)
+          // =========================================================================
+          // MAMENCHISAURUS: CỔ DÀI 12M CỘNG HƯỞNG ỐNG KHÍ QUẢN (SAUROPOD TUBE BELLOW)
+          // =========================================================================
+          toastMsg = isVi ? `🦕 Tiếng gọi bầy hạ âm Cổ Dài: ${ex.nameVi}` : `🦕 Sauropod Infrasound Resonance: ${ex.nameEn}`;
           const osc1 = ctx.createOscillator();
           const osc2 = ctx.createOscillator();
           const filter = ctx.createBiquadFilter();
           const gain = ctx.createGain();
 
           osc1.type = 'triangle';
-          osc1.frequency.setValueAtTime(46, now);
-          osc1.frequency.linearRampToValueAtTime(36, now + 2.2);
+          osc1.frequency.setValueAtTime(42, now);
+          osc1.frequency.linearRampToValueAtTime(32, now + 2.5);
 
           osc2.type = 'sine';
-          osc2.frequency.setValueAtTime(92, now);
-          osc2.frequency.linearRampToValueAtTime(72, now + 2.2);
+          osc2.frequency.setValueAtTime(84, now);
+          osc2.frequency.linearRampToValueAtTime(64, now + 2.5);
 
           filter.type = 'lowpass';
-          filter.frequency.setValueAtTime(170, now);
+          filter.frequency.setValueAtTime(160, now);
 
           gain.gain.setValueAtTime(0.01, now);
-          gain.gain.linearRampToValueAtTime(0.38, now + 0.4);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 2.3);
+          gain.gain.linearRampToValueAtTime(0.68, now + 0.4);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 2.6);
 
           osc1.connect(filter);
           osc2.connect(filter);
           filter.connect(gain);
-          gain.connect(ctx.destination);
+          gain.connect(masterGain);
+          gain.connect(spatialDelay);
 
           osc1.start(now);
           osc2.start(now);
-          osc1.stop(now + 2.35);
-          osc2.stop(now + 2.35);
-        } else {
-          // Khủng long ăn thịt Theropod & Hộ pháp (T-Rex, Giga, Spino...): Infrasound Sub-Bass + Brown Noise
-          const bufferSize = ctx.sampleRate * 2.0;
-          const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-          const output = noiseBuffer.getChannelData(0);
-          let lastOut = 0.0;
-          for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            output[i] = (lastOut + (0.04 * white)) / 1.04;
-            lastOut = output[i];
-            output[i] *= 3.5;
-          }
-          const noise = ctx.createBufferSource();
-          noise.buffer = noiseBuffer;
+          osc1.stop(now + 2.65);
+          osc2.stop(now + 2.65);
 
-          const noiseFilter = ctx.createBiquadFilter();
-          noiseFilter.type = 'lowpass';
-          noiseFilter.frequency.setValueAtTime(260, now);
-          noiseFilter.frequency.exponentialRampToValueAtTime(55, now + 1.8);
-          noiseFilter.Q.setValueAtTime(4.0, now);
-
-          const noiseGain = ctx.createGain();
-          noiseGain.gain.setValueAtTime(0.01, now);
-          noiseGain.gain.linearRampToValueAtTime(0.32, now + 0.15);
-          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.9);
-
-          noise.connect(noiseFilter);
-          noiseFilter.connect(noiseGain);
-          noiseGain.connect(ctx.destination);
-          noise.start(now);
-
-          // Tonal oscillator with throat flutter LFO
+        } else if (dinoId === 'velociraptor') {
+          // =========================================================================
+          // VELOCIRAPTOR: SÁT THỦ THÔNG MINH (AVIAN CHIRP & AGGRESSIVE SCREECH)
+          // =========================================================================
+          toastMsg = isVi ? `⚡ Tiếng rít săn mồi Velociraptor` : `⚡ Velociraptor Pack Screech: ${ex.nameEn}`;
           const osc = ctx.createOscillator();
-          const oscGain = ctx.createGain();
+          const shaper = ctx.createWaveShaper();
+          shaper.curve = makeRoarDistortionCurve(35);
+          const gain = ctx.createGain();
           osc.type = 'sawtooth';
-          const baseFreq = (dinoId === 't_rex' || dinoId === 'giganotosaurus' || dinoId === 'spinosaurus') ? 48 : 62;
-          osc.frequency.setValueAtTime(baseFreq, now);
-          osc.frequency.linearRampToValueAtTime(baseFreq * 0.65, now + 1.7);
+          osc.frequency.setValueAtTime(720, now);
+          osc.frequency.exponentialRampToValueAtTime(280, now + 0.85);
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.6, now + 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+          osc.connect(shaper);
+          shaper.connect(gain);
+          gain.connect(masterGain);
+          gain.connect(spatialDelay);
+          osc.start(now);
+          osc.stop(now + 0.95);
 
+        } else {
+          // =========================================================================
+          // T-REX, GIGANOTOSAURUS, CARNOTAURUS, ALLOSAURUS & KHỦNG LONG ĐỈNH CAO
+          // =========================================================================
+          const isRex = (dinoId === 't_rex');
+          const isGiga = (dinoId === 'giganotosaurus');
+          toastMsg = isRex 
+            ? (isVi ? `👑 Tiếng gầm bạo chúa T-Rex (Sấm sét hẻm núi)` : `👑 T-Rex Apex Predator Thunder Roar`)
+            : (isVi ? `📢 Tiếng gầm sinh học Hollywood: ${ex.nameVi}` : `📢 Hollywood Blockbuster Roar: ${ex.nameEn}`);
+
+          // Hạ âm Sub-bass chấn động lồng ngực (32Hz - 54Hz)
+          const baseFreq = isGiga ? 42 : (isRex ? 48 : 58);
+          const subOsc = ctx.createOscillator();
+          const subGain = ctx.createGain();
+          subOsc.type = 'sine';
+          subOsc.frequency.setValueAtTime(baseFreq, now);
+          subOsc.frequency.linearRampToValueAtTime(baseFreq * 0.6, now + 1.9);
+          subGain.gain.setValueAtTime(0.01, now);
+          subGain.gain.linearRampToValueAtTime(0.65, now + 0.2);
+          subGain.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
+          subOsc.connect(subGain);
+          subGain.connect(masterGain);
+          subOsc.start(now);
+          subOsc.stop(now + 2.05);
+
+          // Luồng âm vòm họng bão hòa Overdrive kinh điển
+          const osc = ctx.createOscillator();
+          const shaper = ctx.createWaveShaper();
+          shaper.curve = makeRoarDistortionCurve(isRex ? 44 : 38);
+
+          const f1 = ctx.createBiquadFilter();
+          f1.type = 'peaking';
+          f1.frequency.setValueAtTime(360, now);
+          f1.gain.setValueAtTime(8, now);
+
+          const f2 = ctx.createBiquadFilter();
+          f2.type = 'peaking';
+          f2.frequency.setValueAtTime(isRex ? 1420 : 1150, now);
+          f2.gain.setValueAtTime(11, now);
+
+          // Rung màng cổ LFO
           const lfo = ctx.createOscillator();
           const lfoGain = ctx.createGain();
-          lfo.frequency.setValueAtTime(14, now);
-          lfoGain.gain.setValueAtTime(18, now);
+          lfo.frequency.setValueAtTime(15, now);
+          lfoGain.gain.setValueAtTime(20, now);
           lfo.connect(osc.frequency);
           lfo.start(now);
-          lfo.stop(now + 1.8);
+          lfo.stop(now + 1.9);
 
-          const oscFilter = ctx.createBiquadFilter();
-          oscFilter.type = 'lowpass';
-          oscFilter.frequency.setValueAtTime(220, now);
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(baseFreq * 1.5, now);
+          osc.frequency.linearRampToValueAtTime(baseFreq * 0.75, now + 1.85);
 
-          oscGain.gain.setValueAtTime(0.01, now);
-          oscGain.gain.linearRampToValueAtTime(0.42, now + 0.12);
-          oscGain.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+          const roarGain = ctx.createGain();
+          roarGain.gain.setValueAtTime(0.01, now);
+          roarGain.gain.linearRampToValueAtTime(0.75, now + 0.15);
+          roarGain.gain.exponentialRampToValueAtTime(0.001, now + 1.95);
 
-          osc.connect(oscFilter);
-          oscFilter.connect(oscGain);
-          oscGain.connect(ctx.destination);
+          osc.connect(shaper);
+          shaper.connect(f1);
+          f1.connect(f2);
+          f2.connect(roarGain);
+          roarGain.connect(masterGain);
+          roarGain.connect(spatialDelay);
           osc.start(now);
-          osc.stop(now + 1.85);
+          osc.stop(now + 2.0);
+
+          // Hơi thở cuồng nộ (Turbulent air turbulence)
+          const bSize = ctx.sampleRate * 1.8;
+          const nBuf = ctx.createBuffer(1, bSize, ctx.sampleRate);
+          const out = nBuf.getChannelData(0);
+          let lastOut = 0.0;
+          for (let i = 0; i < bSize; i++) {
+            const white = Math.random() * 2 - 1;
+            out[i] = (lastOut + (0.04 * white)) / 1.04;
+            lastOut = out[i];
+            out[i] *= 2.8;
+          }
+          const nSrc = ctx.createBufferSource();
+          nSrc.buffer = nBuf;
+          const nFilt = ctx.createBiquadFilter();
+          nFilt.type = 'lowpass';
+          nFilt.frequency.setValueAtTime(280, now);
+          nFilt.frequency.exponentialRampToValueAtTime(50, now + 1.8);
+          const nGain = ctx.createGain();
+          nGain.gain.setValueAtTime(0.01, now);
+          nGain.gain.linearRampToValueAtTime(0.38, now + 0.18);
+          nGain.exponentialRampToValueAtTime ? nGain.gain.exponentialRampToValueAtTime(0.001, now + 1.85) : nGain.gain.linearRampToValueAtTime(0, now + 1.85);
+          nSrc.connect(nFilt);
+          nFilt.connect(nGain);
+          nGain.connect(masterGain);
+          nSrc.start(now);
         }
 
-        // Hồi phục nhạc nền sau 2 giây
+        // Tự động phục hồi nhạc nền Epic sau khi gầm xong
         setTimeout(() => {
-          if (isBgmPlaying && !isPlayingAudio) fadeBgmVolume(normalBgmVolume, 600);
-        }, 2100);
+          if (isBgmPlaying && !isPlayingAudio) fadeBgmVolume(normalBgmVolume, 650);
+        }, 2350);
 
-        showSeasonToast(currentLang === 'vi' ? `📢 Tiếng gầm sinh học: ${ex.nameVi}` : `📢 Biological Roar: ${ex.nameEn}`);
+        showSeasonToast(toastMsg);
       } catch (err) {
-        console.warn('Web Audio Roar error:', err);
+        console.warn('Hollywood Roar error:', err);
       }
     }
 
     const btnPlayRoar = document.getElementById('btn-play-roar');
     if (btnPlayRoar) {
       btnPlayRoar.addEventListener('click', playProceduralRoar);
+    }
+
+    // Sao chép Prompt AI Sáng Tạo Video & Tranh 2K
+    function copyPromptToClipboard(text, btnElem, successLabelVi, successLabelEn) {
+      const isVi = currentLang === 'vi';
+      const labelElem = btnElem ? btnElem.querySelector('.copy-text') : null;
+      const originalText = labelElem ? labelElem.textContent : '📋 Sao chép';
+
+      function markSuccess() {
+        if (btnElem) btnElem.classList.add('copied');
+        if (labelElem) labelElem.textContent = isVi ? successLabelVi : successLabelEn;
+        showSeasonToast(isVi ? '📋 Đã sao chép prompt vào bộ nhớ tạm!' : '📋 Prompt copied to clipboard!');
+        setTimeout(() => {
+          if (btnElem) btnElem.classList.remove('copied');
+          if (labelElem) labelElem.textContent = originalText;
+        }, 1800);
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(markSuccess).catch(() => {
+          fallbackCopyText(text);
+          markSuccess();
+        });
+      } else {
+        fallbackCopyText(text);
+        markSuccess();
+      }
+    }
+
+    function fallbackCopyText(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) { }
+      document.body.removeChild(ta);
+    }
+
+    const btnCopyVidPrompt = document.getElementById('btn-copy-video-prompt');
+    if (btnCopyVidPrompt) {
+      btnCopyVidPrompt.addEventListener('click', () => {
+        const pElem = document.getElementById('exhibit-video-prompt-text');
+        if (pElem) copyPromptToClipboard(pElem.textContent.trim(), btnCopyVidPrompt, '✓ Đã chép Video!', '✓ Copied Video!');
+      });
+    }
+
+    const btnCopyArtPrompt = document.getElementById('btn-copy-art-prompt');
+    if (btnCopyArtPrompt) {
+      btnCopyArtPrompt.addEventListener('click', () => {
+        const pElem = document.getElementById('exhibit-art-prompt-text');
+        if (pElem) copyPromptToClipboard(pElem.textContent.trim(), btnCopyArtPrompt, '✓ Đã chép Tranh!', '✓ Copied Art!');
+      });
     }
 
     // =========================================================================
@@ -7975,6 +8421,14 @@
       if (imageCaption) {
         imageCaption.textContent = ex.imageTitle || `${isVi ? ex.nameVi : ex.nameEn} — Trực quan 2K`;
       }
+
+      // Cập nhật Prompt AI Sáng Tạo Video & Tranh 2K
+      const videoPromptElem = document.getElementById('exhibit-video-prompt-text');
+      const artPromptElem = document.getElementById('exhibit-art-prompt-text');
+      const defaultVideoPrompt = `Cinematic 8k documentary video: ${ex.nameEn} in its natural prehistoric habitat, ${ex.formation || 'Mesozoic ecosystem'}. Dynamic tracking shot, accurate biomechanics, volumetric sunlight, photorealistic 60fps.`;
+      const defaultArtPrompt = ex.prompt || `Masterpiece museum paleoart: ${ex.nameEn} in late Cretaceous environment, photorealistic 8k detail, ultra-high resolution.`;
+      if (videoPromptElem) videoPromptElem.textContent = ex.videoPrompt || defaultVideoPrompt;
+      if (artPromptElem) artPromptElem.textContent = ex.artPrompt || defaultArtPrompt;
 
       // Cập nhật dossier địa tầng trong Paleo Modal
       const dForm = document.getElementById('dossier-formation');
